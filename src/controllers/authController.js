@@ -1,9 +1,14 @@
 import dotenv from 'dotenv';
 import twilio from 'twilio';
-import jsonwebtoken from 'jsonwebtoken';
 import bcryptjs from 'bcryptjs';
+import { Op } from 'sequelize';
+import constants from '../utils/constants.js';
+import { hash, hash_compare } from '../utils/hashing.js';
+import jsonwebtoken from 'jsonwebtoken';
 import User from "../models/authModel.js";
 import Config from '../config/authConfig.js';
+import { RoleContext } from 'twilio/lib/rest/conversations/v1/role.js';
+import Roles from '../models/roleModel.js';
 
 dotenv.config();
 
@@ -14,24 +19,42 @@ const client = twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, {
 })
 
 
-export const Signup = (req, res) => {
+export const Signup = async (req, res) => {
     try {
       const username = req.body.username;
       const email = req.body.email;
       const password = req.body.password;
       const confirm_password = req.body.confirm_password;
-  
-      if(password !== confirm_password) {
-          console.log("Passwords Do not Match")
-      } else if(!email || !password || !confirm_password) {
-         console.log("Please Provide All Fields")
-      } else {
-         User.create({
-          email: email,
-          username: username,
-          password: bcryptjs.hashSync(password, 8)
-         })
+
+      let user = await User.findOne({where: {[Op.or]: [{username}, {email}]}});
+      if(user) {
+        res.status(422).send({msg: "Username or Email Already Exists"});
       }
+
+      const settings = {
+        notification: {
+            push: true,
+            email: true
+        }
+      }
+
+      if(password !== confirm_password) {
+        console.log("Passwords Do not Match")
+    } else if(!email || !password || !confirm_password) {
+       console.log("Please Provide All Fields")
+    } else {
+      user =   User.create({
+         email: email,
+         username: username,
+         password: bcryptjs.hashSync(password, 8),
+         settings
+        })
+
+        return user;
+      
+     }
+
+  
       return res.status(201).send("User Created Successfully"); 
     } catch (err) {
        res.status(500).send({message: err.message});

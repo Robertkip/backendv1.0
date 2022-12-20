@@ -1,18 +1,23 @@
 import Apartment from "../models/apartmentModel.js";
+import fs from 'fs';
 import multer from "multer";
 import path from "path";
 
 export const apartmentUpload = async (req, res, next) => {
    try {
-     let apartment = {
+      console.log(req.file);
+     Apartment.create({
       apartment_name:req.body.apartment_name,
       apartment_description:req.body.apartment_description,
       apartment_location:req.body.apartment_location,
-      image: req.file.path
-     }
-  
-     Apartment.create(apartment);
-     return res.status(201).send("User Created Successfully"); 
+       
+   }).then((image) => {
+      fs.writeFileSync(
+         __basedir + "/resources/static/assets/tmp" + image.name,
+         image.data
+      );
+      return res.send(`File Uploaded`);
+   });
    } catch (err) {
       res.status(500).send({message: err.message});
    }
