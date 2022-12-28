@@ -1,23 +1,23 @@
 import multer from "multer";
+import util from "util";
 
-const imageFilter = (req, file, cb) => {
-    if(file.mimetype.startsWith("image")) {
-        cb(null, true)
-    } else {
-      cb("Please upload only images", false);
-    }
-}
+const maxSize = 2 * 1024 * 1024;
 
-var storage = multer.diskStorage({
+let storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, __basedir + "/resources/static/assets/uploads");
+        cb(null, __basedir + "/resources/static/assets/uploads/");
     },
     filename: (req, file, cb) => {
-        cb(null, `${Date.now()}-waridi-${file.originalname}`);
+        console.log(file.originalname);
+        cb(null, file.originalname);
     },
 });
 
-var uploadFile = multer({storage: storage, fileFilter: imageFilter})
+let uploadFile = multer({
+    storage: storage,
+    limits: {fileSize: maxSize},
+}).single("file");
 
-export default uploadFile;
+let uploadFileMiddleware = util.promisify(uploadFile);
 
+export default uploadFileMiddleware;

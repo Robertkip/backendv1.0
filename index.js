@@ -3,13 +3,26 @@ import express from "express";
 import cors from 'cors';
 import helmet from "helmet";
 import logger from 'morgan';
+import path from "path";
+import url from "url";
 import apartmentRouter from './src/routers/apartmentRoute.js';
 import authRouter from './src/routers/authRoute.js';
-
+import roleRouter from './src/routers/roles.js';
+import permissionRouter from './src/routers/permission.js';
 
 const app = express();
+
+
+const __filename = url.fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+console.log(__dirname);
+
+global.__basedir = __dirname;
+
+console.log(__basedir);
+
 let corsOptions = {
-    localhost: "http://192.168.0.37:8084"
+    localhost: "http://192.168.0.28:8084"
 };
 
 // const Roles = db.roles;
@@ -23,11 +36,14 @@ app.use(express.json());
 app.use(helmet());
 app.use(logger('common'));
 
+app.use("/images", express.static('Images'));
 
 app.use("/api/v1", apartmentRouter);
 app.use("/api/v1", authRouter);
+app.use("/api/v1", roleRouter);
+app.use("/api/v1", permissionRouter);
 
-app.listen(PORT, '192.168.0.37', () => {
+app.listen(PORT, '192.168.0.28', () => {
     console.log(`Server is running on port`)
 })
 
