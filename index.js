@@ -7,11 +7,11 @@ import path from "path";
 import url from "url";
 import apartmentRouter from './src/routers/apartmentRoute.js';
 import authRouter from './src/routers/authRoute.js';
-import roleRouter from './src/routers/roles.js';
+import roleRouter from './src/routers/roleRoute.js';
 import permissionRouter from './src/routers/permission.js';
+import marketRouter from "./src/routers/marketRoute.js";
 
 const app = express();
-
 
 const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -22,7 +22,7 @@ global.__basedir = __dirname;
 console.log(__basedir);
 
 let corsOptions = {
-    localhost: "http://192.168.0.28:8084"
+    localhost: "http://192.168.0.37:8084"
 };
 
 // const Roles = db.roles;
@@ -42,8 +42,9 @@ app.use("/api/v1", apartmentRouter);
 app.use("/api/v1", authRouter);
 app.use("/api/v1", roleRouter);
 app.use("/api/v1", permissionRouter);
+app.use("/api/v1", marketRouter);
 
-app.listen(PORT, '192.168.0.28', () => {
+app.listen(PORT, '192.168.0.37', () => {
     console.log(`Server is running on port`)
 })
 

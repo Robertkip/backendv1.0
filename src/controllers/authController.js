@@ -6,8 +6,8 @@ import constants from '../utils/constants.js';
 import { hash, hash_compare } from '../utils/hashing.js';
 import jsonwebtoken from 'jsonwebtoken';
 import User from "../models/authModel.js";
-import Config from '../config/authConfig.js';
-import Roles from '../models/role.js';
+import * as PasswordHelper from "../helpers/passwordHelper.js";
+import * as Helper from "../helpers/helper.js";
 dotenv.config();
 
 const {TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_SERVICE_SID} = process.env;
@@ -23,6 +23,9 @@ export const Signup = async (req, res) => {
       const email = req.body.email;
       const password = req.body.password;
       const confirm_password = req.body.confirm_password;
+      const active = req.body.active;
+      const verified = req.body.verified;
+      const roleId = req.body.roleId
 
       let user = await User.findOne({where: {[Op.or]: [{username}, {email}]}});
 
@@ -45,23 +48,17 @@ export const Signup = async (req, res) => {
     } else if(!email || !password || !confirm_password) {
        console.log("Please Provide All Fields")
     } else {
-        Roles.findOne({
-            where: {
-                role_name: 'superadmin'
-            }
-        }).then((role) => {
-            console.log(role.id);
-            user =   User.create({
+          const user =   User.create({
                 email: email,
                 username: username,
                 password: bcryptjs.hashSync(password, 8),
-                role_id: req.id,
+                active: active,
+                verified: verified,
+                roleId: roleId,
                 settings
                })
        
-               return user;
-        })
-     
+               return user;  
       
      }
   
@@ -72,37 +69,56 @@ export const Signup = async (req, res) => {
     }
   }
   
-  export const Signin = (req, res) => {
+  export const Signin = async (req, res) => {
       try {
-          User.findOne({
-              where: {email: req.body.email}
-          }).then(user => {
-              if(!user){
-                  return res.status(404).send({message: "User not Found."});
-              }
-  
-              let validPassword = bcryptjs.compareSync(
-                  req.body.password,
-                  user.password
-              );
-  
-              if(!validPassword) {
-                  return res.status(401).send({
-                      accessToken: null,
-                      message: "Invalid Password"
-                  });
-              }
-  
-              let token = jsonwebtoken.sign({id: user.id}, Config.secret, {
-                  expiresIn: 86400,
-              });
-              res.status(200).send({
-                  id: user.id,
-                  email: user.email,
-                  password: user.password,
-                  accessToken: token
-              })
-          }) 
+        const {email, password} = req.body;
+         const user = await User.findOne({
+              where: {email: email}
+          })
+          if(!user) {
+            return res.status(401).send({msg: "Unauthorized"});
+          }
+
+          const matched = await PasswordHelper.PasswordCompare(password, user.password);
+          if(!matched){
+            return res.status(401).send({msg: "Unauthorized"});
+          }
+
+          const dataUser = {
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            roleId: user.roleId,
+            password: user.password,
+            confirm_password: user.confirm_password,
+            verified: user.verified,
+            active: user.active
+          }
+
+          const token = Helper.GenerateToken(dataUser);
+          const refreshToken = Helper.GenerateRefreshToken(dataUser);
+
+          user.accessToken = refreshToken;
+
+
+          await user.save();
+          res.cookie('refreshToken', refreshToken, {
+			httpOnly: true,
+			maxAge: 24 * 60 * 60 * 1000
+		});
+
+    const responseUser = {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      roleId: user.roleId,
+      verified: user.verified,
+      active: user.active,
+      token: token,
+    }
+
+        return res.status(200).send(responseUser);
+
       } catch (err) {
           res.status(500).send({ message: err.message });
       }
@@ -136,6 +152,3 @@ export const Signup = async (req, res) => {
        res.status(error?.status || 400).send(error?.message || `Something went wrong`);
     }
   }
-
-  
-  
