@@ -3,13 +3,13 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-// let userData = {
-//     username,
-//     email,
-//     roleId,
-//     verified,
-//     active,
-// };
+function userData () {
+   username;
+    email;
+    roleId;
+    verified;
+   active;
+};
 
 export const ResponseData = (status, data, message) =>  {
    let res = {
@@ -39,6 +39,7 @@ export const ExtractToken = (token) => {
         if(err){
             resData = null;
         } else {
+            console.log(resData);
             resData = decoded
         }
     });
@@ -62,7 +63,7 @@ export const ExtractRefreshToken = (token) => {
     });
 
     if(resData) {
-        const result = userData(resData);
+        const result = resData;
         return result;
     }
     return null;

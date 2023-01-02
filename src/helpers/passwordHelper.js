@@ -9,5 +9,3 @@ export const PasswordCompare = async (password, passwordHashing) => {
     const matched = await bcrypt.compare(password, passwordHashing);
     return matched;
 };
-
-
