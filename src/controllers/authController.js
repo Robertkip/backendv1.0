@@ -16,7 +16,6 @@ const client = twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, {
     lazyLoading: true
 })
 
-
 export const Signup = async (req, res) => {
     try {
       const username = req.body.username;

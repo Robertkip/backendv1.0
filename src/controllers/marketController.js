@@ -5,7 +5,7 @@ import Market from "../models/marketModel.js";
 
 export const createMarket = (req, res) => {
     try {
-        const product_image = "http://192.168.0.37:8084/images/" + req.file.filename;
+        const product_image = "http://192.168.0.28:8084/images/" + req.file.filename;
         Market.create({
             product_name: req.body.product_name,
             product_description: req.body.product_description,

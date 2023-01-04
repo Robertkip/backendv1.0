@@ -22,7 +22,7 @@ global.__basedir = __dirname;
 console.log(__basedir);
 
 let corsOptions = {
-    localhost: "http://192.168.0.37:8084"
+    localhost: "http://192.168.0.28:8084"
 };
 
 // const Roles = db.roles;
@@ -44,7 +44,7 @@ app.use("/api/v1", roleRouter);
 app.use("/api/v1", permissionRouter);
 app.use("/api/v1", marketRouter);
 
-app.listen(PORT, '192.168.0.37', () => {
+app.listen(PORT, '192.168.0.28', () => {
     console.log(`Server is running on port`)
 })
 
