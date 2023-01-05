@@ -3,13 +3,15 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-function userData () {
-   username;
-    email;
-    roleId;
-    verified;
-   active;
-};
+let userData = {};
+
+let {
+   username,
+    email,
+    roleId,
+    verified,
+   active,
+} = userData;
 
 export const ResponseData = (status, data, message) =>  {
    let res = {
@@ -21,7 +23,7 @@ export const ResponseData = (status, data, message) =>  {
 } 
 
 export const GenerateToken = (data) => {
-    const token = jwt.sign(data, process.env.JWT_TOKEN, {expiresIn: "20s"});
+    const token = jwt.sign(data, process.env.JWT_TOKEN, {expiresIn: "1d"});
 
     return token
 }
@@ -39,13 +41,12 @@ export const ExtractToken = (token) => {
         if(err){
             resData = null;
         } else {
-            console.log(resData);
-            resData = decoded
+            resData = decoded;
         }
     });
 
     if(resData) {
-        const result = resData;
+        const result =resData;
         return result;
     }
     return null;

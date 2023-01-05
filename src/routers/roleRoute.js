@@ -4,6 +4,6 @@ import * as Authorization from "../middlewares/authorizationPermission.js";
 
 const router = express.Router();
 
-router.post("/role", Authorization.AdminRole,  RoleController.CreateRole)
+router.post("/role",Authorization.Authenticated,  Authorization.AdminRole,  RoleController.CreateRole)
 
 export default router;

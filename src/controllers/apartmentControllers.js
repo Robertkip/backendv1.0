@@ -1,6 +1,5 @@
 import multer from "multer";
 import path from "path";
-import fs from "fs";
 import Apartment from "../models/apartmentModel.js";
 
 export const uploadApartment = (req, res) => {
