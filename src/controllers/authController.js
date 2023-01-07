@@ -44,7 +44,7 @@ export const Signup = async (req, res) => {
     } else if(!email || !password || !confirm_password) {
        console.log("Please Provide All Fields")
     } else {
-          const user =   User.create({
+        const usercreate =  User.create({
                 email: email,
                 username: username,
                 password: bcryptjs.hashSync(password, 8),
@@ -52,15 +52,22 @@ export const Signup = async (req, res) => {
                 verified: verified,
                 roleId: roleId,
                 settings
-               })
-       
-               return user;  
-      
-     }
-  
-      return res.status(201).send("User Created Successfully"); 
+               });       
 
-    } catch (err) {
+        console.log(usercreate);
+
+        const responseUser = {
+                id: usercreate.id,
+                username: usercreate.username,
+                email: usercreate.email,
+                roleId: usercreate.roleId,
+                verified: usercreate.verified,
+                active: usercreate.active,
+              }         
+       
+      return res.status(201).send(responseUser);     
+     }
+  } catch (err) {
        res.status(500).send({message: err.message});
     }
   }
