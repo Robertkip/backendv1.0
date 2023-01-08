@@ -4,10 +4,10 @@ import Apartment from "../models/apartmentModel.js";
 
 export const uploadApartment = (req, res) => {
     try {
-        const name1 = "http://192.168.0.28:8084/images/" + req.files[0].filename;
-        const name2 = "http://192.168.0.28:8084/images/" + req.files[1].filename;
-        const name3 = "http://192.168.0.28:8084/images/" + req.files[2].filename;
-        const name4 = "http://192.168.0.28:8084/images/" + req.files[3].filename;
+        const name1 = "http://192.168.0.37:8084/images/" + req.files[0].filename;
+        const name2 = "http://192.168.0.37:8084/images/" + req.files[1].filename;
+        const name3 = "http://192.168.0.37:8084/images/" + req.files[2].filename;
+        const name4 = "http://192.168.0.37:8084/images/" + req.files[3].filename;
 
          Apartment.create({
           apartment_name : req.body.apartment_name,
@@ -43,6 +43,20 @@ export const getAllApartments = async (req, res) => {
        return res.status(200).send(data);
     });
 }
+
+export const getApartmentById = async (req, res) => {
+   const p_id = req.params.id;
+     Apartment.findByPk(p_id).then(apartment => {
+       if(!apartment){
+           res.status(404).json({message: "Apartment not found"});
+           next();
+       } else {
+        return res.json(apartment);
+       }
+     })
+     .catch((error) =>  next(error));
+}
+
 
 const storage = multer.diskStorage({
    destination: (req, file, cb) => {

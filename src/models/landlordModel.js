@@ -1,28 +1,33 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../config/connectDb";
 
-const Agent = sequelize.define('Agent', {
-    agent_fname: {
+const Landlord = sequelize.define('Landlord', {
+    apartment_id: {
+    
+    },
+    landlord_fname: {
         type: DataTypes.STRING,
     },
-    agent_lname: {
+    landlord_lname: {
         type: DataTypes.STRING,
     },
-    agent_phonenumber: {
+    landlord_id: {
         type: DataTypes.INTEGER,
     },
-    agent_idno: {
+    landlord_phonenumber: {
         type: DataTypes.INTEGER,
     },
-    agent_location: {
-        type: DataTypes.STRING,
+    landlord_location: {
+        type: DataTypes.INTEGER,
     },
-    agent_avatar: {
+    landlord_avatar: {
         type: DataTypes.STRING
     },
     type: {
-        type: DataTypes.BLOB
+        type: DataTypes.BLOB,
     },
 });
 
-export default Agent;
+export default Landlord; 
+
+
