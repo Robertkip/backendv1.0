@@ -1,5 +1,5 @@
 import express from 'express';
-import * as tenantController from '../controllers/tenantController';
+import * as tenantController from '../controllers/tenantController.js';
 
 const router = express.Router();
 

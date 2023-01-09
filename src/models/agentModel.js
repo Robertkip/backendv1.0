@@ -1,7 +1,11 @@
 import { DataTypes } from "sequelize";
-import { sequelize } from "../config/connectDb";
+import { sequelize } from "../config/connectDb.js";
+import User from "./authModel.js";
 
 const Agent = sequelize.define('Agent', {
+    userId: {
+      type: DataTypes.INTEGER,
+    },
     agent_fname: {
         type: DataTypes.STRING,
     },
@@ -26,3 +30,10 @@ const Agent = sequelize.define('Agent', {
 });
 
 export default Agent;
+
+Agent.associations = (models) => {
+  Agent.belongsTo(User, {
+    foreignKey: 'userId',
+  })
+  return Agent;
+};

@@ -1,15 +1,19 @@
-import { sequelize } from "../config/connectDb";
-import { DataTypes, STRING } from "sequelize";
+import { sequelize } from "../config/connectDb.js";
+import { DataTypes} from "sequelize";
+import User from "./authModel.js";
 
 const Tenant = sequelize.define('Tenant',{
+    userId: {
+     type: DataTypes.INTEGER,
+    },
     tenant_fname: {
         type: DataTypes.STRING
     },
     tenant_lname:{
-        type: STRING,
+        type: DataTypes.STRING,
     },
     tenant_location: {
-        type: STRING,
+        type: DataTypes.STRING,
     },
     tenant_id: {
         type: DataTypes.INTEGER,
@@ -23,9 +27,13 @@ const Tenant = sequelize.define('Tenant',{
     type: {
         type: DataTypes.STRING,
     },
-    data: {
-        type: DataTypes.BLOB
-    }
 });
+
+Tenant.associations = (models) => {
+    Tenant.belongsTo(User, {
+       foreignKey: 'userId',
+    })
+   return Tenant; 
+}
 
 export default Tenant;

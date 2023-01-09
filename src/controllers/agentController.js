@@ -1,18 +1,19 @@
-import Agent from "../models/agentModel";
+import Agent from "../models/agentModel.js";
 import { Op } from "sequelize";
 import multer from "multer";
 import path from "path";
 
  
 export const registerAgent = async (req, res) => {
+    const userId = req.body.userId;
     const agent_fname = req.body.agent_fname;
     const agent_lname = req.body.agent_lname;
-    const agent_phonenumber = req.body.agent_number;
+    const agent_phonenumber = req.body.agent_phonenumber;
     const agent_idno = req.body.agent_idno;
     const agent_location = req.body.agent_location;
     const agent_avatar = req.file.filename;
 
-    const agent = await Agent.findOne({where: { [Op.or]: [{agent_idno}, {agent_number}]}})
+    const agent = await Agent.findOne({where: { [Op.or]: [{agent_idno}, {agent_phonenumber}]}})
 
     if(!agent_fname || !agent_lname || !agent_phonenumber || !agent_idno){
        res.status(400).json({msg: "Please Provide All Fields"})
@@ -20,6 +21,7 @@ export const registerAgent = async (req, res) => {
         res.status(400).json({msg: "User with that name does not exist"});
     } else {
         Agent.create({
+            userId,
             agent_fname,
             agent_lname,
             agent_phonenumber,
@@ -27,6 +29,8 @@ export const registerAgent = async (req, res) => {
             agent_location,
             agent_avatar,
             type: req.file.mimetype,
+        }).then(data => {
+            res.status(201).send(data);
         })
     }
 }

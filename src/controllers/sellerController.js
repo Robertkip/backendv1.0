@@ -1,9 +1,10 @@
-import Seller from "../models/sellerModel";
+import Seller from "../models/sellerModel.js";
 import multer from "multer";
 import path from "path";
 
 export const registerSeller = (req, res) => {
     try {
+        const userId = req.body.userId;
         const seller_fname = req.body.seller_name;
         const seller_lname = req.body.seller_lname;
         const seller_id = req.body.seller_id;
@@ -11,6 +12,7 @@ export const registerSeller = (req, res) => {
         const seller_avatar = "http://192.168.0.37:8084/" + req.file.filename;
 
         Seller.create({
+            userId,
             seller_fname,
             seller_lname,
             seller_id,
@@ -26,6 +28,7 @@ export const registerSeller = (req, res) => {
         res.status(404).send({msg: "Error Creating User"});
     }
 }
+
 
 export const getAllSeller = async (req, res, next) => {
    await Seller.findAll().then(data => {

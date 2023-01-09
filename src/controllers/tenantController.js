@@ -1,9 +1,11 @@
 import multer from "multer";
+import { Op } from "sequelize";
 import path from "path";
-import Tenant from "../models/tenantModel";
+import Tenant from "../models/tenantModel.js";
 
 export const registerTenant = async (req, res) => {
     try {
+        const userId = req.body.userId;
         const tenant_fname = req.body.tenant_name;
         const tenant_lname = req.body.tenant_lname;
         const tenant_id =    req.body.tenant_id;
@@ -26,6 +28,7 @@ export const registerTenant = async (req, res) => {
            console.log("Please Provide All Fields")
         } else {    
         Tenant.create({
+            userId,
             tenant_fname,
             tenant_lname,
             tenant_id,

@@ -1,17 +1,18 @@
 import multer from "multer";
 import path from "path";
-import Landlord from "../models/landlordModel";
+import Landlord from "../models/landlordModel.js";
 
 export const registerLandlord = async (req, res) => {
     try {
+        const userId = req.body.userId;
         const landlord_fname = req.body.landlord_name;
         const landlord_lname = req.body.landlord_lname;
-        const landlord_id =    req.body.landlord_id;
+        const landlord_idno =    req.body.landlord_idno;
         const landlord_phonenumber = req.body.landlord_phonenumber;
         const landlord_location = req.body.landlord_location;
         const landlord_avatar = "http://192.168.0.37:8084/" + req.file.filename;
 
-        let landlord = await Landlord.findOne({where: {[Op.or]: [{landlord_id}, {landlord_phonenumber}]}});
+        let landlord = await Landlord.findOne({where: {[Op.or]: [{landlord_idno}, {landlord_phonenumber}]}});
 
         if(!req.body.landlord_id || !req.body.landlord_phonenumber) {
             res.status(400).send({
@@ -26,9 +27,10 @@ export const registerLandlord = async (req, res) => {
            console.log("Please Provide All Fields")
         } else {    
         Landlord.create({
+            userId,
             landlord_fname,
             landlord_lname,
-            landlord_id,
+            landlord_idno,
             landlord_phonenumber,
             landlord_location,
             landlord_avatar,
@@ -64,15 +66,14 @@ export const getLandlordById = async (req, res, next) => {
   }).catch((error) => next(error));
 }
 
-
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, __basedir + 'Images');
+      cb(null, __basedir, 'Image')
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.filename));
-  } 
-});
+     cb(null, Date.now() + path.extname(file.originalname));
+  }
+})
 
 export const upload = multer({
     storage: storage,

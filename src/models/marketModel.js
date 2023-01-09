@@ -1,7 +1,12 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../config/connectDb.js";
+import Seller from "./sellerModel.js";
 
 const Market = sequelize.define('Market', {
+    sellerId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+    },
     product_name: {
         type: DataTypes.STRING
     },
@@ -23,3 +28,10 @@ const Market = sequelize.define('Market', {
 })
 
 export default Market;
+
+Market.associations = (models) => {
+    Market.belongsTo(Seller, {
+        foreignKey: 'sellerId',
+    })
+   return Seller;   
+}
