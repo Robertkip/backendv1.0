@@ -1,47 +1,36 @@
 import multer from "multer";
 import path from "path";
+import { Op } from "sequelize";
 import Landlord from "../models/landlordModel.js";
 
 export const registerLandlord = async (req, res) => {
-    try {
-        const userId = req.body.userId;
-        const landlord_fname = req.body.landlord_name;
-        const landlord_lname = req.body.landlord_lname;
-        const landlord_idno =    req.body.landlord_idno;
-        const landlord_phonenumber = req.body.landlord_phonenumber;
-        const landlord_location = req.body.landlord_location;
-        const landlord_avatar = "http://192.168.0.37:8084/" + req.file.filename;
+    const userId = req.body.userId;
+    const landlord_fname = req.body.landlord_fname;
+    const landlord_lname = req.body.landlord_lname;
+    const landlord_phonenumber = req.body.landlord_phonenumber;
+    const landlord_idno = req.body.landlord_idno;
+    const landlord_location = req.body.landlord_location;
+    const landlord_avatar = req.file.filename;
 
-        let landlord = await Landlord.findOne({where: {[Op.or]: [{landlord_idno}, {landlord_phonenumber}]}});
+    const landlord = await Landlord.findOne({where: { [Op.or]: [{landlord_idno}, {landlord_phonenumber}]}})
 
-        if(!req.body.landlord_id || !req.body.landlord_phonenumber) {
-            res.status(400).send({
-                msg: 'Please provide all fields'
-            })
-          } else if (landlord) {
-               res.status(422).send({msg: "Landlord Already Exists"});
-          } else 
-          if(password !== confirm_password) {
-            console.log("Passwords Do not Match")
-        } else if(!email || !password || !confirm_password) {
-           console.log("Please Provide All Fields")
-        } else {    
+    if(!landlord_fname || !landlord_lname || !landlord_phonenumber || !landlord_idno){
+       res.status(400).json({msg: "Please Provide All Fields"})
+    } else if(landlord){
+        res.status(400).json({msg: "Landlord with that name does not exist"});
+    } else {
         Landlord.create({
             userId,
             landlord_fname,
             landlord_lname,
-            landlord_idno,
             landlord_phonenumber,
+            landlord_idno,
             landlord_location,
             landlord_avatar,
-            type: req.file.mimeType
-        }).then(landlord => {
-          
-        res.status(201).json(landlord);
+            type: req.file.mimetype,
+        }).then(data => {
+            res.status(201).send(data);
         })
-    }
-    } catch (error) {
-        res.status(404).send({msg: "Error Creating User"});
     }
 }
 
@@ -67,25 +56,27 @@ export const getLandlordById = async (req, res, next) => {
 }
 
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-      cb(null, __basedir, 'Image')
-  },
-  filename: (req, file, cb) => {
-     cb(null, Date.now() + path.extname(file.originalname));
-  }
+    destination: (req, file, cb) => {
+        cb(null, __basedir + '/Images')
+    },
+    filename: (req, file, cb) => {
+       cb(null, Date.now() + path.extname(file.originalname));
+    }
 })
 
 export const upload = multer({
     storage: storage,
     limits: {fileSize: '1000000'},
-    fileFilter: (req, file, cb) => {
-        const fileTypes = /jpeg||jpg||png||gif/
-        const mimeTypes = fileTypes.test(file.mimetype)
-        const extname = fileTypes.test(path.extname(file.originalname))
+    fileFilter: (req, file, cb ) => {
+        const fileTypes = /jpeg||jpg||png||gif/;
+        const mimeTypes = fileTypes.test(file.mimetype);
+        const extname = fileTypes.test(path.extname(file.originalname));
 
-        if(mimeTypes && extname){
-          return cb(null, true)
-        }
-        cb('Please upload proper file type');
+    if( mimeTypes && extname){
+        cb(null, true);
+    } else {
+        cb("Please Upload the correct file Type");
+      }
     }
 }).single('image');
+

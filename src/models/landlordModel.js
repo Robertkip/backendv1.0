@@ -19,7 +19,7 @@ const Landlord = sequelize.define('Landlord', {
         type: DataTypes.INTEGER,
     },
     landlord_location: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
     },
     landlord_avatar: {
         type: DataTypes.STRING

@@ -4,7 +4,6 @@ import path from "path";
 import Tenant from "../models/tenantModel.js";
 
 export const registerTenant = async (req, res) => {
-    try {
         const userId = req.body.userId;
         const tenant_fname = req.body.tenant_name;
         const tenant_lname = req.body.tenant_lname;
@@ -21,12 +20,7 @@ export const registerTenant = async (req, res) => {
             })
           } else if (tenant) {
                res.status(422).send({msg: "Landlord Already Exists"});
-          } else 
-          if(password !== confirm_password) {
-            console.log("Passwords Do not Match")
-        } else if(!email || !password || !confirm_password) {
-           console.log("Please Provide All Fields")
-        } else {    
+          } else {    
         Tenant.create({
             userId,
             tenant_fname,
@@ -40,9 +34,6 @@ export const registerTenant = async (req, res) => {
           
         res.status(201).json(tenant);
         })
-    }
-    } catch (error) {
-        res.status(404).send({msg: "Error Creating User"});
     }
 }
 
@@ -67,13 +58,12 @@ export const getTenantByPK = async (req, res, next) => {
   }).catch((error) => next(error));
 }
 
-
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, __basedir + 'Images');
+    cb(null, __basedir + '/Images');
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.filename));
+    cb(null, Date.now() + path.extname(file.originalname));
   } 
 });
 
