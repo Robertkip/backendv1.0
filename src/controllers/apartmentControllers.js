@@ -4,10 +4,10 @@ import Apartment from "../models/apartmentModel.js";
 
 export const uploadApartment = (req, res) => {
     try {
-        const name1 = "http://192.168.0.37:8084/images/" + req.files[0].filename;
-        const name2 = "http://192.168.0.37:8084/images/" + req.files[1].filename;
-        const name3 = "http://192.168.0.37:8084/images/" + req.files[2].filename;
-        const name4 = "http://192.168.0.37:8084/images/" + req.files[3].filename;
+        const name1 = "http://192.168.0.28:8084/images/" + req.files[0].filename;
+        const name2 = "http://192.168.0.28:8084/images/" + req.files[1].filename;
+        const name3 = "http://192.168.0.28:8084/images/" + req.files[2].filename;
+        const name4 = "http://192.168.0.28:8084/images/" + req.files[3].filename;
 
          Apartment.create({
           apartment_name : req.body.apartment_name,

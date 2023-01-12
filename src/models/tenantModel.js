@@ -15,7 +15,7 @@ const Tenant = sequelize.define('Tenant',{
     tenant_location: {
         type: DataTypes.STRING,
     },
-    tenant_id: {
+    tenant_idno: {
         type: DataTypes.INTEGER,
     },
     tenant_phonenumber: {

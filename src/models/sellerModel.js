@@ -15,10 +15,10 @@ const Seller = sequelize.define('Seller', {
     seller_phonenumber: {
         type: INTEGER,
     },
-    seller_locations: {
+    seller_location: {
         type: DataTypes.STRING,
     },
-    seller_id: {
+    seller_idno: {
         type: DataTypes.INTEGER,
     },
     seller_avatar: {
