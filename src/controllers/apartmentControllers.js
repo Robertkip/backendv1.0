@@ -4,15 +4,16 @@ import Apartment from "../models/apartmentModel.js";
 
 export const uploadApartment = (req, res) => {
     try {
-        const name1 = "http://192.168.0.28:8084/images/" + req.files[0].filename;
-        const name2 = "http://192.168.0.28:8084/images/" + req.files[1].filename;
-        const name3 = "http://192.168.0.28:8084/images/" + req.files[2].filename;
-        const name4 = "http://192.168.0.28:8084/images/" + req.files[3].filename;
+        const name1 = "http://38.242.239.1:8084/images/" + req.files[0].filename;
+        const name2 = "http://38.242.239.1:8084/images/" + req.files[1].filename;
+        const name3 = "http://38.242.239.1:8084/images/" + req.files[2].filename;
+        const name4 = "http://38.242.239.1:8084/images/" + req.files[3].filename;
 
          Apartment.create({
           apartment_name : req.body.apartment_name,
           apartment_location : req.body.apartment_location,
           apartment_description : req.body.apartment_description, 
+          logent_id: req.body.logent_id,
           type1 : req.files.mimetype,
           name1: name1,
           type2 : req.files.mimetype,
