@@ -34,7 +34,6 @@ export const registerLandlord = async (req, res) => {
     }
 }
 
-
 export const getAllLandlord = async (req, res, next) => {
    await Landlord.findAll().then(data => {
     res.status(200).json(data);
@@ -43,7 +42,7 @@ export const getAllLandlord = async (req, res, next) => {
 }
 
 export const getLandlordById = async (req, res, next) => {
-  const s_id = req.params.id;
+  const s_id = req.params.userId;
   
   await Landlord.findByPk(s_id).then(landlord => {
      if(!landlord){
