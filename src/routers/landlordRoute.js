@@ -5,6 +5,7 @@ const router = express.Router();
 
 router.post('/landlord',   landlordController.upload, landlordController.registerLandlord);
 router.get('/alllandlord', landlordController.getAllLandlord);
-router.get('/landlord/:id', landlordController.getLandlordById);
+router.get('/landlordid/:id', landlordController.getLandlordById);
+router.get('/landlorduser/:userId', landlordController.getSingleLandlord);
 
 export default router;
