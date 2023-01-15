@@ -44,14 +44,11 @@ export const getAllLandlord = async (req, res, next) => {
 export const getLandlordById = async (req, res, next) => {
   const s_id = req.params.userId;
   
-  await Landlord.findByPk(s_id).then(landlord => {
-     if(!landlord){
-        res.status(404).send({msg: "Landlord Not Found"});
-        next();
-     } else {
-        res.json(landlord);
-     }
-  }).catch((error) => next(error));
+  await Landlord.findByPk(s_id).then(landlord => res.status(200).send(landlord))
+  .catch((error) => {
+    res.status(400).send(error);
+  })
+  .catch((error) => next(error));
 }
 
 const storage = multer.diskStorage({
