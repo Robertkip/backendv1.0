@@ -5,16 +5,16 @@ import Tenant from "../models/tenantModel.js";
 
 export const registerTenant = async (req, res) => {
         const userId = req.body.userId;
-        const tenant_fname = req.body.tenant_name;
+        const tenant_fname = req.body.tenant_fname;
         const tenant_lname = req.body.tenant_lname;
-        const tenant_id =    req.body.tenant_id;
+        const tenant_idno =    req.body.tenant_idno;
         const tenant_phonenumber = req.body.tenant_phonenumber;
         const tenant_location = req.body.tenant_location;
-        const tenant_avatar = "http://192.168.0.37:8084/" + req.file.filename;
+        const tenant_avatar = "http://38.242.239:1/image/" + req.file.filename;
 
-        let tenant = await Tenant.findOne({where: {[Op.or]: [{tenant_id}, {tenant_phonenumber}]}});
+        let tenant = await Tenant.findOne({where: {[Op.or]: [{tenant_idno}, {tenant_phonenumber}]}});
 
-        if(!req.body.tenant_id || !req.body.tenant_phonenumber) {
+        if(!req.body.tenant_idno || !req.body.tenant_phonenumber) {
             res.status(400).send({
                 msg: 'Please provide all fields'
             })
@@ -25,7 +25,7 @@ export const registerTenant = async (req, res) => {
             userId,
             tenant_fname,
             tenant_lname,
-            tenant_id,
+            tenant_idno,
             tenant_phonenumber,
             tenant_location,
             tenant_avatar,
@@ -57,6 +57,23 @@ export const getTenantByPK = async (req, res, next) => {
      }
   }).catch((error) => next(error));
 }
+
+
+export const getSingleTenant = async (req, res) => {
+
+  try {
+    const {userId} = req.params;
+    const tenant = await Tenant.findOne({
+      where: {userId: userId},
+    })
+    if(tenant){
+      return res.status(200).json({tenant});
+    }
+  } catch (error) {
+    return res.status(500).send(error.message);
+  }
+}
+
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {

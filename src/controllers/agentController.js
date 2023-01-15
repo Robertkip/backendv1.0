@@ -54,6 +54,22 @@ export const getAgentById = async (req, res, next) => {
    }).catch()
 }
 
+export const getSingleAgent = async (req, res) => {
+
+    try {
+      const {userId} = req.params;
+      const agent = await Agent.findOne({
+        where: {userId: userId},
+      })
+      if(agent){
+        return res.status(200).json({agent});
+      }
+    } catch (error) {
+      return res.status(500).send(error.message);
+    }
+  }
+
+
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, __basedir, 'Image')
