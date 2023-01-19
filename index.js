@@ -5,7 +5,7 @@ import helmet from "helmet";
 import logger from 'morgan';
 import path from "path";
 import url from "url";
-import { Socket } from "socket.io";
+import SocketIO from "socket.io";
 import apartmentRouter from './src/routers/apartmentRoute.js';
 import authRouter from './src/routers/authRoute.js';
 import roleRouter from './src/routers/roleRoute.js';
