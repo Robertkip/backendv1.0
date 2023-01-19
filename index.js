@@ -5,6 +5,7 @@ import helmet from "helmet";
 import logger from 'morgan';
 import path from "path";
 import url from "url";
+import { Socket } from "socket.io";
 import apartmentRouter from './src/routers/apartmentRoute.js';
 import authRouter from './src/routers/authRoute.js';
 import roleRouter from './src/routers/roleRoute.js';
@@ -14,6 +15,7 @@ import landlordRouter from "./src/routers/landlordRoute.js";
 import tenantRouter from "./src/routers/tenantRoute.js";
 import sellerRouter from "./src/routers/sellerRoute.js";
 import agentRouter from "./src/routers/agentRoute.js";
+
 
 const app = express();
 
@@ -26,8 +28,9 @@ global.__basedir = __dirname;
 console.log(__basedir);
 
 let corsOptions = {
-    localhost: "http://192.168.0.37:8084"
+    localhost: "http://192.168.0.28:8084"
 };
+
 
 // const Roles = db.roles;
 const PORT = process.env.PORT || 8084;
@@ -53,8 +56,18 @@ app.use("/api/v1", sellerRouter);
 app.use("/api/v1", agentRouter);
 
 
-app.listen(PORT, '192.168.0.37', () => {
+const server =  app.listen(PORT, '192.168.0.37', () => {
     console.log(`Server is running on port`)
 })
+
+const io = Socket(server, {
+    cors: {
+        origin: "http://localhost:8084",
+    },
+});
+
+global.ononline = new Map();
+
+
 
 export default app;

@@ -17,8 +17,8 @@ module.exports = (sequelize, DataTypes) => {
     userId: DataTypes.INTEGER,
     agent_fname: DataTypes.STRING,
     agent_lname: DataTypes.STRING,
-    agent_phonenumber: DataTypes.INTEGER,
     agent_idno: DataTypes.INTEGER,
+    agent_phonenumber: DataTypes.INTEGER,
     agent_location: DataTypes.STRING,
     agent_avatar: DataTypes.STRING,
     type: DataTypes.BLOB

@@ -45,6 +45,22 @@ export const getAllApartments = async (req, res) => {
     });
 }
 
+export const getTenantLandlordApartments = async (req, res) => {
+
+  try {
+    const {logent_id} = req.params;
+    const apartments = await Apartment.findAll({
+      where: {logent_id: logent_id},
+    })
+    if(apartments){
+      return res.status(200).json({apartments});
+    }
+  } catch (error) {
+    return res.status(500).send(error.message);
+  }
+}
+
+
 export const getApartmentById = async (req, res) => {
    const p_id = req.params.id;
      Apartment.findByPk(p_id).then(apartment => {

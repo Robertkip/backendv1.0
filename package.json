@@ -32,7 +32,9 @@
     "path": "^0.12.7",
     "pg": "^8.8.0",
     "pg-hstore": "^2.3.4",
+    "react-native-elements": "^3.4.3",
     "sequelize": "^6.27.0",
+    "socket.io": "^4.5.4",
     "twilio": "^3.84.0",
     "url": "^0.11.0",
     "util": "^0.12.5"

@@ -1,6 +1,7 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../config/connectDb.js";
 import User from "./authModel.js";
+import Apartment from "./apartmentModel.js";
 
 const Agent = sequelize.define('Agent', {
     userId: {
@@ -13,7 +14,7 @@ const Agent = sequelize.define('Agent', {
         type: DataTypes.STRING,
     },
     agent_phonenumber: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
     },
     agent_idno: {
         type: DataTypes.INTEGER,
@@ -33,7 +34,14 @@ export default Agent;
 
 Agent.associations = (models) => {
   Agent.belongsTo(User, {
-    foreignKey: 'userId',
+    foreignKey: 'userId', 
   })
+
+  Agent.hasMany(Apartment, {
+    foreignKey: 'id',
+    as: 'apartments'
+  });
+  
   return Agent;
+
 };

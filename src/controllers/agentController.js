@@ -28,6 +28,7 @@ export const registerAgent = async (req, res) => {
             agent_idno,
             agent_location,
             agent_avatar,
+            
             type: req.file.mimetype,
         }).then(data => {
             res.status(201).send(data);
@@ -41,6 +42,17 @@ export const getAllAgents = async (req, res) => {
    });
 };
 
+export const getAllApartmentsByAgent =  (req, res, next) =>  {
+    try {
+        return Agent.findByPk(req.params.id, {
+            include: {
+                association: 'apartments'
+            }
+        })
+    } catch (error) {
+        throw new Error(err)
+    }
+}
 
 export const getAgentById = async (req, res, next) => {
    const a_id = req.params.id;
@@ -53,6 +65,7 @@ export const getAgentById = async (req, res, next) => {
     }
    }).catch()
 }
+
 
 export const getSingleAgent = async (req, res) => {
 

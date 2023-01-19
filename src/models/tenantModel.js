@@ -1,10 +1,14 @@
 import { sequelize } from "../config/connectDb.js";
 import { DataTypes} from "sequelize";
 import User from "./authModel.js";
+import Apartment from "./apartmentModel.js";
 
 const Tenant = sequelize.define('Tenant',{
     userId: {
      type: DataTypes.INTEGER,
+    },
+    logentId: {
+        type: DataTypes.INTEGER,
     },
     tenant_fname: {
         type: DataTypes.STRING
@@ -34,6 +38,13 @@ Tenant.associations = (models) => {
        foreignKey: 'userId',
     })
    return Tenant; 
+}
+
+Tenant.associations = (models) => {
+    Tenant.belongsTo(Apartment, {
+        foreignKey: 'logentId',
+    })
+    return Tenant;
 }
 
 export default Tenant;
