@@ -5,8 +5,6 @@ import Landlord from "./landlordModel.js";
 import Agent from "./agentModel.js";
 import Tenant from "./tenantModel.js";
 
-import Seller from "./sellerModel.js";
-
 const Market = sequelize.define('Market', {
     sellerId: {
         type: DataTypes.INTEGER,
@@ -27,9 +25,6 @@ const Market = sequelize.define('Market', {
     product_image: {
         type: DataTypes.STRING
     },
-    data: {
-        type: DataTypes.BLOB
-      },
 })
 
 export default Market;

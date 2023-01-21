@@ -14,12 +14,12 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Market.init({
+    sellerId: DataTypes.INTEGER,
     product_name: DataTypes.STRING,
     product_description: DataTypes.STRING,
     product_price: DataTypes.STRING,
     type: DataTypes.STRING,
-    product_image: DataTypes.STRING,
-    data: DataTypes.BLOB
+    product_image: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'Market',
