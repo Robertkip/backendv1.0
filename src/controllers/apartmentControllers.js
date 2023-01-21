@@ -60,7 +60,6 @@ export const getTenantLandlordApartments = async (req, res) => {
   }
 }
 
-
 export const getApartmentById = async (req, res) => {
    const p_id = req.params.id;
      Apartment.findByPk(p_id).then(apartment => {
@@ -73,7 +72,6 @@ export const getApartmentById = async (req, res) => {
      })
      .catch((error) =>  next(error));
 }
-
 
 const storage = multer.diskStorage({
    destination: (req, file, cb) => {

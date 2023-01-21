@@ -25,6 +25,21 @@ export const getMarket = async (req, res) => {
    })
 }
 
+export const getMarketBySellerId = async () => {
+   try {
+     const {sellerId} = req.params;
+
+     const market = Market.findOne({
+        where: {sellerId: sellerId}
+     })
+     if(market){
+        return res.status(200).json({market});
+      }
+    } catch (error) {
+      return res.status(500).send(error.message);
+    }
+}
+
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, __basedir + '/Images')
