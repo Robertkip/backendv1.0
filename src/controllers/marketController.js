@@ -1,12 +1,12 @@
 import multer from "multer";
 import path from "path";
-import fs from 'fs';
 import Market from "../models/marketModel.js";
 
 export const createMarket = (req, res) => {
     try {
-        const product_image = "http://192.168.0.28:8084/images/" + req.file.filename;
+        const product_image = "http://38.242.239.1:8084/images/" + req.file.filename;
         Market.create({
+            sellerId: req.body.sellerId,
             product_name: req.body.product_name,
             product_description: req.body.product_description,
             product_price: req.body.product_price,

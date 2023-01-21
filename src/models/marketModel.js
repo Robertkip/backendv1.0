@@ -1,5 +1,10 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../config/connectDb.js";
+import User from "./authModel.js";
+import Landlord from "./landlordModel.js";
+import Agent from "./agentModel.js";
+import Tenant from "./tenantModel.js";
+
 import Seller from "./sellerModel.js";
 
 const Market = sequelize.define('Market', {
@@ -30,7 +35,16 @@ const Market = sequelize.define('Market', {
 export default Market;
 
 Market.associations = (models) => {
-    Market.belongsTo(Seller, {
+    Market.belongsTo(User, {
+        foreignKey: 'sellerId',
+    })
+    Market.belongsTo(Landlord, {
+        foreignKey: 'sellerId',
+    })
+     Market.belongsTo(Agent, {
+        foreignKey: 'sellerId',
+    })
+    Market.belongsTo(Tenant, {
         foreignKey: 'sellerId',
     })
    return Seller;   
