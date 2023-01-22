@@ -17,7 +17,7 @@ const Market = sequelize.define('Market', {
         type: DataTypes.STRING
     },
     product_price: {
-        type: DataTypes.STRING
+        type: DataTypes.INTEGER,
     },
     type: {
         type: DataTypes.STRING

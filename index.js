@@ -13,6 +13,7 @@ import marketRouter from "./src/routers/marketRoute.js";
 import landlordRouter from "./src/routers/landlordRoute.js";
 import tenantRouter from "./src/routers/tenantRoute.js";
 import agentRouter from "./src/routers/agentRoute.js";
+import cartRouter from "./src/routers/cartRoute.js";
 
 const app = express();
 
@@ -49,6 +50,7 @@ app.use("/api/v1", marketRouter);
 app.use("/api/v1", landlordRouter);
 app.use("/api/v1", tenantRouter);
 app.use("/api/v1", agentRouter);
+app.use("/api/v1", cartRouter);
 
 const server =  app.listen(PORT, '192.168.0.37', () => {
     console.log(`Server is running on port`)
@@ -61,7 +63,5 @@ const io = new Socket(server, {
 });
 
 global.ononline = new Map();
-
-
 
 export default app;
