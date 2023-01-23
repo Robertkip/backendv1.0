@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
-import { sequelize } from "../config/connectDb";
-import Market from "./marketModel";
-import User from "./authModel";
+import { sequelize } from "../config/connectDb.js";
+import Market from "./marketModel.js";
+import User from "./authModel.js";
 
 const CartItem = sequelize.define('CartItem', {
     userId: {

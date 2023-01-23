@@ -1,8 +1,6 @@
-import CartItem from "../models/cartItemModel";
-import Order from "../models/orderModel";
-import Market from "../models/marketModel";
-import { request } from "express";
-import router from "../routers/apartmentRoute";
+import CartItem from "../models/cartItemModel.js";
+import Order from "../models/orderModel.js";
+import Market from "../models/marketModel.js";
 
 export const getCartItem = async (req, res, next) => {
     try {
