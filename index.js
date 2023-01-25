@@ -14,6 +14,7 @@ import landlordRouter from "./src/routers/landlordRoute.js";
 import tenantRouter from "./src/routers/tenantRoute.js";
 import agentRouter from "./src/routers/agentRoute.js";
 import cartRouter from "./src/routers/cartRoute.js";
+import userProfileRouter from "./src/routers/userProfileRoute.js";
 
 const app = express();
 
@@ -51,6 +52,7 @@ app.use("/api/v1", landlordRouter);
 app.use("/api/v1", tenantRouter);
 app.use("/api/v1", agentRouter);
 app.use("/api/v1", cartRouter);
+app.use("/api/v1", userProfileRouter);
 
 const server =  app.listen(PORT, '192.168.0.37', () => {
     console.log(`Server is running on port`)
