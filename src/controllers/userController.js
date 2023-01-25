@@ -1,5 +1,6 @@
+import multer from "multer";
+import path from "path";
 import UserProfile from "../models/userProfileModel.js";
-
 
 export const createUserProfile = async (req, res, next) => {
     const userId = req.body.userId;
