@@ -30,7 +30,6 @@ let corsOptions = {
     localhost: "http://192.168.0.37:8084"
 };
 
-
 // const Roles = db.roles;
 const PORT = process.env.PORT || 8084;
 
