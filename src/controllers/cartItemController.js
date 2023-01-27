@@ -43,20 +43,19 @@ export const getCartItem = async (req, res, next) => {
 
 
 export const postCartItem = async (req, res, next) => {
-    if(!req.user){
-        return res.status(403).send({error: "Not Authorized."});
-    }
-    CartItem.findAll({
-        where: {
-            userId: req.user.id,
-            product_id: req.body.id,
+    // if(!req.user){
+    //     return res.status(403).send({error: "Not Authorized."});
+    // }
+    // CartItem.findAll({
+    //     where: {
+    //         userId: req.user.id,
+    //         product_id: req.body.id,
 
-        }
-    })
+    //     }
+    // })
     try {
         await CartItem.create({
-            UserId: req.user.id,
-            product_id: request.params.id,
+            product_id: req.body.id,
             product_quantity: req.body.product_quantity,
             product_price: req.body.product_price
         })
