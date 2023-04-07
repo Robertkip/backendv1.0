@@ -26,9 +26,6 @@ global.__basedir = __dirname;
 
 console.log(__basedir);
 
-let corsOptions = {
-    localhost: "http://192.168.0.37:8084"
-};
 
 // const Roles = db.roles;
 const PORT = process.env.PORT || 8084;
@@ -36,7 +33,26 @@ const PORT = process.env.PORT || 8084;
 app.use(
     cookieSession({ name: "session", keys: ["waridi"], maxAge: 24 * 60 * 60 * 100 })
   )
+  if(process.env.NODE_ENV === 'development') {
+  
+    let corsOptions = {
+        localhost: "http://192.168.0.37:8084"
+    };
+
 app.use(cors(corsOptions));
+    } else if(process.env.NODE_ENV === 'production') {
+      let corsOptions = {
+        origin: "http://38.242.239.1:8084"
+      };
+
+app.use(cors(corsOptions));
+    } else {
+        let corsOptions = {
+            localhost: "http://192.168.0.37:8084"
+        };
+
+app.use(cors(corsOptions));
+    }
 app.use(express.json());
 app.use(helmet());
 app.use(logger('common'));
@@ -53,15 +69,45 @@ app.use("/api/v1", agentRouter);
 app.use("/api/v1", cartRouter);
 app.use("/api/v1", userProfileRouter);
 
-const server =  app.listen(PORT, '192.168.0.37', () => {
+// const server =  app.listen(PORT, ADDRESS, () => {
+//     console.log(`Server is running on port`)
+// })
+
+if(process.env.NODE_ENV === 'development') {
+    let ADDRESS = '192.168.0.37';
+    const server =  app.listen(PORT, ADDRESS, () => {
+        console.log(`Server is running on port`)
+    })
+    const io = new Socket(server, {
+        cors: {
+            origin: "http://localhost:8084",
+        },
+    });
+    
+} else if(process.env.NODE_ENV === 'production') {
+  let ADDRESS = '38.242.239.1';
+  const server =  app.listen(PORT, ADDRESS, () => {
     console.log(`Server is running on port`)
 })
-
 const io = new Socket(server, {
     cors: {
         origin: "http://localhost:8084",
     },
 });
+
+} else {
+    let ADDRESS = '192.168.239.1';
+    const server =  app.listen(PORT, ADDRESS, () => {
+        console.log(`Server is running on port`)
+    })
+    const io = new Socket(server, {
+        cors: {
+            origin: "http://localhost:8084",
+        },
+    });
+    
+}
+
 
 global.ononline = new Map();
 

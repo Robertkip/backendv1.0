@@ -66,7 +66,6 @@ export const getAgentById = async (req, res, next) => {
    }).catch()
 }
 
-
 export const getSingleAgent = async (req, res) => {
 
     try {

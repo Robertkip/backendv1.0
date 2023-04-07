@@ -116,6 +116,16 @@ export const Signup = async (req, res) => {
       }
   }
 
+  export const getAllUsers = async (req, res) => {
+      try {
+      const users = await User.findAll();
+      res.status(200).send(users);
+    } catch (err) {
+      res.status(500).send({ message: err.message });
+    }
+  
+  }
+
   export const sendOtp = async () => {
     const {countryCode, phoneNumber} = req.body;
     try {

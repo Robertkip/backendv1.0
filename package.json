@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "node index.js",
+    "dev:server": "NODE_ENV=development node index.js",
     "test": "test"
   },
   "keywords": [

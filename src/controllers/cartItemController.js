@@ -56,7 +56,7 @@ export const postCartItem = async (req, res, next) => {
     try {
         await CartItem.create({
             userId: req.user.id,
-            product_id: req.body.id,
+            product_id: req.body.product_id,
             product_quantity: req.body.product_quantity,
             product_price: req.body.product_price
         })
