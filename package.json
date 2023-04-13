@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "Waridi JS Retrieve",
   "main": "index.js",
-  "type": "module",
   "scripts": {
     "dev:server": "NODE_ENV=development node index.js",
     "test": "test"
