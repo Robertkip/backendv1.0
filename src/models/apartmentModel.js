@@ -15,7 +15,7 @@ const Apartment = sequelize.define("Apartment", {
     type: DataTypes.STRING,
   },
   apartment_description: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT,
   },
   address: {
     type: DataTypes.TEXT,
