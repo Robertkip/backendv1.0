@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 import twilio from "twilio";
 import bcryptjs from "bcryptjs";
 import { Op } from "sequelize";
+import { sequelize } from "../config/connectDb.js";
 import User from "../models/authModel.js";
 import * as PasswordHelper from "../helpers/passwordHelper.js";
 import * as Helper from "../helpers/helper.js";
@@ -128,6 +129,17 @@ export const getAllUsers = async (req, res) => {
   }
 };
 
+export const resetPassword = async (req, res) => {
+  try {
+    await User.findOne({
+      resetPasswordToken: req.body.token,
+      resetPasswordExpires: {
+        $gt: Date.now(),
+      },
+    });
+  } catch (error) {}
+};
+
 // export const sendOtp = async () => {
 //   const {countryCode, phoneNumber} = req.body;
 //   try {
@@ -184,3 +196,65 @@ export const verifyOTP = async (req, res, next) => {
       res.json(err);
     });
 };
+
+export const followUser = async (req, res) => {
+  const id = req.params.id;
+
+  const { currentUserId } = req.body;
+
+  if (currentUserId === id) {
+    res.status(403).json("Action Forbidden");
+  } else {
+    try {
+      const followUser = await User.findOne(id);
+      const followingUser = await User.findOne(currentUserId);
+
+      if (!followUser.followers.includes(currentUserId)) {
+        await followUser.update({ followers: currentUserId });
+        await followingUser.update({ following: id });
+        res.status(200).json("User Followed!");
+      } else {
+        res.status(403).json("User is Already followed by you");
+      }
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  }
+};
+
+export const unfollowUser = async (req, res) => {
+  const id = req.params.id;
+
+  const { currentUserId } = req.body;
+
+  if (currentUserId === id) {
+    res.status(403).json("Action Forbidden");
+  } else {
+    try {
+      const followUser = await User.findOne(id);
+      const followingUser = await User.findOne(currentUserId);
+
+      if (followUser.followers.includes(currentUserId)) {
+        await followUser.update({ followers: currentUserId });
+        await followingUser.update({ followers: id });
+      } else {
+        res.status(403).json("User is not followed by you");
+      }
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  }
+};
+
+// export const registerFollower = async () => {
+//   if (req.body.userId !== req.params.id) {
+//     try {
+//       const user = await User.findByPk(req.params.id);
+//       const currentUser = await User.findByPk(req.body.userId);
+
+//       if (!user.followers.includes(req.body.userId)) {
+//         await user.update({ followings: sequelize.fn("") });
+//       }
+//     } catch (error) {}
+//   }
+// };

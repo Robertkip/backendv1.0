@@ -6,7 +6,6 @@ const router = express.Router();
 
 router.post(
   "/apartment",
-  Authorization.Authenticated,
   apartmentController.upload,
   apartmentController.uploadApartment
 );
@@ -35,6 +34,6 @@ router.delete(
   Authorization.AdminRole,
   apartmentController.deleteAllApartments
 );
-router.get("/", apartmentController.searchApartmentQuery);
+router.get("/", apartmentController.searchApartmentInPlace);
 
 export default router;
