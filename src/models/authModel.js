@@ -16,7 +16,7 @@ const User = sequelize.define("User", {
     allowNull: true,
   },
   followers: {
-    type: DataTypes.ARRAY,
+    type: DataTypes.ARRAY(DataTypes.INTEGER),
     defaultValue: [],
     allowNull: true,
   },
@@ -26,7 +26,7 @@ const User = sequelize.define("User", {
     allowNull: true,
   },
   password: {
-    type: DataTypes.ARRAY(DataTypes.INTEGER),
+    type: DataTypes.STRING,
     allowNull: true,
   },
   confirm_password: {
