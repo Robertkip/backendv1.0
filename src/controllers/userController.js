@@ -1,6 +1,8 @@
 import multer from "multer";
 import path from "path";
 import UserProfile from "../models/userProfileModel.js";
+import User from "../models/authModel.js";
+import Otp from "../models/otpModel.js";
 
 export const createUserProfile = async (req, res, next) => {
   const userId = req.body.userId;

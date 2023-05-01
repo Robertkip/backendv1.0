@@ -6,6 +6,7 @@ import { sequelize } from "../config/connectDb.js";
 import User from "../models/authModel.js";
 import * as PasswordHelper from "../helpers/passwordHelper.js";
 import * as Helper from "../helpers/helper.js";
+import Otp from "../models/otpModel.js";
 dotenv.config();
 
 const { TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_SERVICE_SID } =
@@ -138,6 +139,56 @@ export const resetPassword = async (req, res) => {
       },
     });
   } catch (error) {}
+};
+
+export const emailSend = async () => {
+  let data = await User.findOne({ email: req.body.email });
+  const responseType = {};
+  if (data) {
+    let otpcode = Math.floor(Math.random() * 10000 + 1);
+    let otpData = new Otp({
+      email: req.body.email,
+      code: otpcode,
+      expireIn: new Date().getTime() + 300 * 1000,
+    });
+    let otpResponse = await otpData.save();
+    responseType.statusText = "Success";
+    responseType.message = "Please check Your Email Id";
+  } else {
+    responseType.statusText = "Error";
+    responseType.statusText = "Email Id Not Exist";
+  }
+  res.status(200).json("Ok");
+};
+
+export const changePassword = async (req, res) => {
+  let data = await Otp.findOne({
+    email: req.body.email,
+    code: req.body.otpCode,
+  });
+  const response = {};
+  if (data) {
+    let currentTime = new Date.now();
+
+    let diff = data.expireIn - currentTime;
+
+    if (diff < 0) {
+      response.message = "Verification Code has Expired";
+      response.statusText = "error";
+    } else {
+      let user = await Otp.findOne({ email: req.body.email });
+      user.password = req.body.password;
+      user.save();
+
+      response.message = "Password Changed Successfully";
+      response.statusText = "Success";
+    }
+  } else {
+    response.message = "Invalid Verification Code";
+    response.statusText = "error";
+  }
+
+  res.status(200).json(response);
 };
 
 // export const sendOtp = async () => {

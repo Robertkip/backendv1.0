@@ -32,10 +32,10 @@ async function geocodeAddress(address) {
 export const uploadApartment = async (req, res) => {
   try {
     if (process.env.NODE_ENV === "development") {
-      const name1 = "http://192.168.0.37:8084/images/" + req.files[0].filename;
-      const name2 = "http://192.168.0.37:8084/images/" + req.files[1].filename;
-      const name3 = "http://192.168.0.37:8084/images/" + req.files[2].filename;
-      const name4 = "http://192.168.0.37:8084/images/" + req.files[3].filename;
+      const name1 = "http://192.168.1.120:8084/images/" + req.files[0].filename;
+      const name2 = "http://192.168.1.120:8084/images/" + req.files[1].filename;
+      const name3 = "http://192.168.1.120:8084/images/" + req.files[2].filename;
+      const name4 = "http://192.168.1.120:8084/images/" + req.files[3].filename;
       const newApartment = new Apartment({
         apartment_name: req.body.apartment_name,
         apartment_location: req.body.apartment_location,
