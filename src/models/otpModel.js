@@ -1,8 +1,8 @@
 import { DataTypes } from "sequelize";
-import { sequelize } from "../config/connectDb";
+import { sequelize } from "../config/connectDb.js";
 
 const Otp = sequelize.define("Otp", {
-  email: {
+  userId: {
     type: DataTypes.STRING,
     allowNull: true,
   },
@@ -10,8 +10,12 @@ const Otp = sequelize.define("Otp", {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  createdAt: {
+    type: DataTypes.DATE,
+    allowNull: true,
+  },
   expireIn: {
-    type: DataTypes.NUMBER,
+    type: DataTypes.DATE,
     allowNull: true,
   },
 });

@@ -2,6 +2,8 @@ import dotenv from "dotenv";
 import twilio from "twilio";
 import bcryptjs from "bcryptjs";
 import { Op } from "sequelize";
+import nodemailer from "nodemailer";
+import { google } from "googleapis";
 import { sequelize } from "../config/connectDb.js";
 import User from "../models/authModel.js";
 import * as PasswordHelper from "../helpers/passwordHelper.js";
@@ -9,13 +11,32 @@ import * as Helper from "../helpers/helper.js";
 import Otp from "../models/otpModel.js";
 dotenv.config();
 
-const { TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_SERVICE_SID } =
-  process.env;
+const {
+  TWILIO_ACCOUNT_SID,
+  TWILIO_AUTH_TOKEN,
+  TWILIO_SERVICE_SID,
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
+  MAILING_SERVICE_REFRESH_TOKEN,
+  SENDER_EMAIL_ADDRESS,
+  SENDER_PASSWORD,
+} = process.env;
 
 const client = twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, {
   lazyLoading: true,
 });
 
+dotenv.config();
+
+const { OAuth2 } = google.auth;
+const OAUTH_PLAYGROUND = "https://developers.google.com/oauthplayground";
+
+const oauth2Client = new OAuth2(
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
+  MAILING_SERVICE_REFRESH_TOKEN,
+  OAUTH_PLAYGROUND
+);
 export const Signup = async (req, res) => {
   try {
     const username = req.body.username;
@@ -48,7 +69,7 @@ export const Signup = async (req, res) => {
     } else if (!email || !password || !confirm_password) {
       console.log("Please Provide All Fields");
     } else {
-      User.create({
+      const newUser = new User({
         email: email,
         username: username,
         password: bcryptjs.hashSync(password, 8),
@@ -56,8 +77,10 @@ export const Signup = async (req, res) => {
         verified: verified,
         roleId: roleId,
         settings,
-      }).then((user) => {
-        return res.status(201).send(user);
+      });
+
+      newUser.save().then((result) => {
+        sendOtpVerification(result, res);
       });
     }
   } catch (err) {
@@ -119,6 +142,70 @@ export const Signin = async (req, res) => {
   } catch (err) {
     res.status(500).send({ message: err.message });
   }
+};
+
+oauth2Client.setCredentials({
+  refresh_token: MAILING_SERVICE_REFRESH_TOKEN,
+});
+
+const accessToken = oauth2Client.getAccessToken();
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    type: "OAuth2",
+    user: SENDER_EMAIL_ADDRESS,
+    pass: SENDER_PASSWORD,
+    clientId: GOOGLE_CLIENT_ID,
+    clientSecret: GOOGLE_CLIENT_SECRET,
+    refreshToken: MAILING_SERVICE_REFRESH_TOKEN,
+    accessToken,
+  },
+});
+
+//Testing Success
+transporter.verify((error, success) => {
+  if (error) {
+    console.log(error);
+  } else {
+    console.log("Ready for Messages");
+    console.log(success);
+  }
+});
+
+export const sendOtpVerification = async ({ id, email }, res) => {
+  const otp = `${Math.floor(1000 + Math.random() * 9000)}`;
+
+  //Mail Options
+  const mailOptions = {
+    from: SENDER_EMAIL_ADDRESS,
+    to: email,
+    subject: "Verify Your Email",
+    html: `<p>Enter <b> ${otp} </> To verify Account. </p>`,
+  };
+
+  // Hash the Otp
+  const saltRounds = 10;
+
+  const hashedOTP = await bcryptjs.hash(otp, saltRounds);
+
+  const newOTPVerification = await new Otp({
+    userId: id,
+    otp: hashedOTP,
+    createdAt: Date.now(),
+    expireIn: Date.now() + 360000,
+  });
+
+  await newOTPVerification.save();
+  transporter.sendMail(mailOptions);
+  res.json({
+    status: "PENDING",
+    message: "Verification OTP Email Sent",
+    data: {
+      userId: id,
+      email,
+    },
+  });
 };
 
 export const getAllUsers = async (req, res) => {

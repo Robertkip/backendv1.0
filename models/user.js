@@ -20,6 +20,8 @@ module.exports = (sequelize, DataTypes) => {
     password: DataTypes.STRING,
     confirm_password: DataTypes.STRING,
     accessToken: DataTypes.TEXT,
+    resetPasswordToken: DataTypes.TEXT,
+    resetPasswordExpires: DataTypes.DATE,
     verified: DataTypes.BOOLEAN,
     active: DataTypes.BOOLEAN
   }, {
