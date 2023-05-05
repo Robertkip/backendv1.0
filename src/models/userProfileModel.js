@@ -19,12 +19,12 @@ const UserProfile = sequelize.define("UserProfile", {
     type: DataTypes.INTEGER,
   },
   followers: {
-    type: DataTypes.ARRAY(DataTypes.INTEGER),
+    type: DataTypes.INTEGER,
     defaultValue: [],
     allowNull: true,
   },
   following: {
-    type: DataTypes.ARRAY(DataTypes.INTEGER),
+    type: DataTypes.INTEGER,
     defaultValue: [],
     allowNull: true,
   },

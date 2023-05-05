@@ -5,6 +5,7 @@ import helmet from "helmet";
 import logger from "morgan";
 import path from "path";
 import url from "url";
+import { Op } from "sequelize";
 import { Server as Socket } from "socket.io";
 import apartmentRouter from "./src/routers/apartmentRoute.js";
 import authRouter from "./src/routers/authRoute.js";
@@ -69,7 +70,7 @@ app.use("/api/v1", landlordRouter);
 app.use("/api/v1", tenantRouter);
 app.use("/api/v1", agentRouter);
 app.use("/api/v1", cartRouter);
-app.use("/api/v1", userProfileRouter);
+app.use("/api/v1/user", userProfileRouter);
 
 // const server =  app.listen(PORT, ADDRESS, () => {
 //     console.log(`Server is running on port`)

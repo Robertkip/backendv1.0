@@ -12,4 +12,6 @@ router.get("/alluserprofile", userProfileController.getUserProfile);
 router.get("/userprofile/:id", userProfileController.getUserById);
 router.get("/singleuser/:userId", userProfileController.getSingleUser);
 
+router.get("/", userProfileController.searchUserQuery);
+
 export default router;

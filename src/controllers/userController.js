@@ -1,8 +1,8 @@
 import multer from "multer";
 import path from "path";
+import { Op } from "sequelize";
 import UserProfile from "../models/userProfileModel.js";
 import User from "../models/authModel.js";
-import Otp from "../models/otpModel.js";
 
 export const createUserProfile = async (req, res, next) => {
   const userId = req.body.userId;
@@ -10,6 +10,8 @@ export const createUserProfile = async (req, res, next) => {
   const user_lname = req.body.user_lname;
   const user_phonenumber = req.body.user_phonenumber;
   const user_location = req.body.user_location;
+  const followers = req.body.followers;
+  const following = req.body.following;
   const user_avatar = "http://38.242.239.1:8084/images/" + req.file.filename;
 
   const userprofile = await UserProfile.findOne({
@@ -27,6 +29,8 @@ export const createUserProfile = async (req, res, next) => {
       user_lname,
       user_phonenumber,
       user_location,
+      followers,
+      following,
       user_avatar,
       type: req.file.mimetype,
     }).then((data) => {
@@ -70,6 +74,23 @@ export const getSingleUser = async (req, res) => {
   } catch (error) {
     return res.status(500).send(error.message);
   }
+};
+
+export const searchUserQuery = async (req, res, next) => {
+  // Retrieve all Tutorials from the database.
+  const title = req.query.user_fname;
+  var condition = title ? { user_fname: { [Op.like]: `%${title}%` } } : null;
+
+  await UserProfile.findAll({ where: condition })
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message:
+          err.message || "Some error occurred while retrieving Apartments.",
+      });
+    });
 };
 
 const storage = multer.diskStorage({
