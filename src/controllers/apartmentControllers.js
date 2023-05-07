@@ -76,7 +76,7 @@ export const uploadApartment = async (req, res) => {
       const name2 = "http://38.242.239.1:8084/images/" + req.files[1].filename;
       const name3 = "http://38.242.239.1:8084/images/" + req.files[2].filename;
       const name4 = "http://38.242.239.1:8084/images/" + req.files[3].filename;
-      const newApartment = Apartment({
+      const newApartment = new Apartment({
         apartment_name: req.body.apartment_name,
         apartment_location: req.body.apartment_location,
         apartment_description: req.body.apartment_description,
@@ -102,9 +102,9 @@ export const uploadApartment = async (req, res) => {
         //    return res.status(201).send("Apartment Created Successfully");
       });
       try {
-        const location = await geocodeAddress(newApartment.address);
-        newApartment.latitude = location.latitude;
-        newApartment.longitude = location.longitude;
+        //const location = await geocodeAddress(newApartment.address);
+        //newApartment.latitude = location.latitude;
+        //newApartment.longitude = location.longitude;
 
         await newApartment.save();
         console.log("Apartment Created");

@@ -17,9 +17,9 @@ module.exports = (sequelize, DataTypes) => {
     userId: DataTypes.INTEGER,
     landlord_fname: DataTypes.STRING,
     landlord_lname: DataTypes.STRING,
+    landlord_location: DataTypes.STRING,
     landlord_idno: DataTypes.INTEGER,
     landlord_phonenumber: DataTypes.INTEGER,
-    landlord_location: DataTypes.STRING,
     landlord_avatar: DataTypes.STRING,
     type: DataTypes.BLOB
   }, {

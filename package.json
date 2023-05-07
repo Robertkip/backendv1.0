@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev:server": "NODE_ENV=development node index.js",
+    "prod:server": "NODE_ENV=production node index.js",
     "test": "test"
   },
   "keywords": [
@@ -44,6 +44,6 @@
     "util": "^0.12.5"
   },
   "devDependencies": {
-    "sequelize-cli": "^6.5.2"
+    "sequelize-cli": "^6.6.0"
   }
 }

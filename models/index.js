@@ -19,7 +19,12 @@ if (config.use_env_variable) {
 fs
   .readdirSync(__dirname)
   .filter(file => {
-    return (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js');
+    return (
+      file.indexOf('.') !== 0 &&
+      file !== basename &&
+      file.slice(-3) === '.js' &&
+      file.indexOf('.test.js') === -1
+    );
   })
   .forEach(file => {
     const model = require(path.join(__dirname, file))(sequelize, Sequelize.DataTypes);
@@ -34,22 +39,5 @@ Object.keys(db).forEach(modelName => {
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
-
-db.users = require('../models/users')(sequelize, Sequelize);
-db.roles = require('../models/roles')(sequelize, Sequelize);
-
-db.roles.belongsToMany(db.users, {
-  through: "user_roles",
-  foreignKey: "roleId",
-  otherKey: "userId"
-});
-
-db.roles.belongsToMany(db.roles, {
-  through: "user_roles",
-  foreignKey: "roleId",
-  otherKey: "userId"
-})
-
-db.ROLES = ["user", "admin", "tenant", "landlord", "seller"];
 
 module.exports = db;

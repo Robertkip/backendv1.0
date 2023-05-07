@@ -15,14 +15,14 @@ module.exports = (sequelize, DataTypes) => {
   }
   Tenant.init({
     userId: DataTypes.INTEGER,
-    logentId: DataTypes.INTEGER,
+    logentId: DataTypes.STRING,
     tenant_fname: DataTypes.STRING,
     tenant_lname: DataTypes.STRING,
+    tenent_location: DataTypes.STRING,
     tenant_idno: DataTypes.INTEGER,
     tenant_phonenumber: DataTypes.INTEGER,
-    tenant_location: DataTypes.STRING,
     tenant_avatar: DataTypes.STRING,
-    type: DataTypes.BLOB
+    type: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'Tenant',
