@@ -62,9 +62,9 @@ export const uploadApartment = async (req, res) => {
         //    return res.status(201).send("Apartment Created Successfully");
       });
       try {
-        const location = await geocodeAddress(newApartment.address);
-        newApartment.latitude = location.latitude;
-        newApartment.longitude = location.longitude;
+        // const location = await geocodeAddress(newApartment.address);
+        // newApartment.latitude = location.latitude;
+        // newApartment.longitude = location.longitude;
 
         await newApartment.save();
         console.log("Apartment Created");

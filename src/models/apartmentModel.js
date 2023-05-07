@@ -17,15 +17,15 @@ const Apartment = sequelize.define("Apartment", {
   apartment_description: {
     type: DataTypes.TEXT,
   },
-  address: {
-    type: DataTypes.TEXT,
-  },
-  latitude: {
-    type: DataTypes.DECIMAL,
-  },
-  longitude: {
-    type: DataTypes.DECIMAL,
-  },
+  // address: {
+  //   type: DataTypes.TEXT,
+  // },
+  // latitude: {
+  //   type: DataTypes.DECIMAL,
+  // },
+  // longitude: {
+  //   type: DataTypes.DECIMAL,
+  // },
   type1: {
     type: DataTypes.STRING,
   },
