@@ -229,10 +229,8 @@ export const deleteAllApartments = async (req, res, next) => {
 
 export const searchApartmentQuery = async (req, res, next) => {
   // Retrieve all Tutorials from the database.
-  const title = req.query.apartment_location;
-  var condition = title
-    ? { apartment_location: { [Op.like]: `%${title}%` } }
-    : null;
+  const title = req.query.address;
+  var condition = title ? { address: { [Op.like]: `%${title}%` } } : null;
 
   await Apartment.findAll({ where: condition })
     .then((data) => {
@@ -255,6 +253,8 @@ async function getPlaceCoordinates(place) {
   };
 
   const response = await axios.get(PLACES_API_ENDPOINT, { params });
+
+  console.log("Response is", response);
 
   // Parse the response to retrieve the latitude and longitude coordinates
   if (response.status === 200) {
@@ -300,11 +300,15 @@ export async function searchApartmentInPlace(req, res, next) {
   if (response.status === 200) {
     const results = response.data.results;
     console.log("Results is", results);
-    const houseIds = results.map((result) => result.id);
-    const housesInArea = await Apartment.findAll({ where: { id: houseIds } });
-    return housesInArea;
+    const houseIds = results.map((result) => result.vicinity);
+    console.log("House Ids Is", houseIds);
+    await Apartment.findAll({
+      where: { address: houseIds },
+    }).then((data) => {
+      return res.status(200).send(data);
+    });
   } else {
-    return [];
+    return res.status(500).send({ message: "No Data Founde" });
   }
 }
 

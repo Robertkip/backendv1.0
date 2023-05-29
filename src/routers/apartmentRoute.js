@@ -34,6 +34,6 @@ router.delete(
   Authorization.AdminRole,
   apartmentController.deleteAllApartments
 );
-router.get("/", apartmentController.searchApartmentInPlace);
+router.get("/", apartmentController.searchApartmentQuery);
 
 export default router;

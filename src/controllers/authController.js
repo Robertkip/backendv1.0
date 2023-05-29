@@ -255,7 +255,7 @@ export const changePassword = async (req, res) => {
   });
   const response = {};
   if (data) {
-    let currentTime = new Date.now();
+    let currentTime = new Date();
 
     let diff = data.expireIn - currentTime;
 
@@ -384,15 +384,53 @@ export const unfollowUser = async (req, res) => {
   }
 };
 
-// export const registerFollower = async () => {
-//   if (req.body.userId !== req.params.id) {
-//     try {
-//       const user = await User.findByPk(req.params.id);
-//       const currentUser = await User.findByPk(req.body.userId);
+export const followingUser = async (req, res) => {
+  try {
+    const userToFollow = await User.findByPk(req.params.id);
+    const loggedInUser = await User.findByPk(req.user.id);
+    if (!userToFollow) {
+      return res.status(404).json({
+        message: "User not found",
+        success: false,
+      });
+    }
 
-//       if (!user.followers.includes(req.body.userId)) {
-//         await user.update({ followings: sequelize.fn("") });
-//       }
-//     } catch (error) {}
-//   }
-// };
+    //If user is following himself
+    if (userToFollow.id === loggedInUser.id) {
+      return res.status(400).json({
+        message: "You cannot follow yourself",
+        success: false,
+      });
+    }
+    if (loggedInUser.following.includes(userToFollow.id)) {
+      const indexFollowing = loggedInUser.following.indexOf(userToFollow.id);
+      loggedInUser.following.splice(indexFollowing, 1);
+      const indexFollowers = userToFollow.followers.indexOf(loggedInUser.id);
+      userToFollow.followers.splice(indexFollowers, 1);
+
+      await loggedInUser.save();
+      await userToFollow.save();
+
+      return res.status(200).json({
+        success: true,
+        message: "User Unfollowed",
+      });
+    } else {
+      loggedInUser.following.push(userToFollow.id);
+      userToFollow.followers.push(loggedInUser.id);
+
+      await loggedInUser.save();
+      await userToFollow.save();
+
+      return res.status(200).json({
+        success: true,
+        message: "User Followed",
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: e.message,
+    });
+  }
+};
