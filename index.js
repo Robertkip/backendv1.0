@@ -76,13 +76,13 @@ app.use("/api/v1/user", userProfileRouter);
 // })
 
 if (process.env.NODE_ENV === "development") {
-  let ADDRESS = "192.168.1.120";
+  let ADDRESS = "192.168.1.72";
   const server = app.listen(PORT, ADDRESS, () => {
     console.log(`Server is running on port`);
   });
   const io = new Socket(server, {
     cors: {
-      origin: "http://192.168.1.120:8084",
+      origin: "http://192.168.1.72:8084",
     },
   });
 } else if (process.env.NODE_ENV === "production") {
