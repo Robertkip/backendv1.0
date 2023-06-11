@@ -15,6 +15,7 @@ import tenantRouter from "./src/routers/tenantRoute.js";
 import agentRouter from "./src/routers/agentRoute.js";
 import cartRouter from "./src/routers/cartRoute.js";
 import userProfileRouter from "./src/routers/userProfileRoute.js";
+import friendRequestRouter from "./src/routers/friendrequestRouter.js";
 
 const app = express();
 
@@ -38,7 +39,7 @@ app.use(
 );
 if (process.env.NODE_ENV === "development") {
   let corsOptions = {
-    localhost: "http://192.168.0.37:8084",
+    localhost: "http://192.168.1.120:8084",
   };
 
   app.use(cors(corsOptions));
@@ -70,19 +71,20 @@ app.use("/api/v1", tenantRouter);
 app.use("/api/v1", agentRouter);
 app.use("/api/v1", cartRouter);
 app.use("/api/v1/user", userProfileRouter);
+app.use("/api/v1", friendRequestRouter);
 
 // const server =  app.listen(PORT, ADDRESS, () => {
 //     console.log(`Server is running on port`)
 // })
 
 if (process.env.NODE_ENV === "development") {
-  let ADDRESS = "192.168.1.72";
+  let ADDRESS = "192.168.1.120";
   const server = app.listen(PORT, ADDRESS, () => {
     console.log(`Server is running on port`);
   });
   const io = new Socket(server, {
     cors: {
-      origin: "http://192.168.1.72:8084",
+      origin: "http://192.168.1.120:8084",
     },
   });
 } else if (process.env.NODE_ENV === "production") {
