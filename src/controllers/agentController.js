@@ -3,107 +3,107 @@ import { Op } from "sequelize";
 import multer from "multer";
 import path from "path";
 
- 
 export const registerAgent = async (req, res) => {
-    const userId = req.body.userId;
-    const agent_fname = req.body.agent_fname;
-    const agent_lname = req.body.agent_lname;
-    const agent_phonenumber = req.body.agent_phonenumber;
-    const agent_idno = req.body.agent_idno;
-    const agent_location = req.body.agent_location;
-    const agent_avatar = req.file.filename;
+  const userId = req.body.userId;
+  const agent_fname = req.body.agent_fname;
+  const agent_lname = req.body.agent_lname;
+  const agent_phonenumber = req.body.agent_phonenumber;
+  const agent_idno = req.body.agent_idno;
+  const agent_location = req.body.agent_location;
+  const agent_avatar = req.file.filename;
 
-    const agent = await Agent.findOne({where: { [Op.or]: [{agent_idno}, {agent_phonenumber}]}})
+  const agent = await Agent.findOne({
+    where: { [Op.or]: [{ agent_idno }, { agent_phonenumber }] },
+  });
 
-    if(!agent_fname || !agent_lname || !agent_phonenumber || !agent_idno){
-       res.status(400).json({msg: "Please Provide All Fields"})
-    } else if(agent){
-        res.status(400).json({msg: "User with that name does not exist"});
-    } else {
-        Agent.create({
-            userId,
-            agent_fname,
-            agent_lname,
-            agent_phonenumber,
-            agent_idno,
-            agent_location,
-            agent_avatar,
-            
-            type: req.file.mimetype,
-        }).then(data => {
-            res.status(201).send(data);
-        })
-    }
-}
+  if (!agent_fname || !agent_lname || !agent_phonenumber || !agent_idno) {
+    res.status(400).json({ msg: "Please Provide All Fields" });
+  } else if (agent) {
+    res.status(400).json({ msg: "User with that name does not exist" });
+  } else {
+    Agent.create({
+      userId,
+      agent_fname,
+      agent_lname,
+      agent_phonenumber,
+      agent_idno,
+      agent_location,
+      agent_avatar,
 
-export const getAllAgents = async (req, res) => {
-   await Agent.findAll().then(data => {
-      res.status(200).send(data);
-   });
+      type: req.file.mimetype,
+    }).then((data) => {
+      res.status(201).send(data);
+    });
+  }
 };
 
-export const getAllApartmentsByAgent =  (req, res, next) =>  {
-    try {
-        return Agent.findByPk(req.params.id, {
-            include: {
-                association: 'apartments'
-            }
-        })
-    } catch (error) {
-        throw new Error(err)
-    }
-}
+export const getAllAgents = async (req, res) => {
+  await Agent.findAll().then((data) => {
+    res.status(200).send(data);
+  });
+};
+
+export const getAllApartmentsByAgent = (req, res, next) => {
+  try {
+    return Agent.findByPk(req.params.id, {
+      include: {
+        association: "apartments",
+      },
+    });
+  } catch (error) {
+    throw new Error(err);
+  }
+};
 
 export const getAgentById = async (req, res, next) => {
-   const a_id = req.params.id;
-   Agent.findByPk(a_id).then(agent => {
-    if(!agent){
-        res.status(404).json({message: "Agent Not Found"});
+  const a_id = req.params.id;
+  Agent.findByPk(a_id)
+    .then((agent) => {
+      if (!agent) {
+        res.status(404).json({ message: "Agent Not Found" });
         next();
-    } else {
-        res.json(agent)
-    }
-   }).catch()
-}
+      } else {
+        res.json(agent);
+      }
+    })
+    .catch();
+};
 
 export const getSingleAgent = async (req, res) => {
-
-    try {
-      const {userId} = req.params;
-      const agent = await Agent.findOne({
-        where: {userId: userId},
-      })
-      if(agent){
-        return res.status(200).json({agent});
-      }
-    } catch (error) {
-      return res.status(500).send(error.message);
+  try {
+    const { userId } = req.params;
+    const agent = await Agent.findOne({
+      where: { userId: userId },
+    });
+    if (agent) {
+      return res.status(200).json({ agent });
     }
+  } catch (error) {
+    return res.status(500).send(error.message);
   }
-
+};
 
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, __basedir, 'Image')
-    },
-    filename: (req, file, cb) => {
-       cb(null, Date.now() + path.extname(file.originalname));
-    }
-})
+  destination: (req, file, cb) => {
+    cb(null, __basedir, "Image");
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  },
+});
 
 export const upload = multer({
-    storage: storage,
-    limits: {fileSize: '1000000'},
-    fileFilter: (req, file, cb ) => {
-        const fileTypes = /jpeg||jpg||png||gif/;
-        const mimeTypes = fileTypes.test(file.mimetype);
-        const extname = fileTypes.test(path.extname(file.originalname));
+  storage: storage,
+  limits: { fileSize: "1000000" },
+  fileFilter: (req, file, cb) => {
+    const fileTypes = /jpeg||jpg||png||gif/;
+    const mimeTypes = fileTypes.test(file.mimetype);
+    const extname = fileTypes.test(path.extname(file.originalname));
 
-    if( mimeTypes && extname){
-        cb(null, true);
+    if (mimeTypes && extname) {
+      cb(null, true);
     } else {
-        cb("Please Upload the correct file Type");
-      }
+      cb("Please Upload the correct file Type");
     }
-}).single('image');
-
+  },
+}).single("image");
