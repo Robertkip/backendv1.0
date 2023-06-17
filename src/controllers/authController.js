@@ -4,6 +4,8 @@ import bcryptjs from "bcryptjs";
 import { Op } from "sequelize";
 import nodemailer from "nodemailer";
 import { google } from "googleapis";
+import multer from "multer";
+import path from "path";
 import { sequelize } from "../config/connectDb.js";
 import User from "../models/authModel.js";
 import * as PasswordHelper from "../helpers/passwordHelper.js";
@@ -335,6 +337,25 @@ export const verifyOTP = async (req, res, next) => {
     });
 };
 
+export const changeImage = async (req, res) => {
+  const id = req.params.id;
+  const user_avatar = "http://38.242.239.1:8084/" + req.file.filename;
+
+  await User.findOne({ where: { id: id } }).then((updateImage) => {
+    updateImage
+      .update({
+        user_avatar,
+        type: req.file.mimetype,
+      })
+      .then(() => {
+        res.status(200).send({ updateImage });
+      })
+      .catch((error) => {
+        res.status(500).send({ msg: "Error Occurrs" });
+      });
+  });
+};
+
 export const followUser = async (req, res) => {
   const id = req.params.id;
 
@@ -434,3 +455,28 @@ export const followingUser = async (req, res) => {
     });
   }
 };
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, __basedir, "Image");
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  },
+});
+
+export const upload = multer({
+  storage: storage,
+  limits: { fileSize: "1000000" },
+  fileFilter: (req, file, cb) => {
+    const fileTypes = /jpeg||jpg||png||gif/;
+    const mimeTypes = fileTypes.test(file.mimetype);
+    const extname = fileTypes.test(path.extname(file.originalname));
+
+    if (mimeTypes && extname) {
+      cb(null, true);
+    } else {
+      cb("Please Upload the correct file Type");
+    }
+  },
+}).single("image");
