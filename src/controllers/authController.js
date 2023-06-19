@@ -344,6 +344,8 @@ export const changeImage = async (req, res) => {
   await User.findOne({ where: { id: id } }).then((updateImage) => {
     updateImage
       .update({
+        description: req.body.description,
+        dateofbirth: req.body.dateofbirth,
         user_avatar: user_avatar,
         type: req.file.mimetype,
       })

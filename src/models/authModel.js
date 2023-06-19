@@ -39,13 +39,20 @@ const User = sequelize.define("User", {
     type: DataTypes.DATE,
     allowNull: true,
   },
+  dateofbirth: {
+    type: TEXT,
+    allowNull: true,
+  },
+  description: {
+    type: DataTypes.TEXT,
+    allowNull: null,
+  },
   user_avatar: {
     type: DataTypes.STRING,
   },
   type: {
     type: DataTypes.BLOB,
   },
-
   verified: {
     type: DataTypes.BOOLEAN,
     allowNull: true,
