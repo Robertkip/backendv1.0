@@ -40,7 +40,7 @@ const User = sequelize.define("User", {
     allowNull: true,
   },
   dateofbirth: {
-    type: TEXT,
+    type: DataTypes.TEXT,
     allowNull: true,
   },
   description: {
