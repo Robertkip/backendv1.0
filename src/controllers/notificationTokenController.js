@@ -28,3 +28,20 @@ export const notificationDeviceToken = async (req, res) => {
     res.status(500).send({ message: err.message });
   }
 };
+
+export const searchReceiverToken = async (req, res, next) => {
+  // Retrieve all Tutorials from the database.
+  const user = req.query.userId;
+  var condition = user ? { userId: { [Op.like]: `%${user}%` } } : null;
+
+  await NotificationToken.findAll({ where: condition })
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message:
+          err.message || "Some error occurred while retrieving Apartments.",
+      });
+    });
+};
