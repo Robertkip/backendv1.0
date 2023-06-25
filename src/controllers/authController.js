@@ -460,7 +460,7 @@ export const followingUser = async (req, res) => {
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, __basedir, "Image");
+    cb(null, __basedir, "Images");
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + path.extname(file.originalname));
