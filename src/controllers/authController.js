@@ -358,6 +358,22 @@ export const changeImage = async (req, res) => {
   });
 };
 
+export const getSingleUser = async (req, res, next) => {
+  // Retrieve all Tutorials from the database.
+  const { id } = req.query;
+  var condition = id ? { id: { [Op.like]: `%${id}%` } } : null;
+
+  await User.findAll({ where: condition })
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: err.message || "Some error occurred while retrieving Users.",
+      });
+    });
+};
+
 export const followUser = async (req, res) => {
   const id = req.params.id;
 

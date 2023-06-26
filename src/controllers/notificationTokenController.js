@@ -31,8 +31,8 @@ export const notificationDeviceToken = async (req, res) => {
 
 export const searchReceiverToken = async (req, res, next) => {
   // Retrieve all Tutorials from the database.
-  const user = req.query.userId;
-  var condition = user ? { userId: { [Op.like]: `%${user}%` } } : null;
+  const { userId } = req.query;
+  var condition = userId ? { userId: { [Op.like]: `%${userId}%` } } : null;
 
   await NotificationToken.findAll({ where: condition })
     .then((data) => {
