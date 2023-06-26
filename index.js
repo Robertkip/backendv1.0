@@ -73,7 +73,7 @@ app.use("/api/v1", agentRouter);
 app.use("/api/v1", cartRouter);
 app.use("/api/v1/user", userProfileRouter);
 app.use("/api/v1", friendRequestRouter);
-app.use("/api/v1", notificationDeviceRouter);
+app.use("/api/v1/token", notificationDeviceRouter);
 
 // const server =  app.listen(PORT, ADDRESS, () => {
 //     console.log(`Server is running on port`)

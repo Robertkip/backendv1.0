@@ -1,3 +1,4 @@
+import { Op, literal } from "sequelize";
 import NotificationToken from "../models/notificationTokenModel.js";
 
 export const notificationDeviceToken = async (req, res) => {
@@ -30,9 +31,15 @@ export const notificationDeviceToken = async (req, res) => {
 };
 
 export const searchReceiverToken = async (req, res, next) => {
-  // Retrieve all Tutorials from the database.
+  // Retrieve all Tutorials from the database.  const user = req.query.userId; 
+
   const user = req.query.userId;
-  var condition = user ? { userId: { [Op.like]: `%${user}%` } } : null;
+  var condition = user ? { 
+    [Op.and]: [
+      literal(`CAST("userId" AS TEXT) LIKE '%${user}%'`),
+      literal(`"userId" IS NOT NULL`)
+    ]
+  } : null;
 
   await NotificationToken.findAll({ where: condition })
     .then((data) => {
