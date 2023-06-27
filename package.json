@@ -39,6 +39,8 @@
     "react-native-elements": "^3.4.3",
     "sequelize": "^6.27.0",
     "socket.io": "^4.5.4",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^4.6.3",
     "twilio": "^3.84.0",
     "url": "^0.11.0",
     "util": "^0.12.5"
