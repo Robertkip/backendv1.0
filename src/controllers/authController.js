@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 import twilio from "twilio";
 import bcryptjs from "bcryptjs";
-import { Op } from "sequelize";
+import { Op, literal } from "sequelize";
 import nodemailer from "nodemailer";
 import { google } from "googleapis";
 import multer from "multer";
@@ -356,6 +356,29 @@ export const changeImage = async (req, res) => {
         res.status(500).send({ msg: "Error Occurrs" });
       });
   });
+};
+
+export const getSingleUser = async (req, res, next) => {
+  // Retrieve all Tutorials from the database.
+
+ const id = req.query.id;
+  var condition = id ? { 
+    [Op.and]: [
+      literal(`CAST("id" AS TEXT) LIKE '%${id}%'`),
+      literal(`"id" IS NOT NULL`)
+    ]
+  } : null;
+
+
+  await User.findAll({ where: condition })
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: err.message || "Some error occurred while retrieving Users.",
+      });
+    });
 };
 
 export const followUser = async (req, res) => {
