@@ -5,7 +5,10 @@ import helmet from "helmet";
 import logger from "morgan";
 import path from "path";
 import url from "url";
+import fs from "fs";
 import { Server as Socket } from "socket.io";
+import swaggerJSDoc from "swagger-jsdoc";
+import swaggerUi from "swagger-ui-express";
 import apartmentRouter from "./src/routers/apartmentRoute.js";
 import authRouter from "./src/routers/authRoute.js";
 import roleRouter from "./src/routers/roleRoute.js";
@@ -17,6 +20,7 @@ import cartRouter from "./src/routers/cartRoute.js";
 import userProfileRouter from "./src/routers/userProfileRoute.js";
 import friendRequestRouter from "./src/routers/friendrequestRouter.js";
 import notificationDeviceRouter from "./src/routers/notificationTokenRoute.js";
+import options from "./swagger.js";
 
 const app = express();
 
@@ -28,6 +32,12 @@ global.__basedir = __dirname;
 
 console.log(__basedir);
 
+const specs = {
+  customCss: fs.readFileSync("./swagger.css", "utf-8"),
+};
+
+// const spec = swaggerJSDoc(options);
+
 // const Roles = db.roles;
 const PORT = process.env.PORT || 8084;
 
@@ -38,30 +48,33 @@ app.use(
     maxAge: 24 * 60 * 60 * 100,
   })
 );
-if (process.env.NODE_ENV === "development") {
-  let corsOptions = {
-    localhost: "http://192.168.1.76:8084",
-  };
 
-  app.use(cors(corsOptions));
-} else if (process.env.NODE_ENV === "production") {
-  let corsOptions = {
-    origin: "http://38.242.239.1:8084",
-  };
+// if (process.env.NODE_ENV === "development") {
+//   let corsOptions = {
+//     localhost: "http://192.168.1.76:8084",
+//   };
 
-  app.use(cors(corsOptions));
-} else {
-  let corsOptions = {
-    localhost: "http://192.168.1.76:8084",
-  };
+//   app.use(cors(corsOptions));
+// } else if (process.env.NODE_ENV === "production") {
+//   let corsOptions = {
+//     origin: "http://38.242.239.1:8084",
+//   };
 
-  app.use(cors(corsOptions));
-}
+//   app.use(cors(corsOptions));
+// } else {
+//   let corsOptions = {
+//     localhost: "http://192.168.1.76:8084",
+//   };
+
+//   app.use(cors(corsOptions));
+// }
+
 app.use(express.json());
 app.use(helmet());
 app.use(logger("common"));
 
 app.use("/images", express.static("Images"));
+app.use("/swagger-ui", swaggerUi.serve, swaggerUi.setup(options, specs));
 
 app.use("/api/v1", apartmentRouter);
 app.use("/api/v1", authRouter);
