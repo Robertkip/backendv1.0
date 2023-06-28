@@ -1,4 +1,5 @@
 import * as Helper from "../helpers/helper.js";
+import User from "../models/authModel.js";
 
 export const Authenticated = (req, res, next) => {
   try {
@@ -8,7 +9,15 @@ export const Authenticated = (req, res, next) => {
       return res.status(401).send({ msg: "Unauthorized" });
     }
     const result = Helper.ExtractToken(token);
-    console.log("Authenticated result is", result.roleId);
+    console.log("Authenticated result is", result.id);
+
+    const userId = result.id;
+    const user = User.findByPk(userId);
+
+    // req.user = user;
+
+    console.log("User Object is", user);
+
     if (!result) {
       return res.status(401).send({ msg: "Unauthorized" });
     }

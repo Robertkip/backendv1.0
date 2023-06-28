@@ -2,57 +2,19 @@ import CartItem from "../models/cartItemModel.js";
 import Order from "../models/orderModel.js";
 import Market from "../models/marketModel.js";
 
-export const getCartItem = async (req, res, next) => {
+export const getCartItems = async (req, res) => {
   try {
-    let order;
-    if (req.user) {
-      order = await Order.findOne({
-        where: {
-          userId: req.user.id,
-        },
-      });
-    } else {
-      order = await Order.findOne({
-        where: {
-          id: req.session.activeOrder.id,
-          isActive: true,
-        },
-      });
-    }
-    const currentOrder = await CartItem.findAll({
-      where: { orderId: order.id },
-      order: [["product_name", "ASC"]],
-      include: [Market],
-    });
-
-    let totalQuantity = 0;
-    let totalPrice = 0;
-
-    currentOrder.map((eachProduct) => {
-      totalQuantity += eachProduct.product_quantity;
-      totalPrice += eachProduct.product_price * eachProduct.product_quantity;
-      return eachProduct;
-    });
-
-    res.json({ currentOrder: currentOrder, totalQuantity, totalPrice });
-  } catch (error) {
-    next(error);
+    const carts = await CartItem.findAll();
+    res.status(200).send(carts);
+  } catch (err) {
+    res.status(500).send({ message: err.message });
   }
 };
 
 export const postCartItem = async (req, res, next) => {
-  // if(!req.user){
-  //     return res.status(403).send({error: "Not Authorized."});
-  // }
-  // CartItem.findAll({
-  //     where: {
-  //         userId: req.user.id,
-  //         product_id: req.body.id,
-
-  //     }
-  // })
   try {
-    const { product_id } = req.body;
+    console.log("Req User Object Is", req.user);
+    const { product_id } = req.params.id;
     const { userId } = req.user;
     //Check if the product exists;
     const product = await Market.findByPk(product_id);
@@ -62,7 +24,7 @@ export const postCartItem = async (req, res, next) => {
     }
 
     // Check if the product is already in the user's cart
-    const cartItem = await Cart.findOne({
+    const cartItem = await CartItem.findOne({
       where: {
         userId,
         product_id,
@@ -76,7 +38,7 @@ export const postCartItem = async (req, res, next) => {
     }
 
     // Add the product to the cart
-    await Cart.create({
+    await CartItem.create({
       userId,
       product_id,
       // Add other relevant details to the cart item, such as quantity, price, etc.
@@ -86,39 +48,66 @@ export const postCartItem = async (req, res, next) => {
       .status(200)
       .json({ message: "Product added to cart successfully" });
   } catch (error) {
-    return res.status(500).json({ error: "Failed to add product to cart" });
+    return res.status(500).json({ msg });
   }
 };
 
-export const deleteCartItem = async (req, res, next) => {
+export const updateQuantity = async (marketId, quantityToSubtract) => {
   try {
-    let order;
-    if (req.user) {
-      order = await Order.findOne({
-        where: {
-          userId: req.user.id,
-          isActive: true,
-        },
-      });
-    } else {
-      order = await Order.findOne({
-        where: {
-          id: req.session.activeOrder.id,
-          isActive: true,
-        },
-      });
+    const market = await Market.findByPk(marketId);
+
+    if (!market) {
+      throw new Error("Market not found");
     }
 
-    const deletedProduct = await CartItem.findOne({
+    const newQuantity = market.quantity - quantityToSubtract;
+
+    if (newQuantity < 0) {
+      throw new Error("Insufficient quantity");
+    }
+
+    market.quantity = newQuantity;
+    await market.save();
+
+    return market;
+  } catch (error) {
+    throw new Error("Failed to update Market quantity");
+  }
+};
+
+export const removeCartItem = async (req, res, next) => {
+  try {
+    console.log("Req User Object Is", req.user);
+    const { product_id } = req.params.id;
+    const { userId } = req.user;
+    //Check if the product exists;
+    const product = await Market.findByPk(product_id);
+
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    // Check if the product is already in the user's cart
+    const cartItem = await CartItem.findOne({
       where: {
-        product_id: req.params.id,
+        userId,
+        product_id,
       },
     });
 
-    await deletedProduct.destroy();
-    res.send(req.params.id);
+    if (cartItem) {
+      // If the product is already in the cart, you can handle it as per your requirements
+      // For example, you can update the quantity or show an error message
+      return res.status(400).json({ error: "Product already in the cart" });
+    }
+
+    // Add the product to the cart
+    await CartItem.destroy();
+
+    return res
+      .status(200)
+      .json({ message: "Product added to cart successfully" });
   } catch (error) {
-    console.log(error);
-    next(error);
+    return res.status(500).json({ msg });
   }
 };

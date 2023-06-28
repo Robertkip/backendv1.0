@@ -5,42 +5,51 @@ import Landlord from "./landlordModel.js";
 import Agent from "./agentModel.js";
 import Tenant from "./tenantModel.js";
 
-const Market = sequelize.define('Market', {
-    sellerId: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-    },
-    product_name: {
-        type: DataTypes.STRING
-    },
-    product_description: {
-        type: DataTypes.STRING
-    },
-    product_price: {
-        type: DataTypes.INTEGER,
-    },
-    type: {
-        type: DataTypes.STRING
-      },
-    product_image: {
-        type: DataTypes.STRING
-    },
-})
+const Market = sequelize.define("Market", {
+  sellerId: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+  },
+  product_quantity: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+  },
+  product_name: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  product_description: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  product_price: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+  },
+  type: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  product_image: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+});
 
 export default Market;
 
 Market.associations = (models) => {
-    Market.belongsTo(User, {
-        foreignKey: 'sellerId',
-    })
-    Market.belongsTo(Landlord, {
-        foreignKey: 'sellerId',
-    })
-     Market.belongsTo(Agent, {
-        foreignKey: 'sellerId',
-    })
-    Market.belongsTo(Tenant, {
-        foreignKey: 'sellerId',
-    })
-   return Seller;   
-}
+  Market.belongsTo(User, {
+    foreignKey: "sellerId",
+  });
+  Market.belongsTo(Landlord, {
+    foreignKey: "sellerId",
+  });
+  Market.belongsTo(Agent, {
+    foreignKey: "sellerId",
+  });
+  Market.belongsTo(Tenant, {
+    foreignKey: "sellerId",
+  });
+  return Seller;
+};
