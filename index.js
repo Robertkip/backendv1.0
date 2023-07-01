@@ -20,7 +20,8 @@ import cartRouter from "./src/routers/cartRoute.js";
 import userProfileRouter from "./src/routers/userProfileRoute.js";
 import friendRequestRouter from "./src/routers/friendrequestRouter.js";
 import notificationDeviceRouter from "./src/routers/notificationTokenRoute.js";
-import options from "./swagger.js";
+import ratingRouter from "./src/routers/ratingRoute.js";
+import options from "./swagger-output.json" assert { type: "json" };
 
 const app = express();
 
@@ -74,7 +75,7 @@ app.use(helmet());
 app.use(logger("common"));
 
 app.use("/images", express.static("Images"));
-app.use("/swagger-ui", swaggerUi.serve, swaggerUi.setup(options, specs));
+app.use("/swagger-ui", swaggerUi.serve, swaggerUi.setup(options));
 
 app.use("/api/v1", apartmentRouter);
 app.use("/api/v1", authRouter);
@@ -87,6 +88,7 @@ app.use("/api/v1", cartRouter);
 app.use("/api/v1/user", userProfileRouter);
 app.use("/api/v1", friendRequestRouter);
 app.use("/api/v1", notificationDeviceRouter);
+app.use("/api/v1", ratingRouter);
 
 // const server =  app.listen(PORT, ADDRESS, () => {
 //     console.log(`Server is running on port`)

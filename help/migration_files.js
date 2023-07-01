@@ -5,3 +5,4 @@
 // npx sequelize-cli model:generate --name Tenant --attributes userId:integer,logentId:string,tenant_lname:string,tenent_location:string,tenant_idno:integer,tenant_phonenumber:integer,tenant_avatar:string,type:string;
 // npx sequelize-cli model:generate --name Friendrequest --attributes status:enum,senderId:integer,receiverId:integer;
 // npx sequelize-cli model:generate --name NotificationToken --attributes userId:integer,deviceToken:string;
+// npx sequelize-cli model:generate --name Market --attributes sellerId:integer,product_quantity:integer,product_name:string,product_description:string,product_price:integer,type:string,product_image:string;

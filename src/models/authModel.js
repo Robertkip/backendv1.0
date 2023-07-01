@@ -49,9 +49,11 @@ const User = sequelize.define("User", {
   },
   user_avatar: {
     type: DataTypes.STRING,
+    allowNull: true,
   },
   type: {
     type: DataTypes.BLOB,
+    allowNull: true,
   },
   verified: {
     type: DataTypes.BOOLEAN,

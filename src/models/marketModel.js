@@ -4,6 +4,7 @@ import User from "./authModel.js";
 import Landlord from "./landlordModel.js";
 import Agent from "./agentModel.js";
 import Tenant from "./tenantModel.js";
+import CartItem from "./cartItemModel.js";
 
 const Market = sequelize.define("Market", {
   sellerId: {
@@ -39,6 +40,10 @@ const Market = sequelize.define("Market", {
 export default Market;
 
 Market.associations = (models) => {
+  Market.hasOne(CartItem, {
+    foreignKey: "sellerId",
+    as: "cartitem",
+  });
   Market.belongsTo(User, {
     foreignKey: "sellerId",
   });
@@ -51,5 +56,5 @@ Market.associations = (models) => {
   Market.belongsTo(Tenant, {
     foreignKey: "sellerId",
   });
-  return Seller;
+  return Market;
 };
