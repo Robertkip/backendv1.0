@@ -7,55 +7,25 @@ const router = express.Router();
 
 router.use(Authenticated);
 
-export const getCartItem = async (req, res, next) => {
+export const getCartItems = async (req, res) => {
   try {
-    let order;
-    if (req.user) {
-      order = await Order.findOne({
-        where: {
-          userId: req.user.id,
+        const {user} = req;
+    const { product_id } = req.params;
+    const userId  = user.dataValues.id;
+
+    const carts = await CartItem.findAll({
+      where: {
+          userId
         },
-      });
-    } else {
-      order = await Order.findOne({
-        where: {
-          id: req.session.activeOrder.id,
-          isActive: true,
-        },
-      });
-    }
-    const currentOrder = await CartItem.findAll({
-      where: { orderId: order.id },
-      order: [["product_name", "ASC"]],
-      include: [Market],
+     include:Market,
     });
-
-    let totalQuantity = 0;
-    let totalPrice = 0;
-
-    currentOrder.map((eachProduct) => {
-      totalQuantity += eachProduct.product_quantity;
-      totalPrice += eachProduct.product_price * eachProduct.product_quantity;
-      return eachProduct;
-    });
-
-    res.json({ currentOrder: currentOrder, totalQuantity, totalPrice });
-  } catch (error) {
-    next(error);
+    res.status(200).send(carts);
+  } catch (err) {
+    res.status(500).send({ message: err.message });
   }
 };
 
 export const postCartItem = async (req, res, next) => {
-  // if(!req.user){
-  //     return res.status(403).send({error: "Not Authorized."});
-  // }
-  // CartItem.findAll({
-  //     where: {
-  //         userId: req.user.id,
-  //         product_id: req.body.id,
-
-  //     }
-  // })
   try {
     const {user} = req;
     const { product_id } = req.params;
@@ -94,38 +64,87 @@ export const postCartItem = async (req, res, next) => {
       .json({ message: "Product added to cart successfully" });
   } catch (err) {
     return res.status(500).json({message: err.message});
-  }
+  } 
 };
 
-export const deleteCartItem = async (req, res, next) => {
-  try {
-    let order;
-    if (req.user) {
-      order = await Order.findOne({
-        where: {
-          userId: req.user.id,
-          isActive: true,
-        },
-      });
-    } else {
-      order = await Order.findOne({
-        where: {
-          id: req.session.activeOrder.id,
-          isActive: true,
-        },
-      });
-    }
 
-    const deletedProduct = await CartItem.findOne({
+export const updateQuantity = async (req, res) => {
+  try {
+    const { itemId } = req.params;
+    const { action } = req.body;
+    const { userId } = req.user; // Assuming you have user authentication and session management
+
+    // Check if the cart item exists
+    const cartItem = await CartItem.findOne({
       where: {
-        product_id: req.params.id,
+        id: itemId,
+        userId,
       },
     });
 
-    await deletedProduct.destroy();
-    res.send(req.params.id);
+    if (!cartItem) {
+      return res.status(404).json({ error: "Cart item not found" });
+    }
+
+    // Update the quantity of the cart item based on the action
+    if (action === "increment") {
+      cartItem.quantity += 1;
+    } else if (action === "decrement") {
+      if (cartItem.quantity === 1) {
+        // If the quantity is already 1 and the action is 'decrement', you can handle it as per your requirements
+        // For example, you can delete the item from the cart or show an error message
+        return res.status(400).json({ error: "Minimum quantity reached" });
+      }
+      cartItem.quantity -= 1;
+    }
+
+    await cartItem.save();
+
+    return res
+      .status(200)
+      .json({ message: "Cart item quantity updated successfully" });
   } catch (error) {
-    console.log(error);
-    next(error);
+    return res
+      .status(500)
+      .json({ error: "Failed to update cart item quantity" });
+  }
+};
+
+
+
+export const removeCartItem = async (req, res, next) => {
+  try {
+    console.log("Req User Object Is", req.user);
+    const { product_id } = req.params;
+    const { user} = req;
+    const userId  = user.dataValues.id;
+    console.log("Req User Object  Controller", userId);
+
+    //Check if the product exists;
+    const product = await Market.findByPk(product_id);
+
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    // Check if the product is already in the user's cart
+    const cartItem = await CartItem.findOne({
+      where: {
+        userId,
+        product_id,
+      },
+    });
+
+
+    if (!cartItem) {
+      return res.status(404).json({ error: 'Cart item not found' });
+    }
+
+    // Add the product to the cart
+    await cartItem.destroy();
+
+    return res.status(200).json({ message: 'Cart item deleted successfully' });
+  } catch (error) {
+    return res.status(500).json({ error: 'Failed to delete cart item' });
   }
 };

@@ -21,7 +21,6 @@ CartItem.associations = (models) => {
   CartItem.belongsTo(User, {
     foreignKey: "userId",
   });
-  Market.hasMany(CartItem);
 
   return CartItem;
 };

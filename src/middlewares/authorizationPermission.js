@@ -10,6 +10,7 @@ export const Authenticated = async (req, res, next) => {
     }
     const result = Helper.ExtractToken(token);
     console.log("Authenticated result is", result.id);
+
     if (!result) {
       return res.status(401).send({ msg: "Unauthorized" });
     }

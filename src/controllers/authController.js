@@ -11,6 +11,7 @@ import User from "../models/authModel.js";
 import * as PasswordHelper from "../helpers/passwordHelper.js";
 import * as Helper from "../helpers/helper.js";
 import Otp from "../models/otpModel.js";
+import { Authenticated } from "../middlewares/authorizationPermission.js";
 dotenv.config();
 
 const {
