@@ -7,6 +7,7 @@ import path from "path";
 import url from "url";
 import fs from "fs";
 import { Server as Socket } from "socket.io";
+import passport from "passport";
 import swaggerJSDoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 import apartmentRouter from "./src/routers/apartmentRoute.js";
@@ -22,6 +23,7 @@ import friendRequestRouter from "./src/routers/friendrequestRouter.js";
 import notificationDeviceRouter from "./src/routers/notificationTokenRoute.js";
 import ratingRouter from "./src/routers/ratingRoute.js";
 import options from "./swagger-output.json" assert { type: "json" };
+import { initPassport } from "./src/middlewares/initPassport.js";
 
 const app = express();
 
@@ -42,6 +44,8 @@ const specs = {
 // const Roles = db.roles;
 const PORT = process.env.PORT || 8084;
 
+initPassport(app);
+
 app.use(
   cookieSession({
     name: "session",
@@ -57,6 +61,8 @@ app.use(express.json());
 app.use(helmet());
 app.use(logger("common"));
 
+app.use(passport.initialize());
+app.use(passport.session());
 app.use("/images", express.static("Images"));
 app.use("/swagger-ui", swaggerUi.serve, swaggerUi.setup(options));
 
