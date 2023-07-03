@@ -200,7 +200,9 @@ export const sendOtpVerification = async ({ id, email }, res) => {
   });
 
   await newOTPVerification.save();
-  transporter.sendMail(mailOptions);
+  await transporter.sendMail(mailOptions).then((res) => {
+    console.log("Email Response is", res);
+  });
   res.json({
     status: "PENDING",
     message: "Verification OTP Email Sent",
