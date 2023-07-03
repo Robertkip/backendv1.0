@@ -20,7 +20,8 @@ import cartRouter from "./src/routers/cartRoute.js";
 import userProfileRouter from "./src/routers/userProfileRoute.js";
 import friendRequestRouter from "./src/routers/friendrequestRouter.js";
 import notificationDeviceRouter from "./src/routers/notificationTokenRoute.js";
-import options from "./swagger.js";
+import ratingRouter from "./src/routers/ratingRoute.js";
+import options from "./swagger-output.json" assert { type: "json" };
 
 const app = express();
 
@@ -49,32 +50,15 @@ app.use(
   })
 );
 
-// if (process.env.NODE_ENV === "development") {
-//   let corsOptions = {
-//     localhost: "http://192.168.1.76:8084",
-//   };
+app.use(cors());
 
-//   app.use(cors(corsOptions));
-// } else if (process.env.NODE_ENV === "production") {
-//   let corsOptions = {
-//     origin: "http://38.242.239.1:8084",
-//   };
-
-//   app.use(cors(corsOptions));
-// } else {
-//   let corsOptions = {
-//     localhost: "http://192.168.1.76:8084",
-//   };
-
-//   app.use(cors(corsOptions));
-// }
 
 app.use(express.json());
 app.use(helmet());
 app.use(logger("common"));
 
 app.use("/images", express.static("Images"));
-app.use("/swagger-ui", swaggerUi.serve, swaggerUi.setup(options, specs));
+app.use("/swagger-ui", swaggerUi.serve, swaggerUi.setup(options));
 
 app.use("/api/v1", apartmentRouter);
 app.use("/api/v1", authRouter);
@@ -87,7 +71,7 @@ app.use("/api/v1", cartRouter);
 app.use("/api/v1/user", userProfileRouter);
 app.use("/api/v1", friendRequestRouter);
 app.use("/api/v1/token", notificationDeviceRouter);
-
+app.use("/api/v1", ratingRouter);
 // const server =  app.listen(PORT, ADDRESS, () => {
 //     console.log(`Server is running on port`)
 // })
@@ -104,12 +88,12 @@ if (process.env.NODE_ENV === "development") {
   });
 } else if (process.env.NODE_ENV === "production") {
   let ADDRESS = "38.242.239.1";
-  const server = app.listen(PORT, ADDRESS, () => {
+  const server = app.listen(PORT,ADDRESS, () => {
     console.log(`Server is running on port`);
   });
   const io = new Socket(server, {
     cors: {
-      origin: "http://localhost:8084",
+      origin: "http://38.242.239.1:8084",
     },
   });
 } else {

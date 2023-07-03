@@ -40,11 +40,12 @@ const Market = sequelize.define("Market", {
 export default Market;
 
 Market.associations = (models) => {
-Market.hasMany(CartItem, {
-   foreignKey: "productId",
-   sourceKey: "id",
-});
-Market.belongsTo(User, {
+
+  Market.hasOne(CartItem, {
+    foreignKey: "sellerId",
+    as: "cartitem",
+  });
+  Market.belongsTo(User, {
     foreignKey: "sellerId",
   });
   Market.belongsTo(Landlord, {
@@ -56,5 +57,5 @@ Market.belongsTo(User, {
   Market.belongsTo(Tenant, {
     foreignKey: "sellerId",
   });
-  return Seller;
+  return Market;
 };

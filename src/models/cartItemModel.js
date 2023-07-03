@@ -8,7 +8,7 @@ const CartItem = sequelize.define("CartItem", {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
-  product_id: {
+  productId: {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
@@ -16,7 +16,8 @@ const CartItem = sequelize.define("CartItem", {
 
 CartItem.associations = (models) => {
   CartItem.belongsTo(Market, {
-    foreignKey: "product_id",
+    foreignKey: "productId",
+    as: "market",
   });
   CartItem.belongsTo(User, {
     foreignKey: "userId",

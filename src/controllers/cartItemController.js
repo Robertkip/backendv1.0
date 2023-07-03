@@ -1,38 +1,20 @@
 import express from "express";
+import { sequelize } from "../config/connectDb.js";
 import CartItem from "../models/cartItemModel.js";
-import Order from "../models/orderModel.js";
 import Market from "../models/marketModel.js";
 import { Authenticated } from "../middlewares/authorizationPermission.js";
 const router = express.Router();
 
 router.use(Authenticated);
 
-export const getCartItems = async (req, res) => {
-  try {
-        const {user} = req;
-    const { product_id } = req.params;
-    const userId  = user.dataValues.id;
-
-    const carts = await CartItem.findAll({
-      where: {
-          userId
-        },
-     include:Market,
-    });
-    res.status(200).send(carts);
-  } catch (err) {
-    res.status(500).send({ message: err.message });
-  }
-};
-
 export const postCartItem = async (req, res, next) => {
   try {
-    const {user} = req;
-    const { product_id } = req.params;
-    const userId  = user.dataValues.id;
+    const { user } = req;
+    const { productId } = req.params;
+    const userId = user.dataValues.id;
     console.log("Req User Object  Controller", userId);
     //Check if the product exists;
-    const product = await Market.findByPk(product_id);
+    const product = await Market.findByPk(productId);
 
     if (!product) {
       return res.status(404).json({ error: "Product not found" });
@@ -42,7 +24,7 @@ export const postCartItem = async (req, res, next) => {
     const cartItem = await CartItem.findOne({
       where: {
         userId,
-        product_id,
+        productId,
       },
     });
 
@@ -55,7 +37,7 @@ export const postCartItem = async (req, res, next) => {
     // Add the product to the cart
     await CartItem.create({
       userId,
-      product_id,
+      productId,
       // Add other relevant details to the cart item, such as quantity, price, etc.
     });
 
@@ -63,10 +45,51 @@ export const postCartItem = async (req, res, next) => {
       .status(200)
       .json({ message: "Product added to cart successfully" });
   } catch (err) {
-    return res.status(500).json({message: err.message});
-  } 
+    return res.status(500).json({ message: err.message });
+  }
 };
 
+// export const getCartItems = async (req, res) => {
+//   try {
+//     const { user } = req;
+//     const { productId } = req.params;
+//     const userId = user.dataValues.id;
+
+//     const carts = await CartItem.findAll({
+//       where: {
+//         userId,
+//       },
+//       include: Market,
+//     });
+//     res.status(200).send(carts);
+//   } catch (err) {
+//     res.status(500).send({ message: err.message });
+//   }
+// };
+
+export const getCartItems = async (req, res) => {
+  try {
+    const { user } = req;
+    const { productId } = req.params;
+    const userId = user.dataValues.id;
+
+    const query = `
+  SELECT "CartItem".id, "CartItem"."userId", "CartItem"."productId", "Market"."product_quantity", "Market"."product_name", "Market"."product_description", "Market"."product_price", "Market"."type", "Market"."product_image"
+  FROM "CartItems" AS "CartItem"
+  INNER JOIN "Markets" AS "Market" ON "CartItem"."productId" = "Market"."id"
+  WHERE "CartItem"."userId" = :userId
+`;
+
+    const carts = await sequelize.query(query, {
+      replacements: { userId },
+      type: sequelize.QueryTypes.SELECT,
+    });
+
+    res.status(200).send(carts);
+  } catch (err) {
+    res.status(500).send({ message: err.message });
+  }
+};
 
 export const updateQuantity = async (req, res) => {
   try {
@@ -110,18 +133,16 @@ export const updateQuantity = async (req, res) => {
   }
 };
 
-
-
 export const removeCartItem = async (req, res, next) => {
   try {
     console.log("Req User Object Is", req.user);
-    const { product_id } = req.params;
-    const { user} = req;
-    const userId  = user.dataValues.id;
+    const { productId } = req.params;
+    const { user } = req;
+    const userId = user.dataValues.id;
     console.log("Req User Object  Controller", userId);
 
     //Check if the product exists;
-    const product = await Market.findByPk(product_id);
+    const product = await Market.findByPk(productId);
 
     if (!product) {
       return res.status(404).json({ error: "Product not found" });
@@ -131,20 +152,20 @@ export const removeCartItem = async (req, res, next) => {
     const cartItem = await CartItem.findOne({
       where: {
         userId,
-        product_id,
+        productId,
       },
     });
 
-
     if (!cartItem) {
-      return res.status(404).json({ error: 'Cart item not found' });
+      return res.status(404).json({ error: "Cart item not found" });
     }
 
     // Add the product to the cart
     await cartItem.destroy();
 
-    return res.status(200).json({ message: 'Cart item deleted successfully' });
+    return res.status(200).json({ message: "Cart item deleted successfully" });
   } catch (error) {
-    return res.status(500).json({ error: 'Failed to delete cart item' });
+    return res.status(500).json({ error: "Failed to delete cart item" });
   }
 };
+
