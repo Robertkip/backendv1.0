@@ -8,7 +8,7 @@ router.post("/market", marketController.upload, marketController.createMarket);
 router.get("/allmarket", marketController.getMarket);
 router.delete("/market/delete/:id", marketController.deleteMarket);
 router.delete(
-  "/apartment/delete/all",
+  "/market/delete/all",
   Authorization.Authenticated,
   Authorization.AdminRole,
   marketController.deleteAllMarket
