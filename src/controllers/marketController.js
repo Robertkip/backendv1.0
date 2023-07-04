@@ -51,6 +51,23 @@ export const getMarketBySellerId = async () => {
   }
 };
 
+export const deleteMarket = async (req, res, next) => {
+  const p_id = req.params.id;
+  await Market.destroy({ where: { id: p_id } })
+    .then(() => {
+      res.status(200).json({ message: "Market deleted successfully" });
+    })
+    .catch((error) => next(error));
+};
+
+export const deleteAllMarket = async (req, res, next) => {
+  await Market.destroy({ where: {}, truncate: false })
+    .then(() => {
+      res.status(200).json({ message: "Market deleted successfully" });
+    })
+    .catch((error) => next(error));
+};
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, __basedir + "/Images");

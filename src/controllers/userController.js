@@ -12,7 +12,7 @@ export const createUserProfile = async (req, res, next) => {
   const user_location = req.body.user_location;
   const followers = req.body.followers;
   const following = req.body.following;
-  const user_avatar = "http://38.242.239.1:8084/images/" + req.file.filename;
+  const user_avatar = "https://api.waridi.co/images/" + req.file.filename;
 
   const userprofile = await UserProfile.findOne({
     where: { user_phonenumber },

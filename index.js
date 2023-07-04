@@ -23,6 +23,7 @@ import friendRequestRouter from "./src/routers/friendrequestRouter.js";
 import notificationDeviceRouter from "./src/routers/notificationTokenRoute.js";
 import ratingRouter from "./src/routers/ratingRoute.js";
 //import passportSetup from "./src/middlewares/passport.js";
+
 import options from "./swagger-output.json" assert { type: "json" };
 
 
@@ -70,10 +71,10 @@ app.use("/swagger-ui", swaggerUi.serve, swaggerUi.setup(options));
 app.use("/api/v1", apartmentRouter);
 app.use("/api/v1", authRouter);
 app.use("/api/v1", roleRouter);
-app.use("/api/v1", marketRouter);
 app.use("/api/v1", landlordRouter);
 app.use("/api/v1", tenantRouter);
 app.use("/api/v1", agentRouter);
+app.use("/api/v1", marketRouter);
 app.use("/api/v1", cartRouter);
 app.use("/api/v1/user", userProfileRouter);
 app.use("/api/v1", friendRequestRouter);
