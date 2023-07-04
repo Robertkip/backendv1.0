@@ -22,8 +22,9 @@ import userProfileRouter from "./src/routers/userProfileRoute.js";
 import friendRequestRouter from "./src/routers/friendrequestRouter.js";
 import notificationDeviceRouter from "./src/routers/notificationTokenRoute.js";
 import ratingRouter from "./src/routers/ratingRoute.js";
+//import passportSetup from "./src/middlewares/passport.js";
 import options from "./swagger-output.json" assert { type: "json" };
-import { initPassport } from "./src/middlewares/initPassport.js";
+
 
 const app = express();
 
@@ -44,7 +45,7 @@ const specs = {
 // const Roles = db.roles;
 const PORT = process.env.PORT || 8084;
 
-initPassport(app);
+//passportSetup(app);
 
 app.use(
   cookieSession({
@@ -56,8 +57,8 @@ app.use(
 
 app.use(cors());
 
-
-app.use(express.json());
+app.use(express.json({limit: "50mb", extended: true}))
+app.use(express.urlencoded({limit: "50mb", extended: true}))
 app.use(helmet());
 app.use(logger("common"));
 

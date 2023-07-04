@@ -342,7 +342,7 @@ export const verifyOTP = async (req, res, next) => {
 
 export const changeImage = async (req, res) => {
   const id = req.params.id;
-  const user_avatar = "http://38.242.239.1:8084/images/" + req.file.filename;
+  const user_avatar = "https://api.waridi.co/images/" + req.file.filename;
 
   await User.findOne({ where: { id: id } }).then((updateImage) => {
     updateImage

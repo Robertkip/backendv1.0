@@ -3,19 +3,19 @@ import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { Strategy as FacebookStrategy } from "passport-facebook";
 import passport from "passport";
 
+dotenv.config();
+
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const FACEBOOK_ID = process.env.FACEBOOK_ID;
 const FACEBOOK_SECRET = process.env.FACEBOOK_SECRET;
 
-dotenv.config();
-
 passport.use(
   new GoogleStrategy(
     {
-      clientID: GOOGLE_CLIENT_ID,
-      clientSecret: GOOGLE_CLIENT_SECRET,
-      callbackURL: "https://waridi.co/api/v1/google/callback",
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: "https://api.waridi.co/api/v1/google/callback",
     },
     function (accessToken, refreshToken, profile, done) {
       console.log(profile);
@@ -29,7 +29,7 @@ passport.use(
     {
       clientID: FACEBOOK_ID,
       clientSecret: FACEBOOK_SECRET,
-      callbackURL: "https://waridi.co/api/v1/facebook/callback",
+      callbackURL: "https://api.waridi.co/api/v1/facebook/callback",
     },
     function (accessToken, refreshToken, profile, done) {
       console.log(profile);

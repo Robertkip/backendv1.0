@@ -72,10 +72,10 @@ export const uploadApartment = async (req, res) => {
         console.log(error);
       }
     } else if (process.env.NODE_ENV === "production") {
-      const name1 = "http://38.242.239.1:8084/images/" + req.files[0].filename;
-      const name2 = "http://38.242.239.1:8084/images/" + req.files[1].filename;
-      const name3 = "http://38.242.239.1:8084/images/" + req.files[2].filename;
-      const name4 = "http://38.242.239.1:8084/images/" + req.files[3].filename;
+      const name1 = "https://api.waridi.co/images/" + req.files[0].filename;
+      const name2 = "https://api.waridi.co/images/" + req.files[1].filename;
+      const name3 = "https://api.waridi.co/images/" + req.files[2].filename;
+      const name4 = "https://api.waridi.co/images/" + req.files[3].filename;
       const newApartment = new Apartment({
         apartment_name: req.body.apartment_name,
         apartment_location: req.body.apartment_location,

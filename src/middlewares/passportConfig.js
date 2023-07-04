@@ -3,7 +3,7 @@ import "dotenv/config";
 export const facebook = {
   clientId: process.env.FACEBOOK_ID,
   clientSecret: process.env.FACEBOOK_SECRET,
-  callbackURL: "https://waridi.co/api/v1/facebook/callback",
+  callbackURL: "https://api.waridi.co/api/v1/facebook/callback",
   enableProof: true,
   profileFields: ["id", "emails", "name"],
 };
@@ -11,5 +11,5 @@ export const facebook = {
 export const google = {
   clientId: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-  callbackURL: "https://waridi.co/api/v1/google/callback",
+  callbackURL: "https://api.waridi.co/api/v1/google/callback",
 };
