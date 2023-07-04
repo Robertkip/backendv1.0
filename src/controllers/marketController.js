@@ -8,7 +8,7 @@ export const createMarket = async (req, res) => {
   const product_description = req.body.product_description;
   const product_quantity = req.body.product_quantity;
   const product_price = req.body.product_price;
-  const product_image = "http://38.242.239.1:8084/images/" + req.file.filename;
+  const product_image = "https://api.waridi.co/images/" + req.file.filename;
 
   const market = await Market.findOne({ where: { product_name } });
 
@@ -49,6 +49,23 @@ export const getMarketBySellerId = async () => {
   } catch (error) {
     return res.status(500).send(error.message);
   }
+};
+
+export const deleteMarket = async (req, res, next) => {
+  const p_id = req.params.id;
+  await Market.destroy({ where: { id: p_id } })
+    .then(() => {
+      res.status(200).json({ message: "Market deleted successfully" });
+    })
+    .catch((error) => next(error));
+};
+
+export const deleteAllMarket = async (req, res, next) => {
+  await Market.destroy({ where: {}, truncate: false })
+    .then(() => {
+      res.status(200).json({ message: "Market deleted successfully" });
+    })
+    .catch((error) => next(error));
 };
 
 const storage = multer.diskStorage({
