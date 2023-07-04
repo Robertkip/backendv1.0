@@ -9,7 +9,7 @@ router.post(
   apartmentController.upload,
   apartmentController.uploadApartment
 );
-router.get("/allapartment", apartmentController.getAllApartments);
+router.get("/allapartment/", apartmentController.getAllApartments);
 
 router.get("/apartment/:id", apartmentController.getApartmentById);
 router.get(
@@ -34,6 +34,6 @@ router.delete(
   Authorization.AdminRole,
   apartmentController.deleteAllApartments
 );
-router.get("/", apartmentController.searchApartmentQuery);
+router.get("/single-apartment/", apartmentController.searchApartmentQuery);
 
 export default router;

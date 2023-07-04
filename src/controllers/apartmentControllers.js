@@ -158,9 +158,31 @@ export const uploadApartment = async (req, res) => {
   }
 };
 
+const getPagination = (page, size) => {
+  const limit = size ? +size : 3;
+  const offset = page ? page * limit : 0;
+
+  return { limit, offset };
+};
+
+const getPagingData = (data, page, limit) => {
+  const { count: totalItems, rows: tutorials } = data;
+  const currentPage = page ? +page : 0;
+  const totalPages = Math.ceil(totalItems / limit);
+
+  return { totalItems, tutorials, totalPages, currentPage };
+};
+
 export const getAllApartments = async (req, res) => {
-  await Apartment.findAll().then((data) => {
-    return res.status(200).send(data);
+  const { page, size } = req.query;
+  const { limit, offset } = getPagination(page, size);
+  await Apartment.findAndCountAll({
+    where: { published: true },
+    limit,
+    offset,
+  }).then((data) => {
+    const response = getPagingData(data, page, limit);
+    return res.status(200).send(response);
   });
 };
 
