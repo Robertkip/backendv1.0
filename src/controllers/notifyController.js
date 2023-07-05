@@ -1,5 +1,5 @@
 import admin from "firebase-admin";
-import serviceAccount from "../../waridi-793c4-firebase-adminsdk-4z45i-f7be711bb9.json";
+import serviceAccount from "../../waridi-793c4-firebase-adminsdk-4z45i-066bc5716e.json";
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -26,7 +26,7 @@ export const sendTokenInformation = async (req, res) => {
     });
 
     res.status(200).json({ message: "Successfully sent notifications!" });
-  } catch (error) {
+  } catch (err) {
     res
       .status(err.status || 500)
       .json({ message: err.message || "Something went wrong!" });
