@@ -22,6 +22,7 @@ import userProfileRouter from "./src/routers/userProfileRoute.js";
 import friendRequestRouter from "./src/routers/friendrequestRouter.js";
 import notificationDeviceRouter from "./src/routers/notificationTokenRoute.js";
 import ratingRouter from "./src/routers/ratingRoute.js";
+import notificationRouter from "./src/routers/notifyRoute.js";
 
 import passportSetup from "./src/middlewares/passport.js";
 import options from "./swagger-output.json" assert { type: "json" };
@@ -96,6 +97,7 @@ app.use("/api/v1/user", userProfileRouter);
 app.use("/api/v1", friendRequestRouter);
 app.use("/api/v1", notificationDeviceRouter);
 app.use("/api/v1", ratingRouter);
+app.use("/api/v1", notificationRouter);
 
 // const server =  app.listen(PORT, ADDRESS, () => {
 //     console.log(`Server is running on port`)
