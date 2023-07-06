@@ -14,7 +14,7 @@ import {
 
 const router = express.Router();
 
-const CLIENT_URL = "https://api.waridi.co";
+const CLIENT_URL = "https://api.waridi.co/";
 
 router.post("/signup", Signup);
 router.post("/signin", Signin);

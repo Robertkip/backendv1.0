@@ -1,4 +1,6 @@
-import "dotenv/config";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export const facebook = {
   clientId: process.env.FACEBOOK_ID,

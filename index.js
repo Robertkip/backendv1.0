@@ -22,12 +22,10 @@ import userProfileRouter from "./src/routers/userProfileRoute.js";
 import friendRequestRouter from "./src/routers/friendrequestRouter.js";
 import notificationDeviceRouter from "./src/routers/notificationTokenRoute.js";
 import ratingRouter from "./src/routers/ratingRoute.js";
-//import passportSetup from "./src/middlewares/passport.js";
+import { initPassport } from "./src/middlewares/initPassport.js";
 import notificationRouter from "./src/routers/notifyRoute.js";
 
-
 import options from "./swagger-output.json" assert { type: "json" };
-
 
 const app = express();
 
@@ -60,13 +58,13 @@ app.use(
 
 app.use(cors());
 
-app.use(express.json({limit: "50mb", extended: true}))
-app.use(express.urlencoded({limit: "50mb", extended: true}))
+app.use(express.json({ limit: "50mb", extended: true }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(helmet());
 app.use(logger("common"));
 
-app.use(passport.initialize());
-app.use(passport.session());
+initPassport(app);
+
 app.use("/images", express.static("Images"));
 app.use("/swagger-ui", swaggerUi.serve, swaggerUi.setup(options));
 
@@ -99,7 +97,7 @@ if (process.env.NODE_ENV === "development") {
   });
 } else if (process.env.NODE_ENV === "production") {
   let ADDRESS = "38.242.239.1";
-  const server = app.listen(PORT,ADDRESS, () => {
+  const server = app.listen(PORT, ADDRESS, () => {
     console.log(`Server is running on port`);
   });
   const io = new Socket(server, {
