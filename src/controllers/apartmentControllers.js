@@ -255,11 +255,15 @@ export const searchApartmentQuery = async (req, res, next) => {
   const condition = {};
 
   if (address) {
-    condition.address = { [Op.like]: `%${address}%` };
+    condition.address = address
+      ? { address: { [Op.iLike]: `%${address}%` } }
+      : null;
   }
 
   if (apartment_name) {
-    condition.apartment_name = { [Op.like]: `%${apartment_name}%` };
+    condition.apartment_name = apartment_name
+      ? { apartment_name: { [Op.iLike]: `%${apartment_name}%` } }
+      : null;
   }
 
   // var condition = title ? { address: { [Op.like]: `%${title}%` } } : null;
