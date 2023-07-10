@@ -249,24 +249,10 @@ export const deleteAllApartments = async (req, res, next) => {
 };
 
 export const searchApartmentQuery = async (req, res, next) => {
-  // Retrieve all Tutorials from the database.
-  const { address, apartment_name } = req.query;
-
-  const condition = {};
-
-  if (address) {
-    condition.address = address
-      ? { address: { [Op.iLike]: `%${address}%` } }
-      : null;
-  }
-
-  if (apartment_name) {
-    condition.apartment_name = apartment_name
-      ? { apartment_name: { [Op.iLike]: `%${apartment_name}%` } }
-      : null;
-  }
-
-  // var condition = title ? { address: { [Op.like]: `%${title}%` } } : null;
+  const title = req.query.apartment_name;
+  var condition = title
+    ? { apartment_name: { [Op.like]: `%${title}%` } }
+    : null;
 
   await Apartment.findAll({ where: condition })
     .then((data) => {

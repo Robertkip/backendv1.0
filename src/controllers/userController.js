@@ -78,10 +78,10 @@ export const getSingleUser = async (req, res) => {
 
 export const searchUserQuery = async (req, res, next) => {
   // Retrieve all Tutorials from the database.
-  const title = req.query.user_fname;
-  var condition = title ? { user_fname: { [Op.like]: `%${title}%` } } : null;
+  const title = req.query.username;
+  var condition = title ? { username: { [Op.like]: `%${title}%` } } : null;
 
-  await UserProfile.findAll({ where: condition })
+  await User.findAll({ where: condition })
     .then((data) => {
       res.send(data);
     })
