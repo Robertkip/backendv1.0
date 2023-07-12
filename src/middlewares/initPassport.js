@@ -1,7 +1,7 @@
 import passport from "passport";
 import FacebookStrategy from "passport-facebook";
 import GoogleStrategy from "passport-google-oauth20";
-import { facebook, google } from "../middlewares/passportConfig";
+import { facebook, google } from "../middlewares/passportConfig.js";
 import session from "express-session";
 import dotenv from "dotenv";
 
@@ -24,6 +24,11 @@ export const initPassport = (app) => {
 ////////// FACEBOOK //////////
 passport.use(
   new FacebookStrategy(
+    {
+      clientID: process.env.FACEBOOK_APP_ID,
+      clientSecret: process.env.FACEBOOK_APP_SECRET,
+      callbackURL: "https://api.waridi.co/api/v1/google/callback",
+    },
     facebook,
     async (accessToken, refreshToken, profile, done) => {
       console.log(profile);

@@ -139,6 +139,7 @@ if (process.env.NODE_ENV === "development") {
       origin: "http://38.242.239.1:8084",
     },
   });
+  io.listen(8084);
 } else {
   let ADDRESS = "192.168.239.1";
   const server = app.listen(PORT, ADDRESS, () => {
@@ -151,7 +152,6 @@ if (process.env.NODE_ENV === "development") {
   });
 }
 
-io.listen(8084);
 global.ononline = new Map();
 
 export default app;
