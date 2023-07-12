@@ -24,6 +24,11 @@ import notificationDeviceRouter from "./src/routers/notificationTokenRoute.js";
 import ratingRouter from "./src/routers/ratingRoute.js";
 import { initPassport } from "./src/middlewares/initPassport.js";
 import notificationRouter from "./src/routers/notifyRoute.js";
+import {
+  getUser,
+  addNewUser,
+  removeUser,
+} from "./src/controllers/notifyController.js";
 
 import options from "./swagger-output.json" assert { type: "json" };
 
@@ -47,6 +52,12 @@ const specs = {
 const PORT = process.env.PORT || 8084;
 
 //passportSetup(app);
+
+const io = new Socket({
+  cors: {
+    origin: "https://api.waridi.co/api/v1/",
+  },
+});
 
 app.use(
   cookieSession({
@@ -85,6 +96,29 @@ app.use("/api/v1", notificationRouter);
 //     console.log(`Server is running on port`)
 // })
 
+io.on("connection", (socket) => {
+  socket.on("newUser", (username) => {
+    addNewUser(username, socket.id);
+  });
+  socket.on("sendNotification", ({ senderName, receiverName, type }) => {
+    const receiver = getUser(receiverName);
+    io.to(receiver.socketId).emit("getNotification", {
+      senderName,
+      type,
+    });
+  });
+  socket.on("sendText", ({ senderName, receiverName, text }) => {
+    const receiver = getUser(receiverName);
+    io.to(receiver.socketId).emit("getText", {
+      senderName,
+      text,
+    });
+  });
+  socket.on("disconnect", () => {
+    removeUser(socket.id);
+  });
+});
+
 if (process.env.NODE_ENV === "development") {
   let ADDRESS = "192.168.1.76";
   const server = app.listen(PORT, ADDRESS, () => {
@@ -117,6 +151,7 @@ if (process.env.NODE_ENV === "development") {
   });
 }
 
+io.listen(8084);
 global.ononline = new Map();
 
 export default app;
