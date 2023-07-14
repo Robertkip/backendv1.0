@@ -94,6 +94,9 @@ export const Signup = async (req, res) => {
 export const Signin = async (req, res) => {
   try {
     const { email, password } = req.body;
+    req.session.user = user;
+    const sess = req.session.save();
+    console.log("Session is", sess);
     const user = await User.findOne({
       where: { email: email },
     });
@@ -364,14 +367,15 @@ export const changeImage = async (req, res) => {
 export const getSingleUser = async (req, res, next) => {
   // Retrieve all Tutorials from the database.
 
- const id = req.query.id;
-  var condition = id ? { 
-    [Op.and]: [
-      literal(`CAST("id" AS TEXT) LIKE '%${id}%'`),
-      literal(`"id" IS NOT NULL`)
-    ]
-  } : null;
-
+  const id = req.query.id;
+  var condition = id
+    ? {
+        [Op.and]: [
+          literal(`CAST("id" AS TEXT) LIKE '%${id}%'`),
+          literal(`"id" IS NOT NULL`),
+        ],
+      }
+    : null;
 
   await User.findAll({ where: condition })
     .then((data) => {

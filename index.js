@@ -1,3 +1,4 @@
+import dotenv from "dotenv";
 import cookieSession from "cookie-session";
 import express from "express";
 import cors from "cors";
@@ -7,6 +8,9 @@ import path from "path";
 import url from "url";
 import fs from "fs";
 import { Server as Socket } from "socket.io";
+import RedisStore from "connect-redis";
+import { createClient } from "redis";
+import session from "express-session";
 import passport from "passport";
 import swaggerJSDoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
@@ -31,6 +35,8 @@ import {
 } from "./src/controllers/notifyController.js";
 
 import options from "./swagger-output.json" assert { type: "json" };
+
+dotenv.config();
 
 const app = express();
 
@@ -59,6 +65,16 @@ const io = new Socket({
   },
 });
 
+const redisClient = createClient({ legacyMode: true });
+redisClient.connect().catch(console.error);
+
+const redisStore = new RedisStore({
+  client: redisClient,
+  prefix: "waridi",
+});
+
+const REDIS_SESSION_SECRET = process.env.REDIS_SESSION_SECRET;
+
 app.use(
   cookieSession({
     name: "session",
@@ -75,6 +91,20 @@ app.use(helmet());
 app.use(logger("common"));
 
 initPassport(app);
+
+app.use(
+  session({
+    store: redisStore,
+    secret: REDIS_SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: false,
+      httpOnly: false,
+      maxAge: 1000 * 60 * 10,
+    },
+  })
+);
 
 app.use("/images", express.static("Images"));
 app.use("/swagger-ui", swaggerUi.serve, swaggerUi.setup(options));
@@ -120,13 +150,13 @@ io.on("connection", (socket) => {
 });
 
 if (process.env.NODE_ENV === "development") {
-  let ADDRESS = "192.168.1.76";
+  let ADDRESS = "192.168.0.28";
   const server = app.listen(PORT, ADDRESS, () => {
     console.log(`Server is running on port`);
   });
   const io = new Socket(server, {
     cors: {
-      origin: "http://192.168.1.76:8084",
+      origin: "http://192.168.0.28:8084",
     },
   });
 } else if (process.env.NODE_ENV === "production") {
