@@ -3,28 +3,39 @@ import { sequelize } from "../config/connectDb";
 import User from "./authModel";
 
 const Chat = sequelize.define('Chat', {
-    chat: {
-        type: DataTypes.TEXT, 
-        allowNull: false,
+    senderId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
     },
-
-    fromUserId: {
-        type: DataTypes.INTEGER
+    receiverId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
     },
-
-    toUserId: {
-        type: DataTypes.INTEGER
+    messageType: {
+        type: String,
+        validate: {
+            isIn: [['text', 'image']]
+        }
     },
+    message: {
+        type: Text,
+        allowNull: true,
+    },
+    timestamp: {
+        type: Date,
+        defaultValue: Date.now(),
+        allowNull: true,
+    }
 
 })
 
 Chat.associations = (models) => {
     Chat.belongsTo(User, {
-        foreignKey: 'fromUserId'
+        foreignKey: 'senderId'
     }),
 
     Chat.associations(User, {
-        foreignKey: 'toUserId'
+        foreignKey: 'receiverId'
     })
 
     return Chat;

@@ -24,4 +24,13 @@ User.hasMany(FriendRequest, {
   foreignKey: "receiverId",
 });
 
+FriendRequest.associations = (models) => {
+  FriendRequest.belongsTo(User, {
+    foreignKey: 'senderId',
+  })
+
+  FriendRequest.belongsTo(User, {
+    foreignKey: 'receiverId',
+  })
+}
 export default FriendRequest;
