@@ -12,6 +12,7 @@ import * as PasswordHelper from "../helpers/passwordHelper.js";
 import * as Helper from "../helpers/helper.js";
 import Otp from "../models/otpModel.js";
 import { Authenticated } from "../middlewares/authorizationPermission.js";
+import TextFlow from "textflow.js";
 dotenv.config();
 
 const {
@@ -29,7 +30,7 @@ const client = twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, {
   lazyLoading: true,
 });
 
-dotenv.config();
+TextFlow.useKey(process.env.TEXTFLOW_API_KEY)
 
 const { OAuth2 } = google.auth;
 const OAUTH_PLAYGROUND = "https://developers.google.com/oauthplayground";
@@ -342,6 +343,17 @@ export const verifyOTP = async (req, res, next) => {
       res.json(err);
     });
 };
+
+export const sendSmS = async (req, res) => {
+  const {phoneNumber} = req.body;
+  const result = await TextFlow.sendVerificationSMS(phoneNumber);
+
+  if (result.ok) //send sms here
+  return res.status(200).json({ success: true });
+
+return res.status(400).json({ success: false });
+
+}
 
 export const changeImage = async (req, res) => {
   const id = req.params.id;

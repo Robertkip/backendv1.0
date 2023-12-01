@@ -150,13 +150,13 @@ io.on("connection", (socket) => {
 });
 
 if (process.env.NODE_ENV === "development") {
-  let ADDRESS = "192.168.0.28";
+  let ADDRESS = "192.168.0.12";
   const server = app.listen(PORT, ADDRESS, () => {
     console.log(`Server is running on port`);
   });
   const io = new Socket(server, {
     cors: {
-      origin: "http://192.168.0.28:8084",
+      origin: "http://192.168.0.12:8084",
     },
   });
 } else if (process.env.NODE_ENV === "production") {
@@ -171,7 +171,7 @@ if (process.env.NODE_ENV === "development") {
   });
   io.listen(8084);
 } else {
-  let ADDRESS = "192.168.239.1";
+  let ADDRESS = "192.168.0.12";
   const server = app.listen(PORT, ADDRESS, () => {
     console.log(`Server is running on port`);
   });

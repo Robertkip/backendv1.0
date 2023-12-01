@@ -5,8 +5,6 @@ import passport from "passport";
 
 dotenv.config();
 
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
-const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const FACEBOOK_ID = process.env.FACEBOOK_ID;
 const FACEBOOK_SECRET = process.env.FACEBOOK_SECRET;
 
