@@ -24,7 +24,12 @@ module.exports = (sequelize, DataTypes) => {
     accessToken: DataTypes.TEXT,
     resetPasswordToken: DataTypes.TEXT,
     resetPasswordExpires: DataTypes.DATE,
+    dateofbirth: DataTypes.TEXT,
+    description: DataTypes.TEXT,
+    phoneNumber: DataTypes.STRING,
+    code: DataTypes.TEXT,
     verified: DataTypes.BOOLEAN,
+    user_avatar: DataTypes.STRING,
     active: DataTypes.BOOLEAN,
     type: DataTypes.BLOB
   }, {

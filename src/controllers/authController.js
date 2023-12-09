@@ -47,6 +47,7 @@ export const Signup = async (req, res) => {
     const email = req.body.email;
     const password = req.body.password;
     const confirm_password = req.body.confirm_password;
+    const phoneNumber = req.body.phoneNumber;
     const active = req.body.active;
     const verified = req.body.verified;
     const roleId = req.body.roleId;
@@ -62,7 +63,7 @@ export const Signup = async (req, res) => {
       },
     };
 
-    if (!req.body.email || !req.body.password || !req.body.username) {
+    if (!req.body.email || !req.body.password || !req.body.username || !req.body.phoneNumber) {
       res.status(400).send({
         msg: "Please provide all fields",
       });
@@ -77,15 +78,26 @@ export const Signup = async (req, res) => {
         email: email,
         username: username,
         password: bcryptjs.hashSync(password, 8),
+        phoneNumber,
         active: active,
         verified: verified,
         roleId: roleId,
         settings,
       });
 
-      newUser.save().then((result) => {
-        sendOtpVerification(result, res);
-      });
+      newUser.save();
+      // .then((result) => {
+      //   sendOtpVerification(result, res);
+      // });
+
+      const result = await TextFlow.sendVerificationSMS(phoneNumber)
+
+       if (result.ok) 
+       return res.status(200).json({ message: "Verificarion SmS Sent Please Verify"});
+     
+       
+
+      return res.status(201).send(newUser);
     }
   } catch (err) {
     res.status(500).send({ message: err.message });

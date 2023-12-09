@@ -49,7 +49,11 @@ const User = sequelize.define("User", {
   },
   description: {
     type: DataTypes.TEXT,
-    allowNull: null,
+    allowNull: true,
+  },
+  code: {
+    type: DataTypes.TEXT,
+    allowNull: true,
   },
   user_avatar: {
     type: DataTypes.STRING,
