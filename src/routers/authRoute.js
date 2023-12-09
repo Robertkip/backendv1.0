@@ -10,6 +10,7 @@ import {
   changeImage,
   upload,
   getSingleUser,
+  sendSmSFromTextFlow,
 } from "../controllers/authController.js";
 
 const router = express.Router();
@@ -20,11 +21,13 @@ router.post("/signup", Signup);
 router.post("/signin", Signin);
 router.get("/send/:to", sendOtp);
 router.get("/verify/:to/:code", verifyOTP);
+router.post("/sms", sendSmSFromTextFlow);
 router.post("/changepassword", changePassword);
 router.get("/users", getAllUsers);
 router.get("/get-single-user", getSingleUser);
 router.put("/user/:id", upload, changeImage);
 router.get("/google", passport.authenticate("google", { scope: ["profile"] }));
+
 router.get(
   "/facebook",
   passport.authenticate("facebook", { scope: ["profile"] })

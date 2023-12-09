@@ -344,11 +344,11 @@ export const verifyOTP = async (req, res, next) => {
     });
 };
 
-export const sendSmS = async (req, res) => {
+export const sendSmSFromTextFlow = async (req, res) => {
   const {phoneNumber} = req.body;
   const result = await TextFlow.sendVerificationSMS(phoneNumber);
 
-  if (result.ok) //send sms here
+  if (result.ok) 
   return res.status(200).json({ success: true });
 
 return res.status(400).json({ success: false });

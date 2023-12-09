@@ -177,7 +177,7 @@ if (process.env.NODE_ENV === "development") {
   });
   const io = new Socket(server, {
     cors: {
-      origin: "http://localhost:8084",
+      origin: "http://192.168.0.12:8084",
     },
   });
 }

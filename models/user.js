@@ -18,17 +18,15 @@ module.exports = (sequelize, DataTypes) => {
     username: DataTypes.STRING,
     email: DataTypes.STRING,
     connections: DataTypes.INTEGER,
+    phoneNumber: DataTypes.STRING,
     password: DataTypes.STRING,
     confirm_password: DataTypes.STRING,
     accessToken: DataTypes.TEXT,
     resetPasswordToken: DataTypes.TEXT,
     resetPasswordExpires: DataTypes.DATE,
-    dateofbirth: DataTypes.TEXT,
-    description: DataTypes.TEXT,
-    user_avatar: DataTypes.STRING,
-    type: DataTypes.BLOB,
     verified: DataTypes.BOOLEAN,
-    active: DataTypes.BOOLEAN
+    active: DataTypes.BOOLEAN,
+    type: DataTypes.BLOB
   }, {
     sequelize,
     modelName: 'User',

@@ -1,21 +1,21 @@
 {
-   "development": {
+  "development": {
     "username": "postgres",
-    "password": "waridi123",
+    "password": "postgres123",
     "database": "waridi",
     "host": "localhost",
     "dialect": "postgres"
   },
   "test": {
     "username": "postgres",
-    "password": "waridi123",
+    "password": "postgres123",
     "database": "waridi",
     "host": "localhost",
     "dialect": "postgres"
   },
   "production": {
     "username": "postgres",
-    "password": "waridi123",
+    "password": "postgres123",
     "database": "waridi",
     "host": "localhost",
     "dialect": "postgres"

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Waridi JS Retrieve",
   "main": "index.js",
-  "type": "module",
+  "type":"module",
   "scripts": {
     "prod:server": "NODE_ENV=production node index.js",
     "dev:server": "NODE_ENV=development node index.js",
@@ -54,6 +54,6 @@
     "util": "^0.12.5"
   },
   "devDependencies": {
-    "sequelize-cli": "^6.6.0"
+    "sequelize-cli": "^6.6.2"
   }
 }
