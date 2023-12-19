@@ -358,13 +358,15 @@ export const verifyOTP = async (req, res, next) => {
 
 export const sendSmSFromTextFlow = async (req, res) => {
   const {phoneNumber} = req.body;
+
+  console.log("Phone Number Is", phoneNumber);
   const result = await TextFlow.sendVerificationSMS(phoneNumber);
 
-  if (result.ok) 
-  return res.status(200).json({ success: true });
-
-return res.status(400).json({ success: false });
-
+  if (result.ok) {
+   return res.status(200).json({ success: true });
+  } else {
+    return res.status(400).json(res);
+  }
 }
 
 export const changeImage = async (req, res) => {

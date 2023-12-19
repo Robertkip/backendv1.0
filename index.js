@@ -55,25 +55,25 @@ const specs = {
 // const spec = swaggerJSDoc(options);
 
 // const Roles = db.roles;
-const PORT = process.env.PORT || 8084;
+const PORT = process.env.PORT || 8086;
 
 //passportSetup(app);
 
-const io = new Socket({
-  cors: {
-    origin: "https://api.waridi.co/api/v1/",
-  },
-});
+// let io = new Socket({
+//   cors: {
+//     origin: "https://api.waridi.co/api/v1/",
+//   },
+// });
 
-const redisClient = createClient({ legacyMode: true });
-redisClient.connect().catch(console.error);
+// const redisClient = createClient({ legacyMode: true });
+// redisClient.connect().catch(console.error);
 
-const redisStore = new RedisStore({
-  client: redisClient,
-  prefix: "waridi",
-});
+// const redisStore = new RedisStore({
+//   client: redisClient,
+//   prefix: "waridi",
+// });
 
-const REDIS_SESSION_SECRET = process.env.REDIS_SESSION_SECRET;
+// const REDIS_SESSION_SECRET = process.env.REDIS_SESSION_SECRET;
 
 app.use(
   cookieSession({
@@ -92,19 +92,19 @@ app.use(logger("common"));
 
 initPassport(app);
 
-app.use(
-  session({
-    store: redisStore,
-    secret: REDIS_SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: false,
-      httpOnly: false,
-      maxAge: 1000 * 60 * 10,
-    },
-  })
-);
+// app.use(
+//   session({
+//     store: redisStore,
+//     secret: REDIS_SESSION_SECRET,
+//     resave: false,
+//     saveUninitialized: false,
+//     cookie: {
+//       secure: false,
+//       httpOnly: false,
+//       maxAge: 1000 * 60 * 10,
+//     },
+//   })
+// );
 
 app.use("/images", express.static("Images"));
 app.use("/swagger-ui", swaggerUi.serve, swaggerUi.setup(options));
@@ -126,62 +126,74 @@ app.use("/api/v1", notificationRouter);
 //     console.log(`Server is running on port`)
 // })
 
-io.on("connection", (socket) => {
-  socket.on("newUser", (username) => {
-    addNewUser(username, socket.id);
-  });
-  socket.on("sendNotification", ({ senderName, receiverName, type }) => {
-    const receiver = getUser(receiverName);
-    io.to(receiver.socketId).emit("getNotification", {
-      senderName,
-      type,
-    });
-  });
-  socket.on("sendText", ({ senderName, receiverName, text }) => {
-    const receiver = getUser(receiverName);
-    io.to(receiver.socketId).emit("getText", {
-      senderName,
-      text,
-    });
-  });
-  socket.on("disconnect", () => {
-    removeUser(socket.id);
-  });
-});
+// io.on("connection", (socket) => {
+//   socket.on("newUser", (username) => {
+//     addNewUser(username, socket.id);
+//   });
+//   socket.on("sendNotification", ({ senderName, receiverName, type }) => {
+//     const receiver = getUser(receiverName);
+//     io.to(receiver.socketId).emit("getNotification", {
+//       senderName,
+//       type,
+//     });
+//   });
+//   socket.on("sendText", ({ senderName, receiverName, text }) => {
+//     const receiver = getUser(receiverName);
+//     io.to(receiver.socketId).emit("getText", {
+//       senderName,
+//       text,
+//     });
+//   });
+//   socket.on("disconnect", () => {
+//     removeUser(socket.id);
+//   });
+// });
 
-if (process.env.NODE_ENV === "development") {
-  let ADDRESS = "192.168.0.12";
-  const server = app.listen(PORT, ADDRESS, () => {
+  app.listen(PORT,  () => {
     console.log(`Server is running on port`);
   });
-  const io = new Socket(server, {
-    cors: {
-      origin: "http://192.168.0.12:8084",
-    },
-  });
-} else if (process.env.NODE_ENV === "production") {
-  let ADDRESS = "38.242.239.1";
-  const server = app.listen(PORT, ADDRESS, () => {
-    console.log(`Server is running on port`);
-  });
-  const io = new Socket(server, {
-    cors: {
-      origin: "http://38.242.239.1:8084",
-    },
-  });
-  io.listen(8084);
-} else {
-  let ADDRESS = "192.168.0.12";
-  const server = app.listen(PORT, ADDRESS, () => {
-    console.log(`Server is running on port`);
-  });
-  const io = new Socket(server, {
-    cors: {
-      origin: "http://192.168.0.12:8084",
-    },
-  });
-}
+    // io = new Socket(server, {
+    // cors: {
+    //   origin: "http://localhost:8084",
+    // },
+  // }
+  // );
+  // io.listen(8086);
 
-global.ononline = new Map();
+
+// if (process.env.NODE_ENV === "development") {
+//   let ADDRESS = "192.168.0.12";
+//   const server = app.listen(PORT, ADDRESS, () => {
+//     console.log(`Server is running on port`);
+//   });
+//   const io = new Socket(server, {
+//     cors: {
+//       origin: "http://192.168.0.12:8084",
+//     },
+//   });
+// } else if (process.env.NODE_ENV === "production") {
+//   let ADDRESS = "38.242.239.1";
+//   const server = app.listen(PORT, ADDRESS, () => {
+//     console.log(`Server is running on port`);
+//   });
+//   const io = new Socket(server, {
+//     cors: {
+//       origin: "http://38.242.239.1:8084",
+//     },
+//   });
+//   io.listen(8084);
+// } else {
+//   let ADDRESS = "192.168.0.12";
+//   const server = app.listen(PORT, ADDRESS, () => {
+//     console.log(`Server is running on port`);
+//   });
+//   const io = new Socket(server, {
+//     cors: {
+//       origin: "http://192.168.0.12:8084",
+//     },
+//   });
+// }
+
+// global.ononline = new Map();
 
 export default app;
