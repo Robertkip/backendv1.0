@@ -55,7 +55,7 @@ const specs = {
 // const spec = swaggerJSDoc(options);
 
 // const Roles = db.roles;
-const PORT = process.env.PORT || 8086;
+const PORT = process.env.PORT || 8084;
 
 //passportSetup(app);
 

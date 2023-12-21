@@ -2,7 +2,7 @@ import { DataTypes } from "sequelize";
 import { sequelize } from "../config/connectDb.js";
 
 const Otp = sequelize.define("Otp", {
-  userId: {
+  email: {
     type: DataTypes.STRING,
     allowNull: true,
   },

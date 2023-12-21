@@ -6,13 +6,14 @@ import nodemailer from "nodemailer";
 import { google } from "googleapis";
 import multer from "multer";
 import path from "path";
+import otpGenerator from 'otp-generator';
 import { sequelize } from "../config/connectDb.js";
 import User from "../models/authModel.js";
 import * as PasswordHelper from "../helpers/passwordHelper.js";
 import * as Helper from "../helpers/helper.js";
 import Otp from "../models/otpModel.js";
 import { Authenticated } from "../middlewares/authorizationPermission.js";
-import TextFlow from "textflow.js";
+
 dotenv.config();
 
 const {
@@ -30,7 +31,6 @@ const client = twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, {
   lazyLoading: true,
 });
 
-TextFlow.useKey(process.env.TEXTFLOW_API_KEY)
 
 const { OAuth2 } = google.auth;
 const OAUTH_PLAYGROUND = "https://developers.google.com/oauthplayground";
@@ -47,7 +47,6 @@ export const Signup = async (req, res) => {
     const email = req.body.email;
     const password = req.body.password;
     const confirm_password = req.body.confirm_password;
-    const phoneNumber = req.body.phoneNumber;
     const active = req.body.active;
     const verified = req.body.verified;
     const roleId = req.body.roleId;
@@ -56,6 +55,9 @@ export const Signup = async (req, res) => {
       where: { [Op.or]: [{ username }, { email }] },
     });
 
+    let optuser = await Otp.findOne({
+      where: {email}
+    })
     const settings = {
       notification: {
         push: true,
@@ -63,7 +65,7 @@ export const Signup = async (req, res) => {
       },
     };
 
-    if (!req.body.email || !req.body.password || !req.body.username || !req.body.phoneNumber) {
+    if (!req.body.email) {
       res.status(400).send({
         msg: "Please provide all fields",
       });
@@ -74,28 +76,28 @@ export const Signup = async (req, res) => {
     } else if (!email || !password || !confirm_password) {
       console.log("Please Provide All Fields");
     } else {
+
+      await sendOtpVerification(req.body.email).then(res => {
+        console.log("Sender Response Is", res);
+      });
+
+
       const newUser = new User({
         email: email,
         username: username,
         password: bcryptjs.hashSync(password, 8),
-        phoneNumber,
         active: active,
         verified: verified,
         roleId: roleId,
         settings,
       });
 
-      newUser.save();
-      // .then((result) => {
-      //   sendOtpVerification(result, res);
-      // });
 
-      const result = await TextFlow.sendVerificationSMS(phoneNumber)
-
-       if (result.ok) 
-       return res.status(200).json({ message: "Verificarion SmS Sent Please Verify"});
-     
-       
+     await newUser.save();
+      // .then((res) => {
+      //   console.log("Response After Saving Is", res);
+      //   sendOtpVerification(res.dataValues.email);
+      // });     
 
       return res.status(201).send(newUser);
     }
@@ -192,8 +194,11 @@ transporter.verify((error, success) => {
   }
 });
 
-export const sendOtpVerification = async ({ id, email }, res) => {
+export const sendOtpVerification = async (email) => {
   const otp = `${Math.floor(1000 + Math.random() * 9000)}`;
+
+
+  console.log("Sender Email Address Is", email);
 
   //Mail Options
   const mailOptions = {
@@ -204,13 +209,13 @@ export const sendOtpVerification = async ({ id, email }, res) => {
   };
 
   // Hash the Otp
-  const saltRounds = 10;
+  // const saltRounds = 10;
 
-  const hashedOTP = await bcryptjs.hash(otp, saltRounds);
+  // const hashedOTP = await bcryptjs.hash(otp, saltRounds);
 
   const newOTPVerification = await new Otp({
-    userId: id,
-    otp: hashedOTP,
+    email: email,
+    code: otp,
     createdAt: Date.now(),
     expireIn: Date.now() + 360000,
   });
@@ -219,15 +224,46 @@ export const sendOtpVerification = async ({ id, email }, res) => {
   await transporter.sendMail(mailOptions).then((res) => {
     console.log("Email Response is", res);
   });
-  res.json({
-    status: "PENDING",
-    message: "Verification OTP Email Sent",
-    data: {
-      userId: id,
-      email,
-    },
-  });
+  // res.json({
+  //   status: "PENDING",
+  //   message: "Verification OTP Email Sent",
+  //   data: {
+  //     email,
+  //   },
+  // });
 };
+
+export const verifyOtpCode = async (req, res) => {
+ 
+  const useremail = await Otp.findOne({
+    where: { email: req.body.email }
+});
+
+  console.log("Email From Otp Is", useremail);
+
+
+
+  const usercode = await Otp.findOne({
+    where: {
+    code: req.body.code
+  }
+  });
+
+  
+  console.log("Code From Otp Is", usercode);
+  
+
+  if (req.body.email != useremail.dataValues.email) {
+    return res.status(500).send({message: "Email Not Found"})
+  }
+
+  if(req.body.code != usercode.dataValues.code) {
+    return res.status(400).send({message: "Code does not match"})
+  }
+
+  return res.status(200).send({message: "Code Verified"});
+
+}
 
 export const getAllUsers = async (req, res) => {
   try {
@@ -356,17 +392,23 @@ export const verifyOTP = async (req, res, next) => {
     });
 };
 
-export const sendSmSFromTextFlow = async (req, res) => {
-  const {phoneNumber} = req.body;
+// export const sendSmS = async (req, res) => {
+//   const {phoneNumber} = req.body;
 
-  console.log("Phone Number Is", phoneNumber);
-  const result = await TextFlow.sendVerificationSMS(phoneNumber);
+//   console.log("Phone Number Is", phoneNumber);
+//   const result = await textflow.sendVerificationSMS(phoneNumber);
 
-  if (result.ok) {
-   return res.status(200).json({ success: true });
-  } else {
-    return res.status(400).json(res);
-  }
+//   if (result.ok)
+//   return res.status(200).json({ success: true });
+
+//    return res.status(400).json(res);
+
+// }
+
+
+
+export const generateOtp = async () => {
+  const Otp = otpGenerator.generate(6, { digits: true, specialChars: false })
 }
 
 export const changeImage = async (req, res) => {
@@ -413,6 +455,8 @@ export const getSingleUser = async (req, res, next) => {
       });
     });
 };
+
+
 
 export const followUser = async (req, res) => {
   const id = req.params.id;
