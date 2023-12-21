@@ -23,10 +23,6 @@ const User = sequelize.define("User", {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  phoneNumber: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
   confirm_password: {
     type: DataTypes.STRING,
     allowNull: true,
@@ -51,10 +47,6 @@ const User = sequelize.define("User", {
     type: DataTypes.TEXT,
     allowNull: true,
   },
-  code: {
-    type: DataTypes.TEXT,
-    allowNull: true,
-  },
   user_avatar: {
     type: DataTypes.STRING,
     allowNull:true,
@@ -62,12 +54,12 @@ const User = sequelize.define("User", {
   type: {
     type: DataTypes.BLOB,
     allowNull:true,
-  },
+  }, 
   verified: {
     type: DataTypes.BOOLEAN,
-    defaultValue: false,
     allowNull: true,
-  },
+    defaultValue: false
+    },
   active: {
     type: DataTypes.BOOLEAN,
     allowNull: true,

@@ -255,13 +255,17 @@ export const verifyOtpCode = async (req, res) => {
 
   if (req.body.email != useremail.dataValues.email) {
     return res.status(500).send({message: "Email Not Found"})
-  }
-
-  if(req.body.code != usercode.dataValues.code) {
+  } else if(req.body.code != usercode.dataValues.code) {
     return res.status(400).send({message: "Code does not match"})
+  } else if(usercode.dataValues.code == req.body.code) {
+    await User.update({verified: true}, {where: {email: req.body.email}})
+
+   return res.status(200).send({message: "Code Verified"});
+  
+  } else {
+    return res.status(500).send({message: "Error Verifying Code"})
   }
 
-  return res.status(200).send({message: "Code Verified"});
 
 }
 
