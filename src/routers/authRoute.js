@@ -21,7 +21,7 @@ router.post("/signup", Signup);
 router.post("/signin", Signin);
 router.get("/send/:to", sendOtp);
 // router.get("/verify/:to/:code", verifyOTP);
-router.get("/verify", verifyOtpCode);
+router.post("/verify", verifyOtpCode);
 router.post("/changepassword", changePassword);
 router.get("/users", getAllUsers);
 router.get("/get-single-user", getSingleUser);

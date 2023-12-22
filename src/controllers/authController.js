@@ -237,7 +237,7 @@ export const verifyOtpCode = async (req, res) => {
  
   const useremail = await Otp.findOne({
     where: { email: req.body.email }
-});
+  });
 
   console.log("Email From Otp Is", useremail);
 
