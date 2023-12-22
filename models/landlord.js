@@ -16,12 +16,11 @@ module.exports = (sequelize, DataTypes) => {
   Landlord.init({
     userId: DataTypes.INTEGER,
     landlord_fname: DataTypes.STRING,
-    landlord_lname: DataTypes.STRING,
+    landlord_idno: DataTypes.STRING,
+    landlord_phonenumber: DataTypes.STRING,
     landlord_location: DataTypes.STRING,
-    landlord_idno: DataTypes.INTEGER,
-    landlord_phonenumber: DataTypes.INTEGER,
     landlord_avatar: DataTypes.STRING,
-    type: DataTypes.BLOB
+    type: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'Landlord',
