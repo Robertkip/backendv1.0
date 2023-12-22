@@ -109,12 +109,17 @@ export const Signup = async (req, res) => {
 export const Signin = async (req, res) => {
   try {
     const { email, password } = req.body;
-    req.session.user = user;
-    const sess = req.session.save();
-    console.log("Session is", sess);
+  
     const user = await User.findOne({
       where: { email: email },
     });
+
+    console.log("User found", user);  
+
+    // req.session.user = user;
+
+    // const sess = req.session.save();
+
     if (!user) {
       return res.status(401).send({ msg: "Unauthorized" });
     }
@@ -123,7 +128,11 @@ export const Signin = async (req, res) => {
       password,
       user.password
     );
+
+    
+
     if (!matched) {
+      console.log("Password Does Not Match", matched);
       return res.status(401).send({ msg: "Unauthorized" });
     }
 
@@ -161,7 +170,8 @@ export const Signin = async (req, res) => {
 
     return res.status(200).send(responseUser);
   } catch (err) {
-    res.status(500).send({ message: err.message });
+    console.log("Error Registering Is: " + err.message);
+    res.status(500).send(err);
   }
 };
 

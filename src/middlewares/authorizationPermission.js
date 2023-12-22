@@ -35,7 +35,7 @@ export const SuperUser = (req, res, next) => {
   try {
     const roleId = res.locals.roleId;
     console.log(roleId);
-    if (roleId !== 1) {
+    if (roleId !== 6) {
       return res.status(401).send({ msg: "Forbidden" });
     }
 
@@ -52,7 +52,7 @@ export const AdminRole = (req, res, next) => {
     const result = Helper.ExtractToken(token);
     const roleId = result.roleId;
     console.log("The role is for admin is", roleId);
-    if (roleId !== 2) {
+    if (roleId !== 5) {
       return res.status(401).send({ msg: "Forbidden" });
     }
     next();
@@ -64,7 +64,7 @@ export const AdminRole = (req, res, next) => {
 export const BasicUser = (req, res, next) => {
   try {
     const roleId = res.locals.roleId;
-    if (roleId !== 3) {
+    if (roleId !== 1) {
       return res.status(401).send({ msg: "Forbidden" });
     }
 
