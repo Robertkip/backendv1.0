@@ -176,14 +176,24 @@ const getPagingData = (data, page, limit) => {
 export const getAllApartments = async (req, res) => {
   const { page, size } = req.query;
   const { limit, offset } = getPagination(page, size);
-  await Apartment.findAndCountAll({
+  await Apartment.findAndCountAll(
+    {
     limit,
     offset,
-  }).then((data) => {
-    const response = getPagingData(data, page, limit);
-    return res.status(200).send(response.apartments);
+  }
+  ).then((data) => {
+    // const response = getPagingData(data, page, limit);
+    return res.status(200).send(data);
   });
 };
+
+// export const getAllApartments = async (req, res) => {
+//   await Apartment.findAll().then((data) => {
+//     console.log("Apartment Data Is",data);
+//     return res.status(200).json(data);
+//   });
+// };
+
 
 export const getTenantLandlordApartments = async (req, res) => {
   try {
