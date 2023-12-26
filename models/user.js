@@ -28,7 +28,9 @@ module.exports = (sequelize, DataTypes) => {
     active: DataTypes.BOOLEAN,
     dateofbirth: DataTypes.TEXT,
     user_avatar: DataTypes.STRING,
-    type: DataTypes.BLOB
+    type: DataTypes.BLOB,
+    connectionsRequest: DataTypes.INTEGER,
+    connectionRequestSent: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'User',

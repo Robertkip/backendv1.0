@@ -10,8 +10,16 @@ import {
   changeImage,
   upload,
   getSingleUser,
-  verifyOtpCode
+  verifyOtpCode,
+  sentConnectionRequest,
+  receivedConnectionRequest,
+  userConnections,
+  allSocialUsers,
+  updateUserProfile,
+  forgotPassword,
 } from "../controllers/authController.js";
+
+import * as authController from "../controllers/authController.js";
 
 const router = express.Router();
 
@@ -21,10 +29,16 @@ router.post("/signup", Signup);
 router.post("/signin", Signin);
 router.get("/send/:to", sendOtp);
 // router.get("/verify/:to/:code", verifyOTP);
+router.put("/updateprofile/", authController.upload, updateUserProfile);
 router.post("/verify", verifyOtpCode);
-router.post("/changepassword", changePassword);
+router.put("/changepassword/", changePassword);
+router.post("/forgotpassword", forgotPassword);
 router.get("/users", getAllUsers);
 router.get("/get-single-user", getSingleUser);
+router.get("/social-users:/id", allSocialUsers);
+router.post("/send-connection-request", sentConnectionRequest);
+router.post("/receive-connection-request:/id", receivedConnectionRequest);
+router.get("/user-connections:/id", userConnections);
 router.put("/user/:id", upload, changeImage);
 router.get("/google", passport.authenticate("google", { scope: ["profile"] }));
 router.get(

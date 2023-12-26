@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 import twilio from "twilio";
 import bcryptjs from "bcryptjs";
-import { Op, literal } from "sequelize";
+import { Op, literal, where } from "sequelize";
 import nodemailer from "nodemailer";
 import { google } from "googleapis";
 import multer from "multer";
@@ -114,6 +114,13 @@ export const Signin = async (req, res) => {
       where: { email: email },
     });
 
+
+    const matched = await PasswordHelper.PasswordCompare(
+      password,
+      user.password
+    );
+
+
     console.log("User found", user);  
 
     // req.session.user = user;
@@ -122,19 +129,13 @@ export const Signin = async (req, res) => {
 
     if (!user) {
       return res.status(401).send({ msg: "Unauthorized" });
-    }
+    } else if(!matched) {
 
-    const matched = await PasswordHelper.PasswordCompare(
-      password,
-      user.password
-    );
-
-    
-
-    if (!matched) {
       console.log("Password Does Not Match", matched);
       return res.status(401).send({ msg: "Unauthorized" });
-    }
+    } else if (user.verified == false) {
+      return res.status(403).send({ msg: "Verify Account to Login" });
+    } else {
 
     const dataUser = {
       id: user.id,
@@ -157,7 +158,7 @@ export const Signin = async (req, res) => {
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000,
     });
-
+  
     const responseUser = {
       id: user.id,
       username: user.username,
@@ -167,8 +168,9 @@ export const Signin = async (req, res) => {
       active: user.active,
       token: token,
     };
-
+  
     return res.status(200).send(responseUser);
+  }
   } catch (err) {
     console.log("Error Registering Is: " + err.message);
     res.status(500).send(err);
@@ -270,14 +272,74 @@ export const verifyOtpCode = async (req, res) => {
   } else if(usercode.dataValues.code == req.body.code) {
     await User.update({verified: true}, {where: {email: req.body.email}})
 
+    await Otp.destroy({where: {email: req.body.email}});
+
    return res.status(200).send({message: "Code Verified"});
   
   } else {
     return res.status(500).send({message: "Error Verifying Code"})
   }
 
+}
+
+export const forgotPassword = async (req, res) => {
+  
+  const email = req.body.email;
+
+  const user = await User.findOne({
+    where: { email: email }
+  });
+
+  try {
+
+  if(!user){
+    return res.status(401).send({message: "Email Not Found"})
+  } else {
+    await sendOtpVerification(req.body.email).then(res => {
+      console.log("Sender Response Is", res);
+    });
+
+    return res.status(200).send({message: "Email Sent"});
+  }
+} catch (err){
+  res.status(500).send({message: err.message})
+}
+}
+
+
+export const updatePassword = async (req, res) => {
+
 
 }
+
+export const updateUserProfile = async (req, res) => {
+   const userId = req.query.id;
+
+   console.log("Updating user profile Id Is", userId)
+   const username = req.body.username;
+   const user_avatar = "https://api.waridi.co/" + req.file.filename;
+   const description = req.body.description;
+   
+   const user = await User.findOne({
+     where: { id: userId },
+   });
+
+   if (!user) {
+     return res.status(401).send({ msg: "Unauthorized" });
+   } else if(user.verified == false) {
+       
+     return res.status(401).send({ msg: "Please Verify Your Account" });
+
+
+   } else {
+   await User.update({username: username, user_avatar: user_avatar, description: description, 
+    type: req.file.mimetype}, {where: {id: userId}}).then((data) => {
+    res.status(201).send(data);
+    
+  });
+}
+}
+
 
 export const getAllUsers = async (req, res) => {
   try {
@@ -320,33 +382,32 @@ export const emailSend = async () => {
 };
 
 export const changePassword = async (req, res) => {
-  let data = await Otp.findOne({
-    email: req.body.email,
-    code: req.body.otpCode,
-  });
-  const response = {};
-  if (data) {
-    let currentTime = new Date();
+  const userId = req.query.id;
+   const password = req.body.password;
+   const confirmPassword = req.body.confirmPassword;
 
-    let diff = data.expireIn - currentTime;
 
-    if (diff < 0) {
-      response.message = "Verification Code has Expired";
-      response.statusText = "error";
-    } else {
-      let user = await Otp.findOne({ email: req.body.email });
-      user.password = req.body.password;
-      user.save();
+  const user = await User.findOne({
+     where: { id: userId },
+   });
 
-      response.message = "Password Changed Successfully";
-      response.statusText = "Success";
-    }
-  } else {
-    response.message = "Invalid Verification Code";
-    response.statusText = "error";
+   try {
+
+   if (!user) {
+     return res.status(401).send({ msg: "Unauthorized" });
+   } else if (password !== confirmPassword) {
+     return res.status(401).send({ msg: "Passwords Do Not Match" });
+   
+   } else {
+   if (password == confirmPassword) {
+    await User.update({password: password}, {where: {id: userId}}).then((data) => {
+      res.status(201).send(data);
+    });
   }
-
-  res.status(200).json(response);
+  }
+  } catch (err) {
+    res.status(500).send({ message: err.message });
+  }
 };
 
 // export const sendOtp = async () => {
@@ -470,32 +531,59 @@ export const getSingleUser = async (req, res, next) => {
     });
 };
 
+export const allSocialUsers = async (req, res) => {
+  const loggedInUserId = req.params.userId;
+
+  try {
+    const users = await User.findAll({
+      where: {
+        id: {
+          [Op.ne]: loggedInUserId,
+        },
+      },
+    });
+
+    res.status(200).json(users);
+  } catch (err) {
+    console.error("Error retrieving users", err);
+    res.status(500).json({ message: "Error retrieving users" });
+  }
+}
 
 
-export const followUser = async (req, res) => {
-  const id = req.params.id;
-
-  const { currentUserId } = req.body;
+export const sentConnectionRequest = async (req, res) => {
+  
+  const { currentUserId, selectedUserId } = req.body;
 
   if (currentUserId === id) {
     res.status(403).json("Action Forbidden");
   } else {
     try {
-      const followUser = await User.findOne(id);
-      const followingUser = await User.findOne(currentUserId);
-
-      if (!followUser.followers.includes(currentUserId)) {
-        await followUser.update({ followers: currentUserId });
-        await followingUser.update({ following: id });
-        res.status(200).json("User Followed!");
+      const selectedUser = await User.findOne(selectedUserId);
+      if (selectedUser) {
+        selectedUser.connectionsRequest.push(currentUserId);
+        await selectedUser.save();
       } else {
-        res.status(403).json("User is Already followed by you");
+        res.status(404).json({ message: "Selected user not found" });
+        return;
       }
+  
+      // Update the sender's connectionRequestSent array
+      const currentUser = await User.findOne(currentUserId);
+      if (currentUser) {
+        currentUser.connectionRequestSent.push(selectedUserId);
+        await currentUser.save();
+      } else {
+        res.status(404).json({ message: "Current user not found" });
+        return;
+      }
+      res.sendStatus(200);
     } catch (error) {
       res.status(500).json(error);
     }
   }
 };
+
 
 export const unfollowUser = async (req, res) => {
   const id = req.params.id;
@@ -521,56 +609,109 @@ export const unfollowUser = async (req, res) => {
   }
 };
 
-export const followingUser = async (req, res) => {
+
+export const receivedConnectionRequest = async (req, res) => {
+
+  const { senderId, recepientId } = req.body;
+
   try {
-    const userToFollow = await User.findByPk(req.params.id);
-    const loggedInUser = await User.findByPk(req.user.id);
-    if (!userToFollow) {
-      return res.status(404).json({
-        message: "User not found",
-        success: false,
-      });
-    }
+    // Retrieve the documents of sender and the recipient
+    const sender = await User.findOne(senderId);
+    const recepient = await User.findOne(recepientId);
 
-    //If user is following himself
-    if (userToFollow.id === loggedInUser.id) {
-      return res.status(400).json({
-        message: "You cannot follow yourself",
-        success: false,
-      });
-    }
-    if (loggedInUser.following.includes(userToFollow.id)) {
-      const indexFollowing = loggedInUser.following.indexOf(userToFollow.id);
-      loggedInUser.following.splice(indexFollowing, 1);
-      const indexFollowers = userToFollow.followers.indexOf(loggedInUser.id);
-      userToFollow.followers.splice(indexFollowers, 1);
+    // Update the friends arrays
+    sender.friends.push(recepientId);
+    recepient.friends.push(senderId);
 
-      await loggedInUser.save();
-      await userToFollow.save();
+    // Filter and update friend requests arrays
+    recepient.friendsRequests = recepient.connectionsRequest.filter(request => request !== senderId);
+    sender.sentFriendRequests = sender.connectionsRequestSent.filter(request => request !== recepientId);
 
-      return res.status(200).json({
-        success: true,
-        message: "User Unfollowed",
-      });
-    } else {
-      loggedInUser.following.push(userToFollow.id);
-      userToFollow.followers.push(loggedInUser.id);
+    // Save changes
+    await sender.save();
+    await recepient.save();
 
-      await loggedInUser.save();
-      await userToFollow.save();
-
-      return res.status(200).json({
-        success: true,
-        message: "User Followed",
-      });
-    }
+    res.status(200).json({ message: "Friend Request accepted successfully" });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: e.message,
-    });
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
-};
+}
+
+// export const followingUser = async (req, res) => {
+//   try {
+//     const userToFollow = await User.findByPk(req.params.id);
+//     const loggedInUser = await User.findByPk(req.user.id);
+//     if (!userToFollow) {
+//       return res.status(404).json({
+//         message: "User not found",
+//         success: false,
+//       });
+//     }
+
+//     //If user is following himself
+//     if (userToFollow.id === loggedInUser.id) {
+//       return res.status(400).json({
+//         message: "You cannot follow yourself",
+//         success: false,
+//       });
+//     }
+//     if (loggedInUser.following.includes(userToFollow.id)) {
+//       const indexFollowing = loggedInUser.following.indexOf(userToFollow.id);
+//       loggedInUser.following.splice(indexFollowing, 1);
+//       const indexFollowers = userToFollow.followers.indexOf(loggedInUser.id);
+//       userToFollow.followers.splice(indexFollowers, 1);
+
+//       await loggedInUser.save();
+//       await userToFollow.save();
+
+//       return res.status(200).json({
+//         success: true,
+//         message: "User Unfollowed",
+//       });
+//     } else {
+//       loggedInUser.following.push(userToFollow.id);
+//       userToFollow.followers.push(loggedInUser.id);
+
+//       await loggedInUser.save();
+//       await userToFollow.save();
+
+//       return res.status(200).json({
+//         success: true,
+//         message: "User Followed",
+//       });
+//     }
+//   } catch (error) {
+//     res.status(500).json({
+//       success: false,
+//       message: e.message,
+//     });
+//   }
+// };
+
+
+export const userConnections = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Find the user by their primary key
+    const user = await User.findByPk(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const acceptedFriends = user.connections; // Assuming 'friends' is a field in your User model
+
+    res.json(acceptedFriends);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+}
+
+
+
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {

@@ -19,6 +19,15 @@ const User = sequelize.define("User", {
     type: DataTypes.ARRAY(DataTypes.INTEGER),
     allowNull: true,
   },
+  connectionsRequest: {
+    type: DataTypes.ARRAY(DataTypes.INTEGER),
+    allowNull: true,
+  },
+
+  connectionRequestSent: {
+    type: DataTypes.ARRAY(DataTypes.INTEGER),
+    allowNull: true,
+  },
   password: {
     type: DataTypes.STRING,
     allowNull: true,
