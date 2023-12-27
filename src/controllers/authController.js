@@ -317,7 +317,7 @@ export const updateUserProfile = async (req, res) => {
 
    console.log("Updating user profile Id Is", userId)
    const username = req.body.username;
-   const user_avatar = "https://api.waridi.co/" + req.file.filename;
+   const user_avatar = "https://api.waridi.co/images/" + req.file.filename;
    const description = req.body.description;
    
    const user = await User.findOne({
