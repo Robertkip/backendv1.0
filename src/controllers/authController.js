@@ -532,57 +532,65 @@ export const getSingleUser = async (req, res, next) => {
 };
 
 export const allSocialUsers = async (req, res) => {
-  const loggedInUserId = req.params.userId;
+  const loggedInUserId = req.query.id;
 
   try {
-    const users = await User.findAll({
+     await User.findAll({
       where: {
         id: {
           [Op.ne]: loggedInUserId,
         },
       },
+    }).then(user => { 
+      console.log("All Social Users Are", user);
+       res.status(200).json(user);
     });
 
-    res.status(200).json(users);
   } catch (err) {
     console.error("Error retrieving users", err);
     res.status(500).json({ message: "Error retrieving users" });
   }
 }
 
-
 export const sentConnectionRequest = async (req, res) => {
-  
-  const { currentUserId, selectedUserId } = req.body;
+  try {
+    const { currentUserId, selectedUserId } = req.body;
 
-  if (currentUserId === id) {
-    res.status(403).json("Action Forbidden");
-  } else {
-    try {
-      const selectedUser = await User.findOne(selectedUserId);
-      if (selectedUser) {
-        selectedUser.connectionsRequest.push(currentUserId);
-        await selectedUser.save();
-      } else {
-        res.status(404).json({ message: "Selected user not found" });
-        return;
-      }
-  
-      // Update the sender's connectionRequestSent array
-      const currentUser = await User.findOne(currentUserId);
-      if (currentUser) {
-        currentUser.connectionRequestSent.push(selectedUserId);
-        await currentUser.save();
-      } else {
-        res.status(404).json({ message: "Current user not found" });
-        return;
-      }
-      res.sendStatus(200);
-    } catch (error) {
-      res.status(500).json(error);
+    const selectedUser = await User.findByPk(selectedUserId);
+
+    if (!selectedUser) {
+      res.status(404).json({ message: "Selected user not found" });
+      return;
     }
+
+    // Ensure connectionsRequest is an array and initialize it if it doesn't exist
+    selectedUser.connectionsRequest = selectedUser.connectionsRequest || [];
+    
+    // Convert IDs to integers before pushing them into the array
+    selectedUser.connectionsRequest.push(parseInt(currentUserId, 10));
+    await selectedUser.save();
+
+    const currentUser = await User.findByPk(currentUserId);
+
+    if (!currentUser) {
+      res.status(404).json({ message: "Current user not found" });
+      return;
+    }
+
+    // Ensure connectionRequestSent is an array and initialize it if it doesn't exist
+    currentUser.connectionRequestSent = currentUser.connectionRequestSent || [];
+
+    // Convert IDs to integers before pushing them into the array
+    currentUser.connectionRequestSent.push(parseInt(selectedUserId, 10));
+    await currentUser.save();
+
+    res.status(200).json({ message: "Connection request sent successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
+
 
 
 export const unfollowUser = async (req, res) => {
