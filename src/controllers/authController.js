@@ -617,34 +617,92 @@ export const unfollowUser = async (req, res) => {
   }
 };
 
-
 export const receivedConnectionRequest = async (req, res) => {
-
   const { senderId, recepientId } = req.body;
 
   try {
     // Retrieve the documents of sender and the recipient
-    const sender = await User.findOne(senderId);
-    const recepient = await User.findOne(recepientId);
+    const sender = await User.findByPk(senderId);
+    const recepient = await User.findByPk(recepientId);
+
+    // Check if both sender and recepient exist
+    if (!sender || !recepient) {
+      res.status(404).json({ message: "Sender or recepient not found" });
+      return;
+    }
+
+    console.log('Initial state:');
+    console.log('Sender connections:', sender.connections);
+    console.log('Recepient connections:', recepient.connections);
+
+    // Initialize the connections arrays if they're null or undefined
+    sender.connections = sender.connections || [];
+    recepient.connections = recepient.connections || [];
 
     // Update the friends arrays
-    sender.friends.push(recepientId);
-    recepient.friends.push(senderId);
+    sender.connections.push(recepientId);
+    recepient.connections.push(senderId);
 
     // Filter and update friend requests arrays
-    recepient.friendsRequests = recepient.connectionsRequest.filter(request => request !== senderId);
-    sender.sentFriendRequests = sender.connectionsRequestSent.filter(request => request !== recepientId);
+    recepient.connectionsRequest = recepient.connectionsRequest.filter(request => request !== senderId);
+    sender.connectionRequestSent = sender.connectionRequestSent.filter(request => request !== recepientId);
+
+    console.log('After updating arrays:');
+    console.log('Sender connections:', sender.connections);
+    console.log('Recepient connections:', recepient.connections);
+
+    // Update connections field
+    if (!sender.connections.includes(recepientId)) {
+      sender.connections.push(recepientId);
+    }
+
+    if (!recepient.connections.includes(senderId)) {
+      recepient.connections.push(senderId);
+    }
+
+    console.log('After updating connections field:');
+    console.log('Sender connections:', sender.connections);
+    console.log('Recepient connections:', recepient.connections);
 
     // Save changes
-    await sender.save();
-    await recepient.save();
+    await Promise.all([sender.save(), recepient.save()]);
 
     res.status(200).json({ message: "Friend Request accepted successfully" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal Server Error" });
   }
-}
+};
+
+export const getConnections = async (req, res) => {
+  const  userId  = req.query.id; // Assuming you pass the user ID in the request parameters
+
+  try {
+    // Find the user by ID
+    const user = await User.findByPk(userId, {
+      attributes: ['connections'], // Include only the connections field
+    });
+
+    // Check if the user exists
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Fetch user connections
+    const connectionIds = user.connections || []; // Ensure connections is an array
+    const connections = await User.findAll({
+      where: {
+        id: connectionIds,
+      },
+      attributes: ['id', 'username', 'email', 'user_avatar'], // Add other fields you want to include
+    });
+
+    res.status(200).json({ connections });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
 
 // export const followingUser = async (req, res) => {
 //   try {

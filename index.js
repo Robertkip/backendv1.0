@@ -25,9 +25,11 @@ import cartRouter from "./src/routers/cartRoute.js";
 import userProfileRouter from "./src/routers/userProfileRoute.js";
 import friendRequestRouter from "./src/routers/friendrequestRouter.js";
 import notificationDeviceRouter from "./src/routers/notificationTokenRoute.js";
+import messageRouter from "./src/routers/messageRouter.js";
 import ratingRouter from "./src/routers/ratingRoute.js";
 import { initPassport } from "./src/middlewares/initPassport.js";
 import notificationRouter from "./src/routers/notifyRoute.js";
+import User from "./src/models/authModel.js";
 import {
   getUser,
   addNewUser,
@@ -39,6 +41,7 @@ import options from "./swagger-output.json" assert { type: "json" };
 dotenv.config();
 
 const app = express();
+
 
 const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -59,12 +62,11 @@ const PORT = process.env.PORT || 8084;
 
 //passportSetup(app);
 
-// let io = new Socket({
-//   cors: {
-//     origin: "https://api.waridi.co/api/v1/",
-//   },
-// });
-
+let io = new Socket({
+  cors: {
+    origin: "*",
+  },
+});
 // const redisClient = createClient({ legacyMode: true });
 // redisClient.connect().catch(console.error);
 
@@ -88,7 +90,13 @@ app.use(cors());
 app.use(express.json({ limit: "50mb", extended: true }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(helmet());
-app.use(logger("common"));
+app.use(logger("common")); include: [
+  {
+    model: User,
+    as: "sender",
+    attributes: ["_id", "name"],
+  },
+],
 
 initPassport(app);
 
@@ -122,9 +130,57 @@ app.use("/api/v1", friendRequestRouter);
 app.use("/api/v1/token", notificationDeviceRouter);
 app.use("/api/v1", ratingRouter);
 app.use("/api/v1", notificationRouter);
+app.use("/api/v1", messageRouter);
 // const server =  app.listen(PORT, ADDRESS, () => {
 //     console.log(`Server is running on port`)
 // })
+
+let users = [];
+
+io.on("connection", (socket) => { 
+  console.log('User connected', socket.id);
+  socket.on('addUser', userId => {
+      const isUserExist = users.find(user => user.userId === userId);
+      if (!isUserExist) {
+          const user = { userId, socketId: socket.id };
+          users.push(user);
+          io.emit('getUsers', users);
+      }
+ })
+
+ socket.on('sendMessage', async ({senderId, receiverId, message}) => {
+   const receiver = users.find(user => user.userId === receiverId);
+
+   const sender = users.find(user => user.userId === senderId);
+
+   const user = await User.findByPk(senderId);
+
+
+   console.log('sender :>> ', sender, receiver);
+
+   if (receiver) {
+    io.to(receiver.socketId).to(sender.socketId).emit('getMessage', {
+        senderId,
+        message,
+        receiverId,
+    });
+    }else {
+        io.to(sender.socketId).emit('getMessage', {
+            senderId,
+            message,
+            receiverId,
+        });
+    }
+  
+ });
+
+ socket.on('disconnect', () => {
+  users = users.filter(user => user.socketId !== socket.id);
+  io.emit('getUsers', users);
+});
+
+})
+
 
 // io.on("connection", (socket) => {
 //   socket.on("newUser", (username) => {
@@ -176,12 +232,8 @@ app.use("/api/v1", notificationRouter);
 //   const server = app.listen(PORT, ADDRESS, () => {
 //     console.log(`Server is running on port`);
 //   });
-//   const io = new Socket(server, {
-//     cors: {
-//       origin: "http://38.242.239.1:8084",
-//     },
-//   });
-//   io.listen(8084);
+  
+  io.listen(8085);
 // } else {
 //   let ADDRESS = "192.168.0.12";
 //   const server = app.listen(PORT, ADDRESS, () => {
@@ -194,6 +246,6 @@ app.use("/api/v1", notificationRouter);
 //   });
 // }
 
-// global.ononline = new Map();
+global.ononline = new Map();
 
 export default app;

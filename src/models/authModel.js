@@ -1,6 +1,7 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../config/connectDb.js";
 import Role from "./role.js";
+import Message from "./messageModel.js";
 
 const User = sequelize.define("User", {
   roleId: {
