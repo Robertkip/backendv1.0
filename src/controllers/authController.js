@@ -106,6 +106,7 @@ export const Signup = async (req, res) => {
   }
 };
 
+
 export const Signin = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -205,6 +206,7 @@ transporter.verify((error, success) => {
     console.log(success);
   }
 });
+
 
 export const sendOtpVerification = async (email) => {
   const otp = `${Math.floor(1000 + Math.random() * 9000)}`;

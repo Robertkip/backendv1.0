@@ -27,6 +27,7 @@ import friendRequestRouter from "./src/routers/friendrequestRouter.js";
 import notificationDeviceRouter from "./src/routers/notificationTokenRoute.js";
 import messageRouter from "./src/routers/messageRouter.js";
 import ratingRouter from "./src/routers/ratingRoute.js";
+import geoLocationRouter from "./src/routers/geoLocationRoute.js";
 import { initPassport } from "./src/middlewares/initPassport.js";
 import notificationRouter from "./src/routers/notifyRoute.js";
 import User from "./src/models/authModel.js";
@@ -67,15 +68,15 @@ let io = new Socket({
     origin: "*",
   },
 });
-// const redisClient = createClient({ legacyMode: true });
-// redisClient.connect().catch(console.error);
+const redisClient = createClient({ legacyMode: true });
+redisClient.connect().catch(console.error);
 
-// const redisStore = new RedisStore({
-//   client: redisClient,
-//   prefix: "waridi",
-// });
+const redisStore = new RedisStore({
+  client: redisClient,
+  prefix: "waridi",
+});
 
-// const REDIS_SESSION_SECRET = process.env.REDIS_SESSION_SECRET;
+const REDIS_SESSION_SECRET = process.env.REDIS_SESSION_SECRET;
 
 app.use(
   cookieSession({
@@ -100,19 +101,19 @@ app.use(logger("common")); include: [
 
 initPassport(app);
 
-// app.use(
-//   session({
-//     store: redisStore,
-//     secret: REDIS_SESSION_SECRET,
-//     resave: false,
-//     saveUninitialized: false,
-//     cookie: {
-//       secure: false,
-//       httpOnly: false,
-//       maxAge: 1000 * 60 * 10,
-//     },
-//   })
-// );
+app.use(
+  session({
+    store: redisStore,
+    secret: REDIS_SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: false,
+      httpOnly: false,
+      maxAge: 1000 * 60 * 10,
+    },
+  })
+);
 
 app.use("/images", express.static("Images"));
 app.use("/swagger-ui", swaggerUi.serve, swaggerUi.setup(options));
@@ -131,6 +132,7 @@ app.use("/api/v1/token", notificationDeviceRouter);
 app.use("/api/v1", ratingRouter);
 app.use("/api/v1", notificationRouter);
 app.use("/api/v1", messageRouter);
+app.use("/api/v1", geoLocationRouter);
 // const server =  app.listen(PORT, ADDRESS, () => {
 //     console.log(`Server is running on port`)
 // })
