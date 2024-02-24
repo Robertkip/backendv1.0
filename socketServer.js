@@ -1,4 +1,4 @@
-let users = []; //
+let users = []; 
 
 
 const EditData = (data, id, call) => {

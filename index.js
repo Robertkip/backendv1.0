@@ -31,6 +31,7 @@ import geoLocationRouter from "./src/routers/geoLocationRoute.js";
 import { initPassport } from "./src/middlewares/initPassport.js";
 import notificationRouter from "./src/routers/notifyRoute.js";
 import User from "./src/models/authModel.js";
+import Message from "./src/models/messageModel.js";
 import {
   getUser,
   addNewUser,
@@ -149,32 +150,34 @@ io.on("connection", (socket) => {
           io.emit('getUsers', users);
       }
  })
-
  socket.on('sendMessage', async ({senderId, receiverId, message}) => {
-   const receiver = users.find(user => user.userId === receiverId);
+  const receiver = users.find(user => user.userId === receiverId);
+  const sender = users.find(user => user.userId === senderId);
 
-   const sender = users.find(user => user.userId === senderId);
+  const user = await User.findByPk(senderId);
 
-   const user = await User.findByPk(senderId);
+  console.log('sender :>> ', sender, receiver);
 
+  if (receiver) {
+     io.to(receiver.socketId).emit('getMessage', {
+         senderId,
+         message,
+         receiverId,
+     });
 
-   console.log('sender :>> ', sender, receiver);
-
-   if (receiver) {
-    io.to(receiver.socketId).to(sender.socketId).emit('getMessage', {
-        senderId,
-        message,
-        receiverId,
-    });
-    }else {
-        io.to(sender.socketId).emit('getMessage', {
-            senderId,
-            message,
-            receiverId,
-        });
-    }
-  
- });
+     io.to(sender.socketId).emit('getMessage', {
+         senderId,
+         message,
+         receiverId,
+     });
+  } else {
+     io.to(sender.socketId).emit('getMessage', {
+         senderId,
+         message,
+         receiverId,
+     });
+  }
+});
 
  socket.on('disconnect', () => {
   users = users.filter(user => user.socketId !== socket.id);
@@ -184,28 +187,49 @@ io.on("connection", (socket) => {
 })
 
 
-// io.on("connection", (socket) => {
-//   socket.on("newUser", (username) => {
-//     addNewUser(username, socket.id);
-//   });
-//   socket.on("sendNotification", ({ senderName, receiverName, type }) => {
-//     const receiver = getUser(receiverName);
-//     io.to(receiver.socketId).emit("getNotification", {
-//       senderName,
-//       type,
-//     });
-//   });
-//   socket.on("sendText", ({ senderName, receiverName, text }) => {
-//     const receiver = getUser(receiverName);
-//     io.to(receiver.socketId).emit("getText", {
-//       senderName,
-//       text,
-//     });
-//   });
-//   socket.on("disconnect", () => {
-//     removeUser(socket.id);
-//   });
-// });
+io.on("connection", (socket) => {
+  socket.on("newUser", (username) => {
+    addNewUser(username, socket.id);
+  });
+  socket.on("sendNotification", ({ senderName, receiverName, type }) => {
+    const receiver = getUser(receiverName);
+    io.to(receiver.socketId).emit("getNotification", {
+      senderName,
+      type,
+    });
+  });
+  socket.on("sendText", ({ senderName, receiverName, text }) => {
+    const receiver = getUser(receiverName);
+    io.to(receiver.socketId).emit("getText", {
+      senderName,
+      text,
+    });
+  });
+  socket.on("disconnect", () => {
+    removeUser(socket.id);
+  });
+});
+
+
+app.post("/api/v1/send-message", async (req, res) => {
+  const { senderId, receiverId, message } = req.body;
+
+
+  // Emit the message through Socket.IO
+  io.emit('sendMessage', { senderId, receiverId, message });
+
+  try {
+
+    await Message.create({senderId, message, receiverId}); 
+
+    return res.status(200).json({message: "Message sent successfully"});
+
+    } catch (error) {
+        return res.status(500).json({message: error.message}); 
+    }
+
+
+})
 
   app.listen(PORT,  () => {
     console.log(`Server is running on port`);
