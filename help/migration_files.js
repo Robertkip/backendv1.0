@@ -9,3 +9,4 @@
 // npx sequelize-cli model:generate --name Landlord --attributes userId: integer,landlord_fname:string,landlord_idno:string,landlord_phonenumber:string,landlord_location:string,landlord_avatar:string,type:string;
 // npx sequelize-cli model:generate --name Message --attributes senderId:integer,receiverId:integer,message:text,messageType:string;
 // npx sequelize-cli model:generate --name Notification --attributes userId:integer,notification_type:string,notification_message:string,notification_status:string,notification_time:string;
+//npx sequelize-cli model:generate --name Connection --attributes userId:integer,connectionId:integer;

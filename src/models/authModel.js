@@ -2,7 +2,7 @@ import { DataTypes } from "sequelize";
 import { sequelize } from "../config/connectDb.js";
 import Role from "./role.js";
 import Message from "./messageModel.js";
-
+import Connection from "./connectionsModel.js";
 const User = sequelize.define("User", {
   roleId: {
     type: DataTypes.INTEGER,
@@ -14,19 +14,6 @@ const User = sequelize.define("User", {
   },
   email: {
     type: DataTypes.STRING,
-    allowNull: true,
-  },
-  connections: {
-    type: DataTypes.ARRAY(DataTypes.INTEGER),
-    allowNull: true,
-  },
-  connectionsRequest: {
-    type: DataTypes.ARRAY(DataTypes.INTEGER),
-    allowNull: true,
-  },
-
-  connectionRequestSent: {
-    type: DataTypes.ARRAY(DataTypes.INTEGER),
     allowNull: true,
   },
   password: {
@@ -75,12 +62,25 @@ const User = sequelize.define("User", {
     type: DataTypes.BOOLEAN,
     allowNull: true,
   },
+  connectionsRequest: {
+    type: DataTypes.ARRAY(DataTypes.INTEGER),
+    allowNull: true,
+  },
+  connectionRequestSent: {
+    type: DataTypes.ARRAY(DataTypes.INTEGER),
+    allowNull: true,
+  },
 });
 
 User.associations = (models) => {
   User.belongsTo(Role, {
     foreignKey: "roleId",
   });
+
+  User.hasMany(Connection, {
+     foreignKey: "connectionId",
+  })
+
   return User;
 };
 

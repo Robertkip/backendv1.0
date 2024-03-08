@@ -13,6 +13,7 @@ import * as PasswordHelper from "../helpers/passwordHelper.js";
 import * as Helper from "../helpers/helper.js";
 import Otp from "../models/otpModel.js";
 import { Authenticated } from "../middlewares/authorizationPermission.js";
+import Connection from "../models/connectionsModel.js";
 
 dotenv.config();
 
@@ -627,6 +628,7 @@ export const receivedConnectionRequest = async (req, res) => {
     const sender = await User.findByPk(senderId);
     const recepient = await User.findByPk(recepientId);
 
+
     // Check if both sender and recepient exist
     if (!sender || !recepient) {
       res.status(404).json({ message: "Sender or recepient not found" });
@@ -637,34 +639,34 @@ export const receivedConnectionRequest = async (req, res) => {
     console.log('Sender connections:', sender.connections);
     console.log('Recepient connections:', recepient.connections);
 
+
+    await Connection.create({userId: senderId, connectionId: recepientId})
+    await Connection.create({userId: recepientId, connectionId: senderId})
+
     // Initialize the connections arrays if they're null or undefined
-    sender.connections = sender.connections || [];
-    recepient.connections = recepient.connections || [];
+    // sender.connections = sender.connections || [];
+    // recepient.connections = recepient.connections || [];
 
     // Update the friends arrays
-    sender.connections.push(recepientId);
-    recepient.connections.push(senderId);
+    // sender.connections.push(recepientId);
+    // recepient.connections.push(senderId);
 
     // Filter and update friend requests arrays
     recepient.connectionsRequest = recepient.connectionsRequest.filter(request => request !== senderId);
     sender.connectionRequestSent = sender.connectionRequestSent.filter(request => request !== recepientId);
 
-    console.log('After updating arrays:');
     console.log('Sender connections:', sender.connections);
     console.log('Recepient connections:', recepient.connections);
 
     // Update connections field
-    if (!sender.connections.includes(recepientId)) {
-      sender.connections.push(recepientId);
-    }
+    // if (!sender.connections.includes(recepientId)) {
+    //   sender.connections.push(recepientId);
+    // }
 
-    if (!recepient.connections.includes(senderId)) {
-      recepient.connections.push(senderId);
-    }
+    // if (!recepient.connections.includes(senderId)) {
+    //   recepient.connections.push(senderId);
+    // }
 
-    console.log('After updating connections field:');
-    console.log('Sender connections:', sender.connections);
-    console.log('Recepient connections:', recepient.connections);
 
     // Save changes
     await Promise.all([sender.save(), recepient.save()]);
@@ -677,27 +679,29 @@ export const receivedConnectionRequest = async (req, res) => {
 };
 
 export const getConnections = async (req, res) => {
-  const  userId  = req.query.id; // Assuming you pass the user ID in the request parameters
+  const userId = req.query.id;
 
   try {
-    // Find the user by ID
-    const user = await User.findByPk(userId, {
-      attributes: ['connections'], // Include only the connections field
-    });
-
-    // Check if the user exists
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    // Fetch user connections
-    const connectionIds = user.connections || []; // Ensure connections is an array
-    const connections = await User.findAll({
-      where: {
-        id: connectionIds,
-      },
-      attributes: ['id', 'username', 'email', 'user_avatar'], // Add other fields you want to include
-    });
+    const connections = await sequelize.query(
+      `
+      SELECT
+          c."connectionId",
+          u.id,
+          u.username,
+          u.email,
+          u.user_avatar
+      FROM
+          "Connections" c
+      LEFT JOIN
+          "Users" u ON c."connectionId" = u.id
+      WHERE
+          c."userId" = :userId
+      `,
+      {
+        replacements: { userId },
+        type: sequelize.QueryTypes.SELECT,
+      }
+    );
 
     res.status(200).json({ connections });
   } catch (error) {
@@ -705,6 +709,7 @@ export const getConnections = async (req, res) => {
     res.status(500).json({ message: 'Internal Server Error' });
   }
 };
+
 
 // export const followingUser = async (req, res) => {
 //   try {
