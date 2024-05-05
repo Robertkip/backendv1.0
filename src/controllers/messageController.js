@@ -49,3 +49,22 @@ export const getSenderReceiverMessage = async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 };
+
+export const getMessages = async (req, res) => {
+
+    try {
+        const messages = await Message.findAll({
+            where: {
+                [Op.or]: [
+                    { senderId: req.user.id },
+                    { receiverId: req.user.id },
+                ],
+            },
+            order: [["createdAt", "DESC"]],
+        });
+
+        return res.status(200).json({ messages });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}

@@ -31,7 +31,6 @@ export const notificationDeviceToken = async (req, res) => {
 };
 
 export const searchReceiverToken = async (req, res, next) => {
-  // Retrieve all Tutorials from the database.  const user = req.query.userId; 
 
   const user = req.query.userId;
   var condition = user ? { 
@@ -40,7 +39,7 @@ export const searchReceiverToken = async (req, res, next) => {
       literal(`"userId" IS NOT NULL`)
     ]
   } : null;
-  // Retrieve all Tutorials from the database.
+  
   await NotificationToken.findAll({ where: condition })
     .then((data) => {
       res.send(data);
