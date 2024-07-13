@@ -1,10 +1,16 @@
+import dotenv from "dotenv";
 import multer from "multer";
 import path from "path";
 import { Op } from "sequelize";
 import UserProfile from "../models/userProfileModel.js";
 import User from "../models/authModel.js";
 
+dotenv.config();
 export const createUserProfile = async (req, res, next) => {
+
+  const PRODUCTION_IMAGE_ADDRESS = process.env.PRODUCTION_IMAGE_URL
+
+
   const userId = req.body.userId;
   const user_fname = req.body.user_fname;
   const user_lname = req.body.user_lname;
@@ -12,7 +18,7 @@ export const createUserProfile = async (req, res, next) => {
   const user_location = req.body.user_location;
   const followers = req.body.followers;
   const following = req.body.following;
-  const user_avatar = "https://api.waridi.co/images/" + req.file.filename;
+  const user_avatar = PRODUCTION_IMAGE_ADDRESS + req.file.filename;
 
   const userprofile = await UserProfile.findOne({
     where: { user_phonenumber },

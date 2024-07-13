@@ -11,6 +11,7 @@ dotenv.config();
 const PLACES_API_ENDPOINT = process.env.PLACES_API_ENDPOINT;
 const PLACES_SEARCH_API_ENDPOINT = process.env.PLACES_SEARCH_API_ENDPOINT;
 const API_KEY = process.env.API_KEY;
+const PRODUCTION_IMAGE_ADDRESS = process.env.PRODUCTION_IMAGE_URL
 
 const geocoder = NodeGeocoder({
   provider: "google",
@@ -72,10 +73,10 @@ export const uploadApartment = async (req, res) => {
         console.log(error);
       }
     } else if (process.env.NODE_ENV === "production") {
-      const name1 = "https://api.waridi.co/images/" + req.files[0].filename;
-      const name2 = "https://api.waridi.co/images/" + req.files[1].filename;
-      const name3 = "https://api.waridi.co/images/" + req.files[2].filename;
-      const name4 = "https://api.waridi.co/images/" + req.files[3].filename;
+      const name1 = PRODUCTION_IMAGE_ADDRESS + req.files[0].filename;
+      const name2 = PRODUCTION_IMAGE_ADDRESS + req.files[1].filename;
+      const name3 = PRODUCTION_IMAGE_ADDRESS + req.files[2].filename;
+      const name4 = PRODUCTION_IMAGE_ADDRESS + req.files[3].filename;
       const newApartment = new Apartment({
         apartment_name: req.body.apartment_name,
         apartment_location: req.body.apartment_location,

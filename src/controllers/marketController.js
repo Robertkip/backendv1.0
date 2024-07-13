@@ -1,14 +1,20 @@
+import dotenv from "dotenv";
 import multer from "multer";
 import path from "path";
 import Market from "../models/marketModel.js";
 
+dotenv.config();
+
 export const createMarket = async (req, res) => {
+  
+  const PRODUCTION_IMAGE_ADDRESS = process.env.PRODUCTION_IMAGE_URL
+
   const sellerId = req.body.sellerId;
   const product_name = req.body.product_name;
   const product_description = req.body.product_description;
   const product_quantity = req.body.product_quantity;
   const product_price = req.body.product_price;
-  const product_image = "https://api.waridi.co/images/" + req.file.filename;
+  const product_image = PRODUCTION_IMAGE_ADDRESS + req.file.filename;
 
   const market = await Market.findOne({ where: { product_name } });
 

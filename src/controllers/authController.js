@@ -320,7 +320,7 @@ export const updateUserProfile = async (req, res) => {
 
    console.log("Updating user profile Id Is", userId)
    const username = req.body.username;
-   const user_avatar = "https://api.waridi.co/images/" + req.file.filename;
+   const user_avatar = PRODUCTION_IMAGE_ADDRESS + req.file.filename;
    const description = req.body.description;
    
    const user = await User.findOne({
@@ -491,7 +491,7 @@ export const generateOtp = async () => {
 
 export const changeImage = async (req, res) => {
   const id = req.params.id;
-  const user_avatar = "https://api.waridi.co/images/" + req.file.filename;
+  const user_avatar = PRODUCTION_IMAGE_ADDRESS + req.file.filename;
 
   await User.findOne({ where: { id: id } }).then((updateImage) => {
     updateImage
