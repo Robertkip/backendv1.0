@@ -154,9 +154,11 @@ export const uploadApartment = async (req, res) => {
       }
     }
     return res.status(201).send("Apartment Created Successfully");
-  } catch (err) {
-    res.status(500).send({ message: err.message });
   }
+  catch (error) {
+    console.error("Error saving apartment:", error);
+    return res.status(500).send({ message: "Internal Server Error", error });
+}
 };
 
 const getPagination = (page, size) => {

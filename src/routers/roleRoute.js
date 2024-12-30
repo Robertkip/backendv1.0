@@ -12,4 +12,6 @@ router.post(
 );
 router.get("/role", RoleController.GetRole);
 
+router.get("/role:/id", RoleController.GetRoleById);
+
 export default router;

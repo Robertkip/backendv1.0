@@ -14,6 +14,7 @@ import * as Helper from "../helpers/helper.js";
 import Otp from "../models/otpModel.js";
 import { Authenticated } from "../middlewares/authorizationPermission.js";
 import Connection from "../models/connectionsModel.js";
+import Role from "../models/role.js";
 
 dotenv.config();
 
@@ -108,36 +109,106 @@ export const Signup = async (req, res) => {
 };
 
 
+// export const Signin = async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
+  
+//     const user = await User.findOne({
+//       where: { email: email },
+//     });
+
+
+//     const matched = await PasswordHelper.PasswordCompare(
+//       password,
+//       user.password
+//     );
+
+
+//     console.log("User found", user);  
+
+//     // req.session.user = user;
+
+//     // const sess = req.session.save();
+
+//     if (!user) {
+//       return res.status(401).send({ msg: "Unauthorized" });
+//     } else if(!matched) {
+
+//       console.log("Password Does Not Match", matched);
+//       return res.status(401).send({ msg: "Unauthorized" });
+//     } else if (user.verified == false) {
+//       return res.status(403).send({ msg: "Verify Account to Login" });
+//     } else {
+
+//     const dataUser = {
+//       id: user.id,
+//       username: user.username,
+//       email: user.email,
+//       roleId: user.roleId,
+//       password: user.password,
+//       confirm_password: user.confirm_password,
+//       verified: user.verified,
+//       active: user.active,
+//     };
+
+//     console.log("Role ID Data User is", dataUser.roleId);
+
+
+//     const role = Role.findByPk(dataUser.roleId);
+
+//     console.log("Role By ID IS", role);
+
+//     const token = Helper.GenerateToken(dataUser);
+//     const refreshToken = Helper.GenerateRefreshToken(dataUser);
+
+//     user.accessToken = refreshToken;
+
+//     await user.save();
+//     res.cookie("refreshToken", refreshToken, {
+//       httpOnly: true,
+//       maxAge: 24 * 60 * 60 * 1000,
+//     });
+  
+//     const responseUser = {
+//       id: user.id,
+//       username: user.username,
+//       email: user.email,
+//       roleId: role,
+//       verified: user.verified,
+//       active: user.active,
+//       token: token,
+//     };
+  
+//     return res.status(200).send(responseUser);
+//   }
+//   } catch (err) {
+//     console.log("Error Registering Is: " + err.message);
+//     res.status(500).send(err);
+//   }
+// };
+
 export const Signin = async (req, res) => {
   try {
     const { email, password } = req.body;
-  
+
     const user = await User.findOne({
       where: { email: email },
     });
 
-
-    const matched = await PasswordHelper.PasswordCompare(
-      password,
-      user.password
-    );
-
-
-    console.log("User found", user);  
-
-    // req.session.user = user;
-
-    // const sess = req.session.save();
-
     if (!user) {
       return res.status(401).send({ msg: "Unauthorized" });
-    } else if(!matched) {
+    }
 
+    const matched = await PasswordHelper.PasswordCompare(password, user.password);
+
+    if (!matched) {
       console.log("Password Does Not Match", matched);
       return res.status(401).send({ msg: "Unauthorized" });
-    } else if (user.verified == false) {
+    }
+
+    if (user.verified == false) {
       return res.status(403).send({ msg: "Verify Account to Login" });
-    } else {
+    }
 
     const dataUser = {
       id: user.id,
@@ -150,34 +221,41 @@ export const Signin = async (req, res) => {
       active: user.active,
     };
 
+    console.log("Role ID Data User is", dataUser.roleId);
+
+    // Use await to resolve the promise
+    const role = await Role.findByPk(dataUser.roleId);
+
+    console.log("Role By ID IS", role);
+
     const token = Helper.GenerateToken(dataUser);
     const refreshToken = Helper.GenerateRefreshToken(dataUser);
 
     user.accessToken = refreshToken;
-
     await user.save();
+
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000,
     });
-  
+
     const responseUser = {
       id: user.id,
       username: user.username,
       email: user.email,
-      roleId: user.roleId,
+      roleId: role, // This will now be the resolved role object
       verified: user.verified,
       active: user.active,
       token: token,
     };
-  
+
     return res.status(200).send(responseUser);
-  }
   } catch (err) {
     console.log("Error Registering Is: " + err.message);
     res.status(500).send(err);
   }
 };
+
 
 oauth2Client.setCredentials({
   refresh_token: MAILING_SERVICE_REFRESH_TOKEN,

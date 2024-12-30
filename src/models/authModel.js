@@ -47,7 +47,7 @@ const User = sequelize.define("User", {
   user_avatar: {
     type: DataTypes.STRING,
     allowNull:false,
-    defaultValue: 'http://38.242.239.1/images/userprofile.png',
+    defaultValue: 'https://waridi.co/images/userprofile.png',
   },
   type: {
     type: DataTypes.BLOB,

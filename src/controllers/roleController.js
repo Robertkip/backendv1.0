@@ -75,7 +75,7 @@ export const UpdateRole = async (req, res) => {
 	}
 };
 
-const DeleteRole = async (req, res) => {
+export const DeleteRole = async (req, res) => {
 	try {
 		const { id } = req.params;
 
@@ -104,7 +104,7 @@ const DeleteRole = async (req, res) => {
 	}
 }
 
-const GetRoleById = async (req, res) => {
+export const GetRoleById = async (req, res) => {
 	try {
 		const { id } = req.params;
 
