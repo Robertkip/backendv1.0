@@ -1,9 +1,10 @@
 import { Sequelize } from "sequelize";
 import QueryTypes from "sequelize";
+
 export const sequelize = new Sequelize({
   host: "localhost",
   username: "postgres",
-  database: "waridi",
+  database: "waridi123",
   password: "waridi123",
   dialect: "postgres",
   pool: {
