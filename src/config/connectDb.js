@@ -4,7 +4,7 @@ import QueryTypes from "sequelize";
 export const sequelize = new Sequelize({
   host: "localhost",
   username: "postgres",
-  database: "waridi123",
+  database: "waridi",
   password: "waridi123",
   dialect: "postgres",
   pool: {

@@ -243,7 +243,7 @@ export const Signin = async (req, res) => {
       id: user.id,
       username: user.username,
       email: user.email,
-      roleId: role, // This will now be the resolved role object
+      roleId: role.roleName, // This will now be the resolved role object
       verified: user.verified,
       active: user.active,
       token: token,
