@@ -45,6 +45,11 @@ dotenv.config();
 const app = express();
 
 
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true,
+}));
+
 const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 console.log(__dirname);
@@ -63,6 +68,7 @@ const specs = {
 const PORT = process.env.PORT || 8084;
 
 //passportSetup(app);
+
 
 let io = new Socket({
   cors: {
@@ -87,7 +93,6 @@ app.use(
   })
 );
 
-app.use(cors({ origin: "*" }));
 
 app.use(express.json({ limit: "50mb", extended: true }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
