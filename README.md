@@ -9,15 +9,15 @@ This is a real estate mobile application that connects users to LandLords, Prope
 
    1) Clone Github Branch **backendv1.2** to your local setup
      
-            <span style="color:blue"> git clone -b backendv1.2 --single-branch https://github.com/Waridi-RE/backendv1.0.git </span>
+             git clone -b backendv1.2 --single-branch https://github.com/Waridi-RE/backendv1.0.git 
 
    2) CD into your cloned directory *cd backendv1* then install node modules
 
-            <span style="color:blue"> npm install --legacy-peer-deps </span>
+             npm install --legacy-peer-deps
 
          #### Setup Database 
 
-    <div style="background-color: lightgray; padding: 10px; border-left: 5px solid orange;">
-    <strong style="color: orange;">IMPORTANT:</strong> Make sure you have set up PostgreSQL locally if it is on Windows OS, Mac OS, or Linux family distributions.
-   </div>
+         > [!IMPORTANT]      
+         > Make Sure you have setup postgres locally if it is in Windows Os, Mac Os or Linux Family Of Distributions
+
 
