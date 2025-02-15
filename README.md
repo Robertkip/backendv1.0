@@ -15,6 +15,20 @@ This is a real estate mobile application that connects users to LandLords, Prope
 
              npm install --legacy-peer-deps
 
+         #### Setup Environment Variables
+
+        We have environment variables example file pushed to the github repository, create .env file in local setup base directory. Obtain the values and paste where the keys belong           
+
+        #### Setup Email For The Enviroment Variables.
+
+        . Click on the link below to go to auth 2 playground to generate token.
+
+          [Click Here](https://developers.google.com/oauthplayground/)    
+
+          > [!TIP]
+          > Read Out To Administrator to Provide a Token For Your Setup
+
+
          #### Setup Database 
 
          > [!IMPORTANT]      
