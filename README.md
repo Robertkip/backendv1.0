@@ -34,4 +34,10 @@ This is a real estate mobile application that connects users to LandLords, Prope
          > [!IMPORTANT]      
          > Make Sure you have setup postgres locally if it is in Windows Os, Mac Os or Linux Family Of Distributions
 
+         . Install sequelize cli
+
+             npm install sequelize-cli --legacy-peer-deps
+
+             
+
 
