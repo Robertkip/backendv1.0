@@ -38,6 +38,40 @@ This is a real estate mobile application that connects users to LandLords, Prope
 
              npm install sequelize-cli --legacy-peer-deps
 
-             
+         . Delete config models and migrations folder in base directory
+
+
+         . Initial Sequelize CLI
+
+            npm sequelize-cli init 
+
+         . Replace file config/config.json with appropriate database values
+
+         . Create Database in postgres. Depending on the OS you use to access database. In ubuntu from terminal.
+
+            CREATE DATABASE waridi;
+
+            Then
+
+            GRANT PRIVILEGES ON DATABASE waridi TO postgres;
+           
+
+        #### Run Sequelize Migrations
+
+        . In help/migration_file.js there is migration for the Database Tables
+
+           - Run Role migration.    
+
+          
+         > [!IMPORTANT]      
+         > After Generating Migration For Role Or Any Other Table navigate to package.json and since this project runs on ES6 but sequelize migrations are run on ES5 we need to change this line: **"type": "module"** to **"type": "commonjs"** then after pushing migration revert back.
+
+         . Push Migration After Generating Migration
+
+            npx sequelize-cli db:migrate
+
+           
+
+
 
 
