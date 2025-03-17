@@ -109,6 +109,53 @@ export const AdminRole = (req, res, next) => {
   }
 };
 
+export const AgentRole = (req, res, next) => {
+  try {
+    const roleId = res.locals.roleId;
+    console.log("AdminRole Middleware - roleId:", roleId);
+
+    if (roleId !== 2) { // Ensure `5` is the correct roleId for an admin.
+      return res.status(403).send({ msg: "Forbidden - Admin role required" });
+    }
+    next();
+  } catch (err) {
+    console.error("AdminRole Middleware Error:", err);
+    return res.status(500).send({ msg: "Error processing AdminRole middleware" });
+  }
+};
+
+
+
+export const LandlordRole = (req, res, next) => {
+  try {
+    const roleId = res.locals.roleId;
+    console.log("AdminRole Middleware - roleId:", roleId);
+
+    if (roleId !== 3) { // Ensure `5` is the correct roleId for an admin.
+      return res.status(403).send({ msg: "Forbidden - Admin role required" });
+    }
+    next();
+  } catch (err) {
+    console.error("AdminRole Middleware Error:", err);
+    return res.status(500).send({ msg: "Error processing AdminRole middleware" });
+  }
+};
+
+
+export const SalesRole = (req, res, next) => {
+  try {
+    const roleId = res.locals.roleId;
+    console.log("AdminRole Middleware - roleId:", roleId);
+
+    if (roleId !== 4) { // Ensure `5` is the correct roleId for an admin.
+      return res.status(403).send({ msg: "Forbidden - Admin role required" });
+    }
+    next();
+  } catch (err) {
+    console.error("AdminRole Middleware Error:", err);
+    return res.status(500).send({ msg: "Error processing AdminRole middleware" });
+  }
+};
 
 export const BasicUser = (req, res, next) => {
   try {

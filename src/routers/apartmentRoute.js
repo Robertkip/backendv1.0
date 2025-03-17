@@ -36,4 +36,6 @@ router.delete(
 );
 router.get("/single-apartment/", apartmentController.searchApartmentQuery);
 
+router.get("/search-apartment/", apartmentController.searchApartmentInPlace);
+
 export default router;

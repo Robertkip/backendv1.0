@@ -388,11 +388,6 @@ export const forgotPassword = async (req, res) => {
 }
 
 
-export const updatePassword = async (req, res) => {
-
-
-}
-
 export const updateUserProfile = async (req, res) => {
    const userId = req.query.id;
 
@@ -462,34 +457,66 @@ export const emailSend = async () => {
   res.status(200).json("Ok");
 };
 
+
 export const changePassword = async (req, res) => {
-  const userId = req.query.id;
-   const password = req.body.password;
-   const confirmPassword = req.body.confirmPassword;
+  try {
+    const { id } = req.params;
+    const { password, confirmPassword } = req.body;
 
+    if (!password || !confirmPassword) {
+      return res.status(400).json({ msg: "Password fields are required" });
+    }
 
-  const user = await User.findOne({
-     where: { id: userId },
-   });
+    if (password !== confirmPassword) {
+      return res.status(400).json({ msg: "Passwords do not match" });
+    }
 
-   try {
+    const user = await User.findOne({ where: { id } });
 
-   if (!user) {
-     return res.status(401).send({ msg: "Unauthorized" });
-   } else if (password !== confirmPassword) {
-     return res.status(401).send({ msg: "Passwords Do Not Match" });
-   
-   } else {
-   if (password == confirmPassword) {
-    await User.update({password: password}, {where: {id: userId}}).then((data) => {
-      res.status(201).send(data);
-    });
-  }
-  }
+    if (!user) {
+      return res.status(404).json({ msg: "User not found" });
+    }
+
+    const hashedPassword = await bcryptjs.hashSync(password, 10);
+
+    await User.update({ password: hashedPassword }, { where: { id } });
+
+    res.status(200).json({ msg: "Password updated successfully" });
   } catch (err) {
-    res.status(500).send({ message: err.message });
+    console.error("Error changing password:", err);
+    res.status(500).json({ msg: "Internal server error" });
   }
 };
+
+
+// export const changePassword = async (req, res) => {
+//   const userId = req.query.id;
+//    const password = req.body.password;
+//    const confirmPassword = req.body.confirmPassword;
+
+
+//   const user = await User.findOne({
+//      where: { id: userId },
+//    });
+
+//    try {
+
+//    if (!user) {
+//      return res.status(401).send({ msg: "Unauthorized" });
+//    } else if (password !== confirmPassword) {
+//      return res.status(401).send({ msg: "Passwords Do Not Match" });
+   
+//    } else {
+//    if (password == confirmPassword) {
+//     await User.update({password: password}, {where: {id: userId}}).then((data) => {
+//       res.status(201).send(data);
+//     });
+//   }
+//   }
+//   } catch (err) {
+//     res.status(500).send({ message: err.message });
+//   }
+// };
 
 // export const sendOtp = async () => {
 //   const {countryCode, phoneNumber} = req.body;

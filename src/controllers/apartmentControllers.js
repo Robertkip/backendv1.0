@@ -261,22 +261,33 @@ export const deleteAllApartments = async (req, res, next) => {
     .catch((error) => next(error));
 };
 
-export const searchApartmentQuery = async (req, res, next) => {
-  const title = req.query.apartment_name;
-  var condition = title
-    ? { apartment_name: { [Op.like]: `%${title}%` } }
-    : null;
+export const searchApartmentQuery = async (req, res) => {
+  try {
+    const { search } = req.query; 
 
-  await Apartment.findAll({ where: condition })
-    .then((data) => {
-      res.send(data);
-    })
-    .catch((err) => {
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while retrieving Apartments.",
-      });
+    if (!search) {
+      return res.status(400).json({ message: "Search query is required" });
+    }
+
+    const apartments = await Apartment.findAll({
+      where: {
+        [Op.or]: [
+          { apartment_name: { [Op.like]: `%${search}%` } },
+          { apartment_location: { [Op.like]: `%${search}%` } },
+          { address: { [Op.like]: `%${search}%` } },
+        ],
+      },
     });
+
+    if (apartments.length === 0) {
+      return res.status(404).json({ message: "No apartments found" });
+    }
+
+    res.status(200).json(apartments);
+  } catch (error) {
+    console.error("Error searching apartments:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 };
 
 async function getPlaceCoordinates(place) {

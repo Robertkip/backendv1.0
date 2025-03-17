@@ -31,7 +31,7 @@ router.get("/send/:to", sendOtp);
 // router.get("/verify/:to/:code", verifyOTP);
 router.put("/updateprofile/", authController.upload, updateUserProfile);
 router.post("/verify", verifyOtpCode);
-router.put("/changepassword/", changePassword);
+router.put("/changepassword/:id", changePassword);
 router.post("/forgotpassword", forgotPassword);
 router.get("/users", getAllUsers);
 router.get("/get-single-user", getSingleUser);
