@@ -70,6 +70,8 @@ This is a real estate mobile application that connects users to LandLords, Prope
 
             npx sequelize-cli db:migrate
 
+       ## When To Use     
+
            
 
 
