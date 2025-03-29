@@ -70,7 +70,24 @@ This is a real estate mobile application that connects users to LandLords, Prope
 
             npx sequelize-cli db:migrate
 
-       ## When To Use     
+       #### Configure Database
+
+         Add this tables into Postgres Database:
+
+         - Change Password of Postgres
+
+             sudo -i -u postgres
+
+             /password
+
+         INSERT INTO "Roles" ("id", "roleName", "active", "createdAt", "updatedAt") 
+       VALUES 
+          (1, 'USER', true, NOW(), NOW()),
+           (2, 'AGENT', true, NOW(), NOW()),
+          (3, 'LANDLORD', true, NOW(), NOW())
+          (4, 'SALES', true, NOW(), NOW()),
+          (5, 'ADMIN', true, NOW(), NOW()),
+          (6, 'SUPERADMIN', true, NOW(), NOW());
 
            
 
