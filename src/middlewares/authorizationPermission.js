@@ -169,3 +169,13 @@ export const BasicUser = (req, res, next) => {
     return res.status(500).send({ msg: "Error" });
   }
 };
+
+export const detectDevice = (req, res, next) => {
+  const userAgent = req.headers['user-agent'] || '';
+  
+  const isMobile = /mobile|android|iphone|ipad|ipod|windows phone|blackberry|iemobile|opera mini|webos|bb10|playbook|tablet|kindle|silk/i.test(userAgent);
+  
+  req.deviceType = isMobile ? 'mobile' : 'web';
+  
+  next();
+};

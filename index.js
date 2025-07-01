@@ -13,6 +13,7 @@ import { createClient } from "redis";
 import session from "express-session";
 import passport from "passport";
 import swaggerJSDoc from "swagger-jsdoc";
+import { detectDevice } from "./src/middlewares/authorizationPermission.js";
 import swaggerUi from "swagger-ui-express";
 import apartmentRouter from "./src/routers/apartmentRoute.js";
 import authRouter from "./src/routers/authRoute.js";
@@ -32,6 +33,8 @@ import { initPassport } from "./src/middlewares/initPassport.js";
 import notificationRouter from "./src/routers/notifyRoute.js";
 import User from "./src/models/authModel.js";
 import Message from "./src/models/messageModel.js";
+
+import { runMigrations } from "./src/config/connectDb.js";
 import {
   getUser,
   addNewUser,
@@ -93,7 +96,7 @@ app.use(
   })
 );
 
-
+app.use(detectDevice);  
 app.use(express.json({ limit: "50mb", extended: true }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(helmet());
@@ -106,6 +109,7 @@ app.use(logger("common")); include: [
 ],
 
 initPassport(app);
+
 
 app.use(
   session({
@@ -236,9 +240,21 @@ app.post("/api/v1/send-message", async (req, res) => {
 
 })
 
+const startServer = async () => {
+  try {
+
+    await runMigrations();
   app.listen(PORT,  () => {
+
     console.log(`Server is running on port`);
   });
+
+}  catch (error) {
+  console.error('Server startup failed:', error);
+  process.exit(1);
+}
+
+}
     // io = new Socket(server, {
     // cors: {
     //   origin: "http://localhost:8084",
@@ -265,6 +281,9 @@ app.post("/api/v1/send-message", async (req, res) => {
 //   });
   
   io.listen(8085);
+
+
+startServer();
 // } else {
 //   let ADDRESS = "192.168.0.12";
 //   const server = app.listen(PORT, ADDRESS, () => {
