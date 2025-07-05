@@ -6,7 +6,7 @@ import Agent from "./agentModel.js";
 import Tenant from "./tenantModel.js";
 import CartItem from "./cartItemModel.js";
 
-const Market = sequelize.define("Market", {
+const Market = sequelize.define("markets", {
   sellerId: {
     type: DataTypes.INTEGER,
     allowNull: true,

@@ -3,7 +3,7 @@ import { sequelize } from "../config/connectDb.js";
 import Market from "./marketModel.js";
 import User from "./authModel.js";
 
-const CartItem = sequelize.define("CartItem", {
+const CartItem = sequelize.define("cartitem", {
   userId: {
     type: DataTypes.INTEGER,
     allowNull: false,

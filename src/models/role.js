@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../config/connectDb.js";
 
-const Role = sequelize.define('Role', {
+const Role = sequelize.define('role', {
   roleName: {
     type: DataTypes.STRING,
     allowNull: true,

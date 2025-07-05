@@ -3,7 +3,7 @@ import { DataTypes} from "sequelize";
 import User from "./authModel.js";
 import Apartment from "./apartmentModel.js";
 
-const Tenant = sequelize.define('Tenant',{
+const Tenant = sequelize.define('tenant',{
     userId: {
      type: DataTypes.INTEGER,
     },

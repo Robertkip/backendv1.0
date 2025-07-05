@@ -1,7 +1,7 @@
 import { DataTypes, STRING, TEXT } from "sequelize";
 import { sequelize } from "../config/connectDb.js";
 import User from './authModel.js';
-const Message = sequelize.define('Message', {
+const Message = sequelize.define('messages', {
     senderId: {
         type: DataTypes.INTEGER,
         allowNull: true,

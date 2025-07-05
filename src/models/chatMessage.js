@@ -2,7 +2,7 @@ import { DataTypes } from "sequelize";
 import { sequelize } from "../config/connectDb";
 import User from "./authModel";
 
-const Chat = sequelize.define('Chat', {
+const Chat = sequelize.define('chats', {
     senderId: {
         type: DataTypes.INTEGER,
         allowNull: true,

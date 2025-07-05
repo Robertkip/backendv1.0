@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../config/connectDb.js";
 
-const Order = sequelize.define('Order', {
+const Order = sequelize.define('order', {
     totalPrice: {
         type: DataTypes.INTEGER,
         defaultValue: 0

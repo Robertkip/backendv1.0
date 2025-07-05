@@ -3,7 +3,7 @@ import { sequelize } from "../config/connectDb.js";
 import Landlord from "./landlordModel.js";
 import Agent from "./agentModel.js";
 
-const Apartment = sequelize.define("Apartment", {
+const Apartment = sequelize.define("apartment", {
   logent_id: {
     type: DataTypes.INTEGER,
     allowNull: true,
@@ -16,6 +16,9 @@ const Apartment = sequelize.define("Apartment", {
   },
   apartment_county: {
     type: DataTypes.STRING,
+  },
+  apartment_type: {
+    type: DataTypes.STRING
   },
   apartment_description: {
     type: DataTypes.TEXT,

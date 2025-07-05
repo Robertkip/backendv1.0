@@ -3,7 +3,7 @@ import { sequelize } from "../config/connectDb.js";
 import User from "./authModel.js";
 
 //Connection model
-const Connection = sequelize.define("Connection",
+const Connection = sequelize.define("connections",
 {
     userId: {
         type: DataTypes.INTEGER,

@@ -3,7 +3,7 @@ import { sequelize } from "../config/connectDb.js";
 import User from "./authModel.js";
 import Apartment from "./apartmentModel.js";
 
-const Agent = sequelize.define("Agent", {
+const Agent = sequelize.define("agents", {
   userId: {
     type: DataTypes.INTEGER,
   },

@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "prod:server": "NODE_ENV=production node index.js",
+    "prod:server": "NODE_ENV=production nodemon index.js",
     "dev:server": "NODE_ENV=development nodemon index.js",
     "swagger-autogen": "node swagger.js",
     "test": "test"

@@ -6,8 +6,8 @@ const router = express.Router();
 
 router.post(
   "/role",
-  Authorization.Authenticated,
-  Authorization.AdminRole,
+  // Authorization.Authenticated,
+  // Authorization.AdminRole,
   RoleController.CreateRole
 );
 router.get("/role", RoleController.GetRole);

@@ -2,7 +2,7 @@ import { DataTypes } from "sequelize";
 import { sequelize } from "../config/connectDb.js";
 import User from "./authModel.js";
 
-const Landlord = sequelize.define('Landlord', {
+const Landlord = sequelize.define('landlords', {
     userId: {
       type: DataTypes.INTEGER,
     },

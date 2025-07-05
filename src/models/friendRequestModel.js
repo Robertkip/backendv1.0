@@ -2,7 +2,7 @@ import { DataTypes } from "sequelize";
 import { sequelize } from "../config/connectDb.js";
 import User from "./authModel.js";
 
-const FriendRequest = sequelize.define("Friendrequest", {
+const FriendRequest = sequelize.define("friendrequests", {
   status: {
     type: DataTypes.ENUM("pending", "accepted", "declined"),
     allowNull: false,

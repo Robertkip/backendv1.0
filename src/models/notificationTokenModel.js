@@ -2,7 +2,7 @@ import { DataTypes } from "sequelize";
 import { sequelize } from "../config/connectDb.js";
 import User from "./authModel.js";
 
-const NotificationToken = sequelize.define("NotificationToken", {
+const NotificationToken = sequelize.define("notificationtokens", {
   userId: {
     type: DataTypes.INTEGER,
     allowNull: true,

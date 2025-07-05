@@ -3,7 +3,7 @@ import { sequelize } from "../config/connectDb.js";
 import Role from "./role.js";
 import Message from "./messageModel.js";
 import Connection from "./connectionsModel.js";
-const User = sequelize.define("User", {
+const User = sequelize.define("users", {
   roleId: {
     type: DataTypes.INTEGER,
     allowNull: true,

@@ -2,7 +2,7 @@ import { DataTypes } from "sequelize";
 import { sequelize } from "../config/connectDb.js";
 import Users from "./authModel.js";
 
-const VerificationToken = sequelize.define("VerificationToken", {
+const VerificationToken = sequelize.define("verificationtoken", {
   userId: {
     type: DataTypes.STRING,
   },

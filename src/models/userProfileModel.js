@@ -2,7 +2,7 @@ import { sequelize } from "../config/connectDb.js";
 import { DataTypes } from "sequelize";
 import User from "./authModel.js";
 
-const UserProfile = sequelize.define("UserProfile", {
+const UserProfile = sequelize.define("userprofile", {
   userId: {
     type: DataTypes.INTEGER,
   },
@@ -19,15 +19,15 @@ const UserProfile = sequelize.define("UserProfile", {
     type: DataTypes.INTEGER,
   },
   followers: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.ARRAY(DataTypes.INTEGER),
     defaultValue: [],
     allowNull: true,
   },
   following: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.ARRAY(DataTypes.INTEGER),
     defaultValue: [],
     allowNull: true,
-  },
+  },  
   user_avatar: {
     type: DataTypes.STRING,
   },
