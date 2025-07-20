@@ -10,9 +10,8 @@ import fs from "fs";
 import { Server as Socket } from "socket.io";
 import RedisStore from "connect-redis";
 import { createClient } from "redis";
+import { ApolloServer } from "apollo-server-express";
 import session from "express-session";
-import passport from "passport";
-import swaggerJSDoc from "swagger-jsdoc";
 import { detectDevice } from "./src/middlewares/authorizationPermission.js";
 import swaggerUi from "swagger-ui-express";
 import apartmentRouter from "./src/routers/apartmentRoute.js";
@@ -32,7 +31,9 @@ import geoLocationRouter from "./src/routers/geoLocationRoute.js";
 import { initPassport } from "./src/middlewares/initPassport.js";
 import notificationRouter from "./src/routers/notifyRoute.js";
 import User from "./src/models/authModel.js";
+import typeDefs from "./src/graphqlschema/schema.js";
 import Message from "./src/models/messageModel.js";
+import resolvers from "./src/resolvers/resolvers.js";
 
 import { runMigrations } from "./src/config/connectDb.js";
 import {
@@ -52,6 +53,12 @@ app.use(cors({
   origin: "http://localhost:5173",
   credentials: true,
 }));
+
+
+const server = new ApolloServer({ typeDefs, resolvers });
+
+await server.start();
+server.applyMiddleware({ app });
 
 const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

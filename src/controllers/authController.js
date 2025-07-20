@@ -16,6 +16,8 @@ import { Authenticated } from "../middlewares/authorizationPermission.js";
 import Connection from "../models/connectionsModel.js";
 import Role from "../models/role.js";
 
+import UserProfile from "../models/userProfileModel.js";
+
 dotenv.config();
 
 const {
@@ -96,6 +98,20 @@ export const Signup = async (req, res) => {
 
 
      await newUser.save();
+
+     await UserProfile.create({
+      userId: newUser.id,
+      user_fname: username,
+      user_lname: '',
+      user_location: '',
+      user_phonenumber: null,
+      followers: [],
+      following: [],
+      user_avatar: '',
+      type: '',
+    });
+
+
       // .then((res) => {
       //   console.log("Response After Saving Is", res);
       //   sendOtpVerification(res.dataValues.email);

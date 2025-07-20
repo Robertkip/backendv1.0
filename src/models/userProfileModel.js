@@ -30,6 +30,8 @@ const UserProfile = sequelize.define("userprofile", {
   },  
   user_avatar: {
     type: DataTypes.STRING,
+    allowNull:false,
+    defaultValue: 'https://api.waridi.co/images/userprofile.png',
   },
   type: {
     type: DataTypes.STRING,

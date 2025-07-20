@@ -7,7 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export const sequelize = new Sequelize({
-  host: "localhost",
+  host: "62.171.172.146",
   username: "postgres",
   database: "waridi",
   password: "waridi123",
