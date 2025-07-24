@@ -1,6 +1,9 @@
 import { gql } from 'apollo-server-express';
 
 const typeDefs = gql`
+
+  scalar Upload
+
   type UserProfile {
     id: Int!
     user_fname: String
@@ -26,6 +29,7 @@ const typeDefs = gql`
 
   type Mutation {
     updateUserProfile(id: Int!, input: UpdateUserProfileInput!): UserProfile
+    uploadProfileImage(file: Upload!): String
   }
 
   type Query {

@@ -10,7 +10,8 @@ import fs from "fs";
 import { Server as Socket } from "socket.io";
 import RedisStore from "connect-redis";
 import { createClient } from "redis";
-import { ApolloServer } from "apollo-server-express";
+import { ApolloServer } from 'apollo-server-express';
+import { graphqlUploadExpress } from 'graphql-upload';
 import session from "express-session";
 import { detectDevice } from "./src/middlewares/authorizationPermission.js";
 import swaggerUi from "swagger-ui-express";
@@ -35,6 +36,8 @@ import typeDefs from "./src/graphqlschema/schema.js";
 import Message from "./src/models/messageModel.js";
 import resolvers from "./src/resolvers/resolvers.js";
 
+
+
 import { runMigrations } from "./src/config/connectDb.js";
 import {
   getUser,
@@ -55,7 +58,13 @@ app.use(cors({
 }));
 
 
-const server = new ApolloServer({ typeDefs, resolvers });
+app.use(graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 1 }));
+
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+  persistedQueries: false,  
+});
 
 await server.start();
 server.applyMiddleware({ app });
@@ -150,9 +159,6 @@ app.use("/api/v1", ratingRouter);
 app.use("/api/v1", notificationRouter);
 app.use("/api/v1", messageRouter);
 app.use("/api/v1", geoLocationRouter);
-// const server =  app.listen(PORT, ADDRESS, () => {
-//     console.log(`Server is running on port`)
-// })
 
 let users = [];
 
@@ -262,46 +268,10 @@ const startServer = async () => {
 }
 
 }
-    // io = new Socket(server, {
-    // cors: {
-    //   origin: "http://localhost:8084",
-    // },
-  // }
-  // );
-  // io.listen(8086);
-
-
-// if (process.env.NODE_ENV === "development") {
-//   let ADDRESS = "192.168.0.12";
-//   const server = app.listen(PORT, ADDRESS, () => {
-//     console.log(`Server is running on port`);
-//   });
-//   const io = new Socket(server, {
-//     cors: {
-//       origin: "http://192.168.0.12:8084",
-//     },
-//   });
-// } else if (process.env.NODE_ENV === "production") {
-//   let ADDRESS = "38.242.239.1";
-//   const server = app.listen(PORT, ADDRESS, () => {
-//     console.log(`Server is running on port`);
-//   });
-  
   io.listen(8085);
 
 
 startServer();
-// } else {
-//   let ADDRESS = "192.168.0.12";
-//   const server = app.listen(PORT, ADDRESS, () => {
-//     console.log(`Server is running on port`);
-//   });
-//   const io = new Socket(server, {
-//     cors: {
-//       origin: "http://192.168.0.12:8084",
-//     },
-//   });
-// }
 
 global.ononline = new Map();
 
