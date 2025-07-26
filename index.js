@@ -35,6 +35,7 @@ import User from "./src/models/authModel.js";
 import typeDefs from "./src/graphqlschema/schema.js";
 import Message from "./src/models/messageModel.js";
 import resolvers from "./src/resolvers/resolvers.js";
+import { Authenticated } from "./src/middlewares/authorizationPermission.js";
 
 
 
@@ -52,18 +53,23 @@ dotenv.config();
 const app = express();
 
 
-app.use(cors({
-  origin: "http://localhost:5173",
-  credentials: true,
-}));
+
+app.use(cors());
+
+app.use(express.json());
 
 
-app.use(graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 1 }));
+app.use('/graphql', graphqlUploadExpress());
+
 
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  persistedQueries: false,  
+  context: ({ req }) => {
+    return {
+      user: req.user,
+    };
+  },
 });
 
 await server.start();

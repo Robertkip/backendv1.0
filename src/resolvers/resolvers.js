@@ -1,6 +1,7 @@
 import { GraphQLUpload } from 'graphql-upload';
-import fs from 'fs';
+import fs, {createWriteStream} from 'fs';
 import { finished } from 'stream/promises';
+
 import UserProfile from '../models/userProfileModel.js';
 
 const resolvers = {
@@ -19,18 +20,30 @@ const resolvers = {
   },
 
   Mutation: {
-    async uploadProfileImage(_, { file }) {
-      const { createReadStream, filename } = await file;
-
+    uploadProfileImage: async (_, { file, userId }) => {
+      const { createReadStream, filename, mimetype } = await file;
       const stream = createReadStream();
-      const pathName = `./Images/${Date.now()}-${filename}`;
-      const out = fs.createWriteStream(pathName);
-      stream.pipe(out);
-      await finished(out);
-
-      // Example file URL:
-      return `https://api.waridi.co/images/${pathName.replace('./Images/', '')}`;
+  
+      const filePath = `Images/${Date.now()}-${filename}`;
+      const writeStream = createWriteStream(filePath);
+  
+      await new Promise((resolve, reject) =>
+        stream.pipe(writeStream).on("finish", resolve).on("error", reject)
+      );
+  
+      const imageUrl = `https://api.waridi.co/${filePath}`;
+  
+      // 🔥 Update user profile avatar
+      const profile = await UserProfile.findOne({ where: { userId } });
+      if (!profile) {
+        throw new Error('User profile not found');
+      }
+  
+      await profile.update({ user_avatar: imageUrl });
+  
+      return imageUrl;
     },
+    
 
     async updateUserProfile(_, { id, input }) {
       const profile = await UserProfile.findOne({ where: { userId: id } });

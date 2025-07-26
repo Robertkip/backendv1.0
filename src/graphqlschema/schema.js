@@ -29,7 +29,7 @@ const typeDefs = gql`
 
   type Mutation {
     updateUserProfile(id: Int!, input: UpdateUserProfileInput!): UserProfile
-    uploadProfileImage(file: Upload!): String
+    uploadProfileImage(file: Upload!, userId: Int!): String
   }
 
   type Query {
