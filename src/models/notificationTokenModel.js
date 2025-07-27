@@ -1,3 +1,4 @@
+// notificationTokenModel.js
 import { DataTypes } from "sequelize";
 import { sequelize } from "../config/connectDb.js";
 import User from "./authModel.js";
@@ -5,19 +6,17 @@ import User from "./authModel.js";
 const NotificationToken = sequelize.define("notificationtokens", {
   userId: {
     type: DataTypes.INTEGER,
-    allowNull: true,
+    allowNull: false,
   },
   deviceToken: {
     type: DataTypes.STRING,
-    allowNull: true,
+    allowNull: false,
+    unique: true,
   },
 });
 
-NotificationToken.associations = (models) => {
-  NotificationToken.belongsTo(User, {
-    foreignKey: "userId",
-  });
-  return NotificationToken;
-};
+NotificationToken.belongsTo(User, {
+  foreignKey: "userId",
+});
 
 export default NotificationToken;
