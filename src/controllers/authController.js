@@ -317,11 +317,7 @@ export const sendOtpVerification = async (email) => {
     html: `<p>Enter <b> ${otp} </> To verify Account. </p>`,
   };
 
-  // Hash the Otp
-  // const saltRounds = 10;
-
-  // const hashedOTP = await bcryptjs.hash(otp, saltRounds);
-
+ 
   const newOTPVerification = await new Otp({
     email: email,
     code: otp,
@@ -333,13 +329,7 @@ export const sendOtpVerification = async (email) => {
   await transporter.sendMail(mailOptions).then((res) => {
     console.log("Email Response is", res);
   });
-  // res.json({
-  //   status: "PENDING",
-  //   message: "Verification OTP Email Sent",
-  //   data: {
-  //     email,
-  //   },
-  // });
+
 };
 
 export const verifyOtpCode = async (req, res) => {
