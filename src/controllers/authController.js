@@ -343,41 +343,27 @@ export const sendOtpVerification = async (email) => {
 };
 
 export const verifyOtpCode = async (req, res) => {
- 
-  const useremail = await Otp.findOne({
-    where: { email: req.body.email }
-  });
+  const { email, code } = req.body;
+
+  const useremail = await Otp.findOne({ where: { email } });
 
   console.log("Email From Otp Is", useremail);
 
-
-
-  const usercode = await Otp.findOne({
-    where: {
-    code: req.body.code
-  }
-  });
-
-  
-  console.log("Code From Otp Is", usercode);
-  
-
-  if (req.body.email != useremail.dataValues.email) {
-    return res.status(500).send({message: "Email Not Found"})
-  } else if(req.body.code != usercode.dataValues.code) {
-    return res.status(400).send({message: "Code does not match"})
-  } else if(usercode.dataValues.code == req.body.code) {
-    await User.update({verified: true}, {where: {email: req.body.email}})
-
-    await Otp.destroy({where: {email: req.body.email}});
-
-   return res.status(200).send({message: "Code Verified"});
-  
-  } else {
-    return res.status(500).send({message: "Error Verifying Code"})
+  if (!useremail) {
+    return res.status(404).send({ message: "Email not found" });
   }
 
-}
+  if (useremail.code !== code) {
+    return res.status(400).send({ message: "Code does not match" });
+  }
+
+  await User.update({ verified: true }, { where: { email } });
+
+  await Otp.destroy({ where: { email } });
+
+  return res.status(200).send({ message: "Code Verified" });
+};
+
 
 export const forgotPassword = async (req, res) => {
   

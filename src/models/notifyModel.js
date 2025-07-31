@@ -3,41 +3,37 @@ import { sequelize } from "../config/connectDb.js";
 import User from "./authModel.js";
 
 const Notify = sequelize.define('notify', {
-    senderId: {
+    belongsTo: {
         type: DataTypes.INTEGER,
         allowNull: true,
     },
-    recipients: {
-        type: DataTypes.ARRAY(INTEGER),
-        allowNull: true,
-    },
     message: {
-        type: Text,
+      type: DataTypes.TEXT,
         allowNull: true,
     },
     notification_avatar: {
     type: DataTypes.STRING,
     allowNull:false,
      },
+     title: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+  },
    type: {
      type: DataTypes.BLOB,
      allowNull:true,
-  }, 
-  isRead: {
-    type: DataTypes.BOOLEAN,
-    allowNull: true,
-    defaultValue: false,
   },
-    timestamp: {
-        type: Date,
-        defaultValue: Date.now(),
-        allowNull: true,
-    }
+  timestamp: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
+    allowNull: true,
+  }
+  
 })
 
 Notify.associations = (models) => {
     User.belongsTo(User, {
-      foreignKey: "senderId",
+      foreignKey: "belongsTo",
     });
     return Notify;
   };

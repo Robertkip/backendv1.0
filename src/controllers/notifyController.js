@@ -2,6 +2,8 @@ import admin from "firebase-admin";
 import serviceAccount from "../../waridi-793c4-firebase-adminsdk-4z45i-cf675a6b0d.json" assert { type: "json" };
 import NotificationToken from "../models/notificationTokenModel.js";
 
+import Notify from "../models/notifyModel.js";
+
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
@@ -52,6 +54,7 @@ export const getUser = (username) => {
   return onlineUsers.find((users) => users.username === username);
 };
 
+
 export const sendTokenInformation = async (req, res) => {
   try {
     const userId = req.user?.id;
@@ -68,7 +71,7 @@ export const sendTokenInformation = async (req, res) => {
       return res.status(404).json({ message: "No device token found for user" });
     }
 
-    const { title, body, imageUrl } = req.body;
+    const { title, body, imageUrl, type } = req.body;
 
     const response = await admin.messaging().send({
       token: notificationToken.deviceToken,
@@ -79,15 +82,43 @@ export const sendTokenInformation = async (req, res) => {
       },
     });
 
+    await Notify.create({
+      belongsTo: userId,
+      message: body,
+      notification_avatar: imageUrl || null,
+      title: title || "info",
+    });
+
     res.status(200).json({
-      message: "Successfully sent message",
+      message: "Successfully sent message and saved notification",
       response,
     });
+
   } catch (err) {
     console.error("FCM Error:", err);
     res.status(500).json({
       message: "FCM Error",
       error: err,
     });
+  }
+};
+
+export const getUserNotifications = async (req, res) => {
+  try {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({ message: "User not authenticated" });
+    }
+
+    const notifications = await Notify.findAll({
+      where: { belongsTo: userId },
+      order: [['timestamp', 'DESC']],
+    });
+
+    res.status(200).json({ notifications });
+  } catch (error) {
+    console.error("Error fetching notifications:", error);
+    res.status(500).json({ message: "Internal server error", error });
   }
 };
