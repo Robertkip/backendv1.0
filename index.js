@@ -27,6 +27,7 @@ import userProfileRouter from "./src/routers/userProfileRoute.js";
 import friendRequestRouter from "./src/routers/friendrequestRouter.js";
 import notificationDeviceRouter from "./src/routers/notificationTokenRoute.js";
 import messageRouter from "./src/routers/messageRouter.js";
+import propertyRouter from "./src/routers/propertyRoute.js";
 import ratingRouter from "./src/routers/ratingRoute.js";
 import geoLocationRouter from "./src/routers/geoLocationRoute.js";
 import { initPassport } from "./src/middlewares/initPassport.js";
@@ -164,6 +165,7 @@ app.use("/api/v1/token", notificationDeviceRouter);
 app.use("/api/v1", ratingRouter);
 app.use("/api/v1", notificationRouter);
 app.use("/api/v1", messageRouter);
+app.use("/api/v1", propertyRouter);
 app.use("/api/v1", geoLocationRouter);
 
 let users = [];
