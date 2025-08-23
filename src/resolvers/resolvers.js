@@ -17,7 +17,24 @@ const resolvers = {
 
       return profile;
     },
+    async paginatedUserProfiles(_, { page = 1, pageSize = 30 }) {
+      const offset = (page - 1) * pageSize;
+      const { rows, count } = await UserProfile.findAndCountAll({
+        limit: pageSize,
+        offset: offset,
+        order: [['createdAt', 'DESC']], 
+      });
+
+      return {
+        data: rows,
+        total: count,
+        page,
+        pageSize
+      };
+    },
+
   },
+  
 
   Mutation: {
     uploadProfileImage: async (_, { file, userId }) => {

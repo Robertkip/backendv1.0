@@ -16,6 +16,13 @@ const typeDefs = gql`
     type: String
   }
 
+  type PaginatedUserProfiles {
+    data: [UserProfile]
+    total: Int
+    page: Int
+    pageSize: Int
+  }
+
   input UpdateUserProfileInput {
     user_fname: String
     user_lname: String
@@ -34,6 +41,7 @@ const typeDefs = gql`
 
   type Query {
     userProfile(id: Int!): UserProfile
+    paginatedUserProfiles(page: Int, pageSize: Int): PaginatedUserProfiles
   }
 `;
 

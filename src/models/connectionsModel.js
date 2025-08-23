@@ -13,8 +13,14 @@ const Connection = sequelize.define("connections",
         type: DataTypes.INTEGER,
         allowNull: false,
     },
-});
-
+    status: {
+        type: DataTypes.ENUM('pending', 'accepted', 'rejected'),
+        defaultValue: 'pending',
+      }
+    }, {
+      timestamps: true,
+    });
+    
 Connection.associations = (models) => {
   Connection.belongsTo(User, {
      foreignKey: "userId",
