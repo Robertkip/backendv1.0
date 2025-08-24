@@ -1,6 +1,6 @@
 import { gql } from 'apollo-server-express';
 
-const typeDefs = gql`
+const userProfileTypeDefs = gql`
 
   scalar Upload
 
@@ -45,4 +45,4 @@ const typeDefs = gql`
   }
 `;
 
-export default typeDefs;
+export default userProfileTypeDefs;

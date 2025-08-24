@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package post;
+
+service PostService {
+  rpc CreatePost(CreatePostRequest) returns (PostResponse);
+  rpc GetTimeline(GetTimelineRequest) returns (TimelineResponse);
+}
+
+message CreatePostRequest {
+  string userId = 1;
+  string content = 2;
+  repeated string media = 3;
+}
+
+message PostResponse {
+  string postId = 1;
+}
+
+message GetTimelineRequest {
+  string userId = 1;
+}
+
+message TimelineResponse {
+  repeated Post posts = 1;
+}
+
+message Post {
+  string postId = 1;
+  string userId = 2;
+  string content = 3;
+  repeated string media = 4;
+  string createdAt = 5;
+}

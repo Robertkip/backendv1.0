@@ -4,14 +4,18 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import logger from "morgan";
+import fs from "fs";
 import path from "path";
 import url from "url";
-import fs from "fs";
+import { fileURLToPath } from "url";
 import { Server as Socket } from "socket.io";
+import grpc from '@grpc/grpc-js';
 import RedisStore from "connect-redis";
+import { ReflectionService } from '@grpc/reflection';
 import { createClient } from "redis";
 import { ApolloServer } from 'apollo-server-express';
 import { graphqlUploadExpress } from 'graphql-upload';
+import protoLoader from '@grpc/proto-loader';
 import session from "express-session";
 import { detectDevice } from "./src/middlewares/authorizationPermission.js";
 import swaggerUi from "swagger-ui-express";
@@ -33,26 +37,30 @@ import geoLocationRouter from "./src/routers/geoLocationRoute.js";
 import { initPassport } from "./src/middlewares/initPassport.js";
 import notificationRouter from "./src/routers/notifyRoute.js";
 import User from "./src/models/authModel.js";
-import typeDefs from "./src/graphqlschema/schema.js";
+import { createPost, getTimeline } from "./src/controllers/postController.js";
 import Message from "./src/models/messageModel.js";
-import resolvers from "./src/resolvers/resolvers.js";
+import resolvers from "./src/resolvers/index.js";
+import typeDefs from "./src/graphqlschema/index.js";
 import { Authenticated } from "./src/middlewares/authorizationPermission.js";
-
+import connectDB from "./src/config/connectMongo.js";
 
 
 import { runMigrations } from "./src/config/connectDb.js";
-import {
-  getUser,
-  addNewUser,
-  removeUser,
-} from "./src/controllers/notifyController.js";
 
 import options from "./swagger-output.json" assert { type: "json" };
+
+
+const __filename = url.fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+console.log(__dirname);
+
+const PROTO_PATH = path.join(__dirname, "./proto/post.proto");
 
 dotenv.config();
 
 const app = express();
 
+connectDB();
 
 
 app.use(cors());
@@ -75,10 +83,6 @@ const server = new ApolloServer({
 
 await server.start();
 server.applyMiddleware({ app });
-
-const __filename = url.fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-console.log(__dirname);
 
 global.__basedir = __dirname;
 
@@ -110,6 +114,18 @@ const redisStore = new RedisStore({
 });
 
 const REDIS_SESSION_SECRET = process.env.REDIS_SESSION_SECRET;
+
+
+const packageDefinition = protoLoader.loadSync(PROTO_PATH);
+const postProto = grpc.loadPackageDefinition(packageDefinition).post;
+
+const grpcserver = new grpc.Server();
+
+
+const reflection = new ReflectionService(postProto);
+
+reflection.addToServer(grpcserver);
+
 
 app.use(
   cookieSession({
@@ -168,98 +184,20 @@ app.use("/api/v1", messageRouter);
 app.use("/api/v1", propertyRouter);
 app.use("/api/v1", geoLocationRouter);
 
-let users = [];
+grpcserver.addService(postProto.PostService.service, {
+  CreatePost: createPost,
+  GetTimeline: getTimeline,
+});
 
-io.on("connection", (socket) => { 
-  console.log('User connected', socket.id);
-  socket.on('addUser', userId => {
-      const isUserExist = users.find(user => user.userId === userId);
-      if (!isUserExist) {
-          const user = { userId, socketId: socket.id };
-          users.push(user);
-          io.emit('getUsers', users);
-      }
- })
- socket.on('sendMessage', async ({senderId, receiverId, message}) => {
-  const receiver = users.find(user => user.userId === receiverId);
-  const sender = users.find(user => user.userId === senderId);
-
-  const user = await User.findByPk(senderId);
-
-  console.log('sender :>> ', sender, receiver);
-
-  if (receiver) {
-     io.to(receiver.socketId).emit('getMessage', {
-         senderId,
-         message,
-         receiverId,
-     });
-
-     io.to(sender.socketId).emit('getMessage', {
-         senderId,
-         message,
-         receiverId,
-     });
-  } else {
-     io.to(sender.socketId).emit('getMessage', {
-         senderId,
-         message,
-         receiverId,
-     });
+grpcserver.bindAsync(
+  "0.0.0.0:50051",
+  grpc.ServerCredentials.createInsecure(),
+  () => {
+    console.log("gRPC server running on port 50051");
+    grpcserver.start();
   }
-});
+);
 
- socket.on('disconnect', () => {
-  users = users.filter(user => user.socketId !== socket.id);
-  io.emit('getUsers', users);
-});
-
-})
-
-
-io.on("connection", (socket) => {
-  socket.on("newUser", (username) => {
-    addNewUser(username, socket.id);
-  });
-  socket.on("sendNotification", ({ senderName, receiverName, type }) => {
-    const receiver = getUser(receiverName);
-    io.to(receiver.socketId).emit("getNotification", {
-      senderName,
-      type,
-    });
-  });
-  socket.on("sendText", ({ senderName, receiverName, text }) => {
-    const receiver = getUser(receiverName);
-    io.to(receiver.socketId).emit("getText", {
-      senderName,
-      text,
-    });
-  });
-  socket.on("disconnect", () => {
-    removeUser(socket.id);
-  });
-});
-
-
-app.post("/api/v1/send-message", async (req, res) => {
-  const { senderId, receiverId, message } = req.body;
-
-
-  // Emit the message through Socket.IO
-  io.emit('sendMessage', { senderId, receiverId, message });
-
-  try {
-
-    await Message.create({senderId, message, receiverId}); 
-
-    return res.status(200).json({message: "Message sent successfully"});
-
-    } catch (error) {
-        return res.status(500).json({message: error.message}); 
-    }
-
-
-})
 
 const startServer = async () => {
   try {

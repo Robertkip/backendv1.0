@@ -1,7 +1,7 @@
-import Connection from '../models/connectionModel.js';
+import Connection from '../models/connectionsModel.js';
 import UserProfile from '../models/userProfileModel.js';
 
-const resolvers = {
+const connectionResolvers = {
   Query: {
     async pendingConnectionRequests(_, { userId }) {
       return await Connection.findAll({
@@ -71,3 +71,6 @@ if (senderProfile && recipientProfile) {
     },
   },
 };
+
+
+export default connectionResolvers;

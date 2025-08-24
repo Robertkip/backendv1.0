@@ -4,7 +4,7 @@ import { finished } from 'stream/promises';
 
 import UserProfile from '../models/userProfileModel.js';
 
-const resolvers = {
+const userResolvers = {
   Upload: GraphQLUpload,
 
   Query: {
@@ -76,4 +76,4 @@ const resolvers = {
   },
 };
 
-export default resolvers;
+export default userResolvers;
