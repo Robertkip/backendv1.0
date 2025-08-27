@@ -3,7 +3,7 @@ import { sequelize } from "../config/connectDb.js";
 import Landlord from "./landlordModel.js";
 import Agent from "./agentModel.js";
 
-const Apartment = sequelize.define("apartment", {
+const Apartment = sequelize.define("rental_apartment", {
   logent_id: {
     type: DataTypes.INTEGER,
     allowNull: true,

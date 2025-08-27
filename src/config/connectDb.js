@@ -21,8 +21,6 @@ export const sequelize = new Sequelize({
   logging: process.env.NODE_ENV === 'development' ? console.log : false
 });
 
-
-
 // Create Umzug instance with proper configuration
 export const umzug = new Umzug({
   migrations: {
@@ -59,6 +57,7 @@ export const runMigrations = async () => {
   }
 };
 
+// Test database connection
 export const testConnection = async () => {
   try {
     await sequelize.authenticate();

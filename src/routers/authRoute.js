@@ -4,8 +4,6 @@ import {
   Signup,
   Signin,
   getAllUsers,
-  sendOtp,
-  verifyOTP,
   changePassword,
   changeImage,
   upload,
@@ -27,8 +25,6 @@ const CLIENT_URL = "https://api.waridi.co/";
 
 router.post("/signup", Signup);
 router.post("/signin", Signin);
-router.get("/send/:to", sendOtp);
-// router.get("/verify/:to/:code", verifyOTP);
 router.put("/updateprofile/", authController.upload, updateUserProfile);
 router.post("/verify", verifyOtpCode);
 router.put("/changepassword/:id", changePassword);

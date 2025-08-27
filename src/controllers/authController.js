@@ -1,5 +1,4 @@
 import dotenv from "dotenv";
-import twilio from "twilio";
 import bcryptjs from "bcryptjs";
 import { Op, literal, where } from "sequelize";
 import nodemailer from "nodemailer";
@@ -21,9 +20,6 @@ import UserProfile from "../models/userProfileModel.js";
 dotenv.config();
 
 const {
-  TWILIO_ACCOUNT_SID,
-  TWILIO_AUTH_TOKEN,
-  TWILIO_SERVICE_SID,
   GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET,
   MAILING_SERVICE_REFRESH_TOKEN,
@@ -31,9 +27,6 @@ const {
   SENDER_PASSWORD,
 } = process.env;
 
-const client = twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, {
-  lazyLoading: true,
-});
 
 
 const { OAuth2 } = google.auth;
@@ -481,104 +474,6 @@ export const changePassword = async (req, res) => {
 };
 
 
-// export const changePassword = async (req, res) => {
-//   const userId = req.query.id;
-//    const password = req.body.password;
-//    const confirmPassword = req.body.confirmPassword;
-
-
-//   const user = await User.findOne({
-//      where: { id: userId },
-//    });
-
-//    try {
-
-//    if (!user) {
-//      return res.status(401).send({ msg: "Unauthorized" });
-//    } else if (password !== confirmPassword) {
-//      return res.status(401).send({ msg: "Passwords Do Not Match" });
-   
-//    } else {
-//    if (password == confirmPassword) {
-//     await User.update({password: password}, {where: {id: userId}}).then((data) => {
-//       res.status(201).send(data);
-//     });
-//   }
-//   }
-//   } catch (err) {
-//     res.status(500).send({ message: err.message });
-//   }
-// };
-
-// export const sendOtp = async () => {
-//   const {countryCode, phoneNumber} = req.body;
-//   try {
-//       const otpResponse = await client.verify
-//       .services(TWILIO_SERVICE_SID)
-//       .verifications.create({
-//           to: `+${countryCode}${phoneNumber}`,
-//           channel: "sms",
-//       });
-//       res.status(200).send(`OTP send successfully!: ${JSON.stringify(otpResponse)}`);
-//   } catch (error) {
-//       res.status(error?.status || 400).send(error?.message || 'Something went wrong');
-//   }
-// };
-
-// export const verifyOTP = async (req, res, next) => {
-//   const {countryCode, phoneNumber, otp} = req.body;
-//   try {
-//       const verifiedResponse = await client.verify.services(TWILIO_SERVICE_SID)
-//       .verificationChecks.create({
-//           to: `+${countryCode}${phoneNumber}`,
-//           code: otp
-//       });
-//      res.status(200).send(`OTP verified successfully!: ${JSON.stringify(verifiedResponse)}`);
-//   } catch(error) {
-//      res.status(error?.status || 400).send(error?.message || `Something went wrong`);
-//   }
-// }
-
-export const sendOtp = async (req, res) => {
-  const to = req.params.to;
-  client.verify
-    .services(TWILIO_SERVICE_SID)
-    .verifications.create({ to, channel: "sms" })
-    .then((verification) => {
-      res.json(verification);
-    })
-    .catch((err) => {
-      res.json(err);
-    });
-};
-
-export const verifyOTP = async (req, res, next) => {
-  const to = req.params.to;
-  const code = req.params.code;
-
-  client.verify
-    .services(TWILIO_ACCOUNT_SID)
-    .verificationChecks.create({ to, code })
-    .then((res) => {
-      res.status(200).send({ msg: "Phone Verified Successfully" });
-    })
-    .catch((err) => {
-      res.json(err);
-    });
-};
-
-// export const sendSmS = async (req, res) => {
-//   const {phoneNumber} = req.body;
-
-//   console.log("Phone Number Is", phoneNumber);
-//   const result = await textflow.sendVerificationSMS(phoneNumber);
-
-//   if (result.ok)
-//   return res.status(200).json({ success: true });
-
-//    return res.status(400).json(res);
-
-// }
 
 
 
