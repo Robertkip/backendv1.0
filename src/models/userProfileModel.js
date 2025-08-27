@@ -16,8 +16,17 @@ const UserProfile = sequelize.define("userprofile", {
     type: DataTypes.STRING,
   },
   user_phonenumber: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.BIGINT,
   },
+  user_avatar: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: 'https://api.waridi.co/images/userprofile.png',
+  },
+  type: {
+    type: DataTypes.STRING,
+  },
+
   followers: {
     type: DataTypes.ARRAY(DataTypes.INTEGER),
     defaultValue: [],
@@ -27,16 +36,25 @@ const UserProfile = sequelize.define("userprofile", {
     type: DataTypes.ARRAY(DataTypes.INTEGER),
     defaultValue: [],
     allowNull: true,
-  },  
-  user_avatar: {
-    type: DataTypes.STRING,
-    allowNull:false,
-    defaultValue: 'https://api.waridi.co/images/userprofile.png',
   },
-  type: {
-    type: DataTypes.STRING,
+
+  pendingConnections: {
+    type: DataTypes.ARRAY(DataTypes.INTEGER),
+    defaultValue: [],
+    allowNull: true,
   },
+  acceptedConnections: {
+    type: DataTypes.ARRAY(DataTypes.INTEGER),
+    defaultValue: [],
+    allowNull: true,
+  },
+  rejectedConnections: {
+    type: DataTypes.ARRAY(DataTypes.INTEGER),
+    defaultValue: [],
+    allowNull: true,
+  }
 });
+
 
 UserProfile.associations = (models) => {
   UserProfile.belongsTo(User, {

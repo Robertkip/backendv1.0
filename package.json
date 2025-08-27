@@ -16,6 +16,8 @@
   "author": "James Masika Wabuya",
   "license": "ISC",
   "dependencies": {
+    "@grpc/grpc-js": "^1.13.4",
+    "@grpc/proto-loader": "^0.8.0",
     "apollo-server-express": "^3.13.0",
     "axios": "^1.3.5",
     "bcryptjs": "^2.4.3",
@@ -35,7 +37,9 @@
     "graphql-upload": "^13.0.0",
     "helmet": "^6.0.1",
     "install": "^0.13.0",
+    "ioredis": "^5.7.0",
     "jsonwebtoken": "^8.5.1",
+    "mongoose": "^8.17.0",
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
     "node-geocoder": "^4.2.0",
@@ -57,7 +61,6 @@
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^4.6.3",
     "textflow.js": "^0.1.4",
-    "twilio": "^3.84.0",
     "umzug": "^3.8.2",
     "url": "^0.11.0",
     "util": "^0.12.5"
