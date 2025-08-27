@@ -8,25 +8,28 @@ const Property = sequelize.define("property", {
     type: DataTypes.INTEGER,
     allowNull: true,
   },
-  property_name: {
+  apartment_name: {
     type: DataTypes.STRING,
   },
-  property_location: {
+  apartment_location: {
     type: DataTypes.STRING,
   },
-  property_county: {
+  apartment_county: {
     type: DataTypes.STRING,
   },
-  property_type: {
+  apartment_type: {
     type: DataTypes.STRING
   },
-  property_description: {
+  apartment_description: {
     type: DataTypes.TEXT,
   },
-  property_type: {
+  apartment_type: {
     type: DataTypes.STRING,
   },
-  property_price: {
+  apartment_price: {
+    type: DataTypes.STRING,
+  },
+  apartment_previous_price: {
     type: DataTypes.STRING,
   },
   address: {
@@ -76,12 +79,12 @@ const Property = sequelize.define("property", {
   },
 });
 
-export default Apartment;
+export default Property;
 
 Property.associations = (models) => {
-
-  Property.belongsTo(Agent, {
+    Property.belongsTo(Agent, {
     foreignKey: "agent_id",
   });
+
   return Property;
 };

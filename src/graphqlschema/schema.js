@@ -1,6 +1,6 @@
 import { gql } from 'apollo-server-express';
 
-const typeDefs = gql`
+const userProfileTypeDefs = gql`
 
   scalar Upload
 
@@ -14,6 +14,13 @@ const typeDefs = gql`
     following: [Int]
     user_avatar: String
     type: String
+  }
+
+  type PaginatedUserProfiles {
+    data: [UserProfile]
+    total: Int
+    page: Int
+    pageSize: Int
   }
 
   input UpdateUserProfileInput {
@@ -34,7 +41,8 @@ const typeDefs = gql`
 
   type Query {
     userProfile(id: Int!): UserProfile
+    paginatedUserProfiles(page: Int, pageSize: Int): PaginatedUserProfiles
   }
 `;
 
-export default typeDefs;
+export default userProfileTypeDefs;

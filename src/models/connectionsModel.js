@@ -2,32 +2,36 @@ import { DataTypes } from "sequelize";
 import { sequelize } from "../config/connectDb.js";
 import User from "./authModel.js";
 
-const Connection = sequelize.define("connections", {
-  userId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
-  connectionId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
-  status: {
-    type: DataTypes.ENUM("pending", "accepted", "rejected"),
-    allowNull: false,
-    defaultValue: "pending",
-  },
-});
+//Connection model
+const Connection = sequelize.define("connections",
+{
+    userId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+    },
+    connectionId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+    },
+    status: {
+        type: DataTypes.ENUM('pending', 'accepted', 'rejected'),
+        defaultValue: 'pending',
+      }
+    }, {
+      timestamps: true,
+    });
+    
+Connection.associations = (models) => {
+  Connection.belongsTo(User, {
+     foreignKey: "userId",
+     as: "user",
+  });
+  Connection.belongsTo(User, {
+   foreignKey: "connectionId",
+   as: "connection",
+  });
 
-// Set up associations
-Connection.associate = (models) => {
-  Connection.belongsTo(models.User, {
-    foreignKey: "userId",
-    as: "requester",
-  });
-  Connection.belongsTo(models.User, {
-    foreignKey: "connectionId",
-    as: "recipient",
-  });
-};
+  return Connection;
+}
 
 export default Connection;
