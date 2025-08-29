@@ -7,7 +7,7 @@ import logger from "morgan";
 import fs from "fs";
 import path from "path";
 import url from "url";
-import { fileURLToPath } from "url";
+import http from "http";
 import { Server as Socket } from "socket.io";
 import grpc from '@grpc/grpc-js';
 import RedisStore from "connect-redis";
@@ -41,6 +41,7 @@ import { createPost, getTimeline } from "./src/controllers/postController.js";
 import Message from "./src/models/messageModel.js";
 import resolvers from "./src/resolvers/index.js";
 import typeDefs from "./src/graphqlschema/index.js";
+import connectSocket from "./src/socket/ConnectSocket.js";
 import { Authenticated } from "./src/middlewares/authorizationPermission.js";
 import connectDB from "./src/config/connectMongo.js";
 
@@ -198,6 +199,9 @@ grpcserver.bindAsync(
   }
 );
 
+const httpServer = http.createServer(app);
+
+connectSocket(httpServer);
 
 const startServer = async () => {
   try {
@@ -218,6 +222,7 @@ const startServer = async () => {
 
 
 startServer();
+
 
 global.ononline = new Map();
 

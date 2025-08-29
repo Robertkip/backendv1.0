@@ -1,18 +1,17 @@
-import { Socket, Server } from "socket.io";
-const { onJoinRoomEvent, onGetRoomUsersEvent } = require("./SocketEvents");
-import fileUpload from "../helpers/FileUpload";
-import deleteScheduler from "../helpers/DeleteScheduler";
+import { Server } from "socket.io";
+import { onJoinRoomEvent, onGetRoomUsersEvent } from "./SocketEvent.js";
+import fileUpload from "../helpers/FileUpload.js";
+import deleteScheduler from "../helpers/DeleteScheduler.js";
+import Message from "../models/messageModel.js";
 
 function connectSocket(server) {
-  io = new Server(server, {
+  const io = new Server(server, {
     cors: {
       origin: "*",
       methods: ["GET", "POST"],
       credentials: true,
     },
-
-    // SET THE MAXIMUM HTTP REQUEST SIZE TO 100 MB (100 * 1024 * 1024 BYTES)
-    maxHttpBufferSize: 100 * 1024 * 1024,
+    maxHttpBufferSize: 100 * 1024 * 1024, // 100 MB
   });
 
   io.on("connection", (socket) => {
@@ -24,26 +23,32 @@ function connectSocket(server) {
     });
 
     // MESSAGE
-    socket.on("sendMessageEvent", (data) => {
-      if (data.TYPE === "MESSAGE") {
-        // BROADCASTS THE MESSAGE TO ALL CLIENTS CONNECTED TO THE SPECIFIED ROOM, EXCEPT THE SENDER.
-        socket.to(data.ROOM_CODE).emit("receiveMessageEvent", data);
-      } else {
-        // CALL THE FILE UPLOAD FUNCTION
-        fileUpload(data);
+    socket.on("sendMessageEvent", async (data) => {
+      try {
+        // ✅ Save to DB
+        const msg = new Message({
+          roomCode: data.ROOM_CODE,
+          senderId: socket.data.USER_ID,   // attach sender automatically
+          senderName: socket.data.USER_NAME,
+          receiverId: data.RECEIVER_ID || null,
+          type: data.TYPE,
+          message: data.MESSAGE || null,
+          fileUrl: data.FILE_URL || null,
+        });
 
-        // CALL THE SCHEDULE DELETION FUNCTION
-        deleteScheduler(data);
+        await msg.save();
 
-        // BROADCASTS THE MESSAGE TO ALL CLIENTS CONNECTED TO THE SPECIFIED ROOM, EXCEPT THE SENDER.
-        socket.to(data.ROOM_CODE).emit("receiveMessageEvent", data);
+        // ✅ Broadcast to other users in the room
+        socket.to(data.ROOM_CODE).emit("receiveMessageEvent", msg);
+      } catch (err) {
+        console.error("Error saving message:", err);
+        socket.emit("errorEvent", "Failed to save message.");
       }
     });
 
-    // ROOM USER DETAILS: [USER_NAME, USER_ID]
+    // ROOM USER DETAILS
     socket.on("getRoomUsersEvent", (data) => {
-      // UPDATE ROOM USER DETAILS
-      const roomUsers = onGetRoomUsersEvent(data, io); // LIST OF [USER_NAME, USER_ID]
+      const roomUsers = onGetRoomUsersEvent(data, io);
       socket.emit("receiveRoomUsersEvent", roomUsers);
     });
 
@@ -62,7 +67,8 @@ function connectSocket(server) {
       console.log("A user disconnected having ID:", socket.id);
     });
   });
+
+  console.log("✅ Socket.IO initialized and listening.");
 }
 
 export default connectSocket;
-
