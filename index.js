@@ -44,12 +44,8 @@ import typeDefs from "./src/graphqlschema/index.js";
 import connectSocket from "./src/socket/ConnectSocket.js";
 import { Authenticated } from "./src/middlewares/authorizationPermission.js";
 import connectDB from "./src/config/connectMongo.js";
-
-
 import { runMigrations } from "./src/config/connectDb.js";
-
 import options from "./swagger-output.json" assert { type: "json" };
-
 
 const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -63,14 +59,9 @@ const app = express();
 
 connectDB();
 
-
 app.use(cors());
-
 app.use(express.json());
-
-
 app.use('/graphql', graphqlUploadExpress());
-
 
 const server = new ApolloServer({
   typeDefs,
@@ -86,64 +77,49 @@ await server.start();
 server.applyMiddleware({ app });
 
 global.__basedir = __dirname;
-
 console.log(__basedir);
 
 const specs = {
   customCss: fs.readFileSync("./swagger.css", "utf-8"),
 };
 
-// const spec = swaggerJSDoc(options);
-
-// const Roles = db.roles;
 const PORT = process.env.PORT || 8084;
-
-//passportSetup(app);
-
 
 let io = new Socket({
   cors: {
     origin: "*",
   },
 });
-const redisClient = createClient({ legacyMode: true });
+
+const redisClient = createClient({
+  url: process.env.REDIS_URL || 'redis://localhost:6379',
+  legacyMode: true, // Keep for connect-redis compatibility
+});
 redisClient.connect().catch(console.error);
 
 const redisStore = new RedisStore({
   client: redisClient,
-  prefix: "waridi",
+  prefix: "waridi:",
 });
 
-const REDIS_SESSION_SECRET = process.env.REDIS_SESSION_SECRET;
-
+const REDIS_SESSION_SECRET = process.env.REDIS_SESSION_SECRET || 'your-secret-here';
 
 const packageDefinition = protoLoader.loadSync(PROTO_PATH);
 const postProto = grpc.loadPackageDefinition(packageDefinition).post;
 
 const grpcserver = new grpc.Server();
 
-
 grpcserver.addService(postProto.PostService.service, {
-  CreatePost: async (call, callback) => {
-    try {
-      const { userId, content, media } = call.request;
-      const result = await createPost({ userId, content, media });
-      callback(null, { postId: result.postId });
-    } catch (error) {
-      callback(error);
-    }
-  },
-  GetTimeline: async (call, callback) => {
-    try {
-      const { userId } = call.request;
-      const result = await getTimeline({ userId });
-      callback(null, { posts: result.posts });
-    } catch (error) {
-      callback(error);
-    }
-  },
+  CreatePost: createPost,     // ✅ directly pass the controller
+  GetTimeline: getTimeline,   // ✅ directly pass the controller
 });
 
+
+// Add reflection service
+const reflection = new ReflectionService(postProto);
+reflection.addToServer(grpcserver);
+
+// Bind the gRPC server to a single port
 const GRPC_PORT = process.env.GRPC_PORT || 50051;
 grpcserver.bindAsync(
   `0.0.0.0:${GRPC_PORT}`,
@@ -158,10 +134,6 @@ grpcserver.bindAsync(
   }
 );
 
-const reflection = new ReflectionService(postProto);
-reflection.addToServer(grpcserver);
-
-
 app.use(
   cookieSession({
     name: "session",
@@ -170,20 +142,13 @@ app.use(
   })
 );
 
-app.use(detectDevice);  
+app.use(detectDevice);
 app.use(express.json({ limit: "50mb", extended: true }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(helmet());
-app.use(logger("common")); include: [
-  {
-    model: User,
-    as: "sender",
-    attributes: ["_id", "name"],
-  },
-],
+app.use(logger("common"));
 
 initPassport(app);
-
 
 app.use(
   session({
@@ -192,7 +157,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: false,
+      secure: false, // Set to true in production with HTTPS
       httpOnly: false,
       maxAge: 1000 * 60 * 10,
     },
@@ -219,31 +184,25 @@ app.use("/api/v1", messageRouter);
 app.use("/api/v1", propertyRouter);
 app.use("/api/v1", geoLocationRouter);
 
-
 const httpServer = http.createServer(app);
 
 connectSocket(httpServer);
 
 const startServer = async () => {
   try {
-
     await runMigrations();
-  app.listen(PORT,  () => {
+    httpServer.listen(PORT, () => {
+      console.log(`HTTP server is running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error('Server startup failed:', error);
+    process.exit(1);
+  }
+};
 
-    console.log(`Server is running on port`);
-  });
-
-}  catch (error) {
-  console.error('Server startup failed:', error);
-  process.exit(1);
-}
-
-}
-  io.listen(8085);
-
+io.listen(8085);
 
 startServer();
-
 
 global.ononline = new Map();
 
