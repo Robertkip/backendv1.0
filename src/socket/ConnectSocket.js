@@ -1,11 +1,8 @@
 import { Server } from "socket.io";
-import fileUpload from "../helpers/FileUpload";
-import deleteScheduler from "../helpers/DeleteScheduler";
-const { onJoinRoomEvent, onGetRoomUsersEvent } = require("./SocketEvents");
-
-// Keep a global map: USER_ID → socketId
-const userSocketMap = new Map();
-
+import { onJoinRoomEvent, onGetRoomUsersEvent } from "./SocketEvent.js";
+import fileUpload from "../helpers/FileUpload.js";
+import deleteScheduler from "../helpers/DeleteScheduler.js";
+import MessageSchema from "../mongomodel/messageSchema.js";
 function connectSocket(server) {
   const io = new Server(server, {
     cors: {
@@ -17,53 +14,31 @@ function connectSocket(server) {
   });
 
   io.on("connection", (socket) => {
-    console.log(`A user connected with socket ID: ${socket.id}`);
+    console.log(`A user connected having ID : ${socket.id}`);
 
-    // JOIN ROOM
+    // JOINING THE ROOM
     socket.on("joinRoomEvent", (data) => {
-      onJoinRoomEvent(data, socket, io, userSocketMap);
+      onJoinRoomEvent(data, socket, io);
     });
 
-    // MESSAGE (Group or Direct)
-    socket.on("sendMessageEvent", (data) => {
-      // Auto-tag message with sender info
-      const enrichedData = {
-        ...data,
-        SENDER_ID: socket.data.USER_ID,
-        SENDER_NAME: socket.data.USER_NAME,
-        TIMESTAMP: new Date().toISOString(),
-      };
+    // MESSAGE
+    socket.on("sendMessageEvent", async (data) => {
+      try {
+        await MessageSchema.create({
+          roomCode: data.ROOM_CODE,
+          senderId: socket.data.USER_ID,  
+          senderName: socket.data.USER_NAME,
+          receiverId: data.RECEIVER_ID || null,
+          type: data.TYPE,
+          message: data.MESSAGE || null,
+          fileUrl: data.FILE_URL || null,
+        });
 
-      if (data.TYPE === "MESSAGE") {
-        if (data.IS_DIRECT) {
-          // Direct Chat
-          const targetSocketId = userSocketMap.get(data.TARGET_USER_ID);
-          if (targetSocketId) {
-            io.to(targetSocketId).emit("receiveMessageEvent", enrichedData);
-            socket.emit("receiveMessageEvent", enrichedData); // echo back to sender
-          } else {
-            socket.emit("errorEvent", `User ${data.TARGET_USER_ID} is offline`);
-          }
-        } else {
-          // Group Chat
-          socket.to(data.ROOM_CODE).emit("receiveMessageEvent", enrichedData);
-          socket.emit("receiveMessageEvent", enrichedData); // echo back
-        }
-      } else {
-        // File Upload Handling
-        fileUpload(data);
-        deleteScheduler(data);
-
-        if (data.IS_DIRECT) {
-          const targetSocketId = userSocketMap.get(data.TARGET_USER_ID);
-          if (targetSocketId) {
-            io.to(targetSocketId).emit("receiveMessageEvent", enrichedData);
-            socket.emit("receiveMessageEvent", enrichedData);
-          }
-        } else {
-          socket.to(data.ROOM_CODE).emit("receiveMessageEvent", enrichedData);
-          socket.emit("receiveMessageEvent", enrichedData);
-        }
+        // ✅ Broadcast to other users in the room
+        socket.to(data.ROOM_CODE).emit("receiveMessageEvent", msg);
+      } catch (err) {
+        console.error("Error saving message:", err);
+        socket.emit("errorEvent", "Failed to save message.");
       }
     });
 
@@ -73,33 +48,23 @@ function connectSocket(server) {
       socket.emit("receiveRoomUsersEvent", roomUsers);
     });
 
-    // TYPING EVENTS
+    // START TYPING EVENT
     socket.on("sendStartTypingEvent", (data) => {
-      socket.to(data.ROOM_CODE).emit("getStartTypingEvent", {
-        ...data,
-        USER_ID: socket.data.USER_ID,
-        USER_NAME: socket.data.USER_NAME,
-      });
+      socket.to(data.ROOM_CODE).emit("getStartTypingEvent", data);
     });
 
+    // STOP TYPING EVENT
     socket.on("sendStopTypingEvent", (data) => {
-      socket.to(data.ROOM_CODE).emit("getStopTypingEvent", {
-        ...data,
-        USER_ID: socket.data.USER_ID,
-        USER_NAME: socket.data.USER_NAME,
-      });
+      socket.to(data.ROOM_CODE).emit("getStopTypingEvent", data);
     });
 
     // DISCONNECT
     socket.on("disconnect", () => {
-      console.log("User disconnected:", socket.id);
-      if (socket.data.USER_ID) {
-        userSocketMap.delete(socket.data.USER_ID);
-      }
+      console.log("A user disconnected having ID:", socket.id);
     });
   });
 
-  return io;
+  console.log("✅ Socket.IO initialized and listening.");
 }
 
 export default connectSocket;

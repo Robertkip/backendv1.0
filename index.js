@@ -7,7 +7,7 @@ import logger from "morgan";
 import fs from "fs";
 import path from "path";
 import url from "url";
-import { fileURLToPath } from "url";
+import http from "http";
 import { Server as Socket } from "socket.io";
 import grpc from '@grpc/grpc-js';
 import RedisStore from "connect-redis";
@@ -41,6 +41,7 @@ import { createPost, getTimeline } from "./src/controllers/postController.js";
 import Message from "./src/models/messageModel.js";
 import resolvers from "./src/resolvers/index.js";
 import typeDefs from "./src/graphqlschema/index.js";
+import connectSocket from "./src/socket/ConnectSocket.js";
 import { Authenticated } from "./src/middlewares/authorizationPermission.js";
 import connectDB from "./src/config/connectMongo.js";
 
@@ -122,8 +123,42 @@ const postProto = grpc.loadPackageDefinition(packageDefinition).post;
 const grpcserver = new grpc.Server();
 
 
-const reflection = new ReflectionService(postProto);
+grpcserver.addService(postProto.PostService.service, {
+  CreatePost: async (call, callback) => {
+    try {
+      const { userId, content, media } = call.request;
+      const result = await createPost({ userId, content, media });
+      callback(null, { postId: result.postId });
+    } catch (error) {
+      callback(error);
+    }
+  },
+  GetTimeline: async (call, callback) => {
+    try {
+      const { userId } = call.request;
+      const result = await getTimeline({ userId });
+      callback(null, { posts: result.posts });
+    } catch (error) {
+      callback(error);
+    }
+  },
+});
 
+const GRPC_PORT = process.env.GRPC_PORT || 50051;
+grpcserver.bindAsync(
+  `0.0.0.0:${GRPC_PORT}`,
+  grpc.ServerCredentials.createInsecure(),
+  (error, port) => {
+    if (error) {
+      console.error('gRPC bind error:', error);
+      return;
+    }
+    console.log(`gRPC server listening on port ${port}`);
+    grpcserver.start();
+  }
+);
+
+const reflection = new ReflectionService(postProto);
 reflection.addToServer(grpcserver);
 
 
@@ -184,20 +219,10 @@ app.use("/api/v1", messageRouter);
 app.use("/api/v1", propertyRouter);
 app.use("/api/v1", geoLocationRouter);
 
-grpcserver.addService(postProto.PostService.service, {
-  CreatePost: createPost,
-  GetTimeline: getTimeline,
-});
 
-grpcserver.bindAsync(
-  "0.0.0.0:50051",
-  grpc.ServerCredentials.createInsecure(),
-  () => {
-    console.log("gRPC server running on port 50051");
-    grpcserver.start();
-  }
-);
+const httpServer = http.createServer(app);
 
+connectSocket(httpServer);
 
 const startServer = async () => {
   try {
@@ -218,6 +243,7 @@ const startServer = async () => {
 
 
 startServer();
+
 
 global.ononline = new Map();
 

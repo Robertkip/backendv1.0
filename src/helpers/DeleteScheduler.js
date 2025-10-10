@@ -1,7 +1,6 @@
 import path from "path";
 
-import deleteDirectory from "./DeleteDirectory";
-
+import deleteDirectory from "./DeleteDirectory.js";
 
 function getSubfolderPath(roomCode) {
     const subfolderPath = path.join(__dirname, `../uploads/${roomCode}`);
