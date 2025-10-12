@@ -34,17 +34,9 @@ static_resources:
                   - name: envoy.filters.http.cors
                     typed_config:
                       "@type": type.googleapis.com/envoy.extensions.filters.http.cors.v3.Cors
-                      allow_origin_string_match:
-                        - prefix: "*"
-                      allow_methods: GET, PUT, DELETE, POST, OPTIONS
-                      allow_headers: keep-alive, user-agent, cache-control, content-type, authorization, grpc-timeout
-                      allow_credentials: false
-                      max_age: "1728000"
-                      expose_headers: grpc-status, grpc-message
                   - name: envoy.filters.http.router
                     typed_config:
                       "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
-
   clusters:
     - name: grpc_service
       connect_timeout: 0.25s
