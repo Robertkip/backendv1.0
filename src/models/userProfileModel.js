@@ -1,6 +1,8 @@
 import { sequelize } from "../config/connectDb.js";
 import { DataTypes } from "sequelize";
 import User from "./authModel.js";
+import Like from "./likeModel.js";
+import Post from "./postModel.js";
 
 const UserProfile = sequelize.define("userprofile", {
   userId: {
@@ -64,3 +66,11 @@ UserProfile.associations = (models) => {
 };
 
 export default UserProfile;
+
+
+UserProfile.hasMany(Post, { foreignKey: 'authorId' });
+UserProfile.belongsToMany(Post, { through: Like, foreignKey: 'userId' });
+
+Post.belongsTo(UserProfile, { foreignKey: 'authorId' });
+
+Post.belongsToMany(UserProfile, { through: Like, foreignKey: 'postId' });

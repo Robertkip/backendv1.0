@@ -19,7 +19,7 @@ static_resources:
                         - match: { prefix: "/" }
                           route:
                             cluster: grpc_service
-                            max_grpc_timeout: 0s
+                            timeout: 5s  # Increased timeout
                       cors:
                         allow_origin_string_match:
                           - prefix: "*"
@@ -37,10 +37,15 @@ static_resources:
                   - name: envoy.filters.http.router
                     typed_config:
                       "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
+                      access_log:
+                        - name: envoy.access_loggers.file
+                          typed_config:
+                            "@type": type.googleapis.com/envoy.extensions.access_loggers.file.v3.FileAccessLog
+                            path: /var/log/envoy.log
   clusters:
     - name: grpc_service
-      connect_timeout: 0.25s
-      type: logical_dns
+      connect_timeout: 5s  # Increased from 0.25s
+      type: static  # Changed to static for local testing
       http2_protocol_options: {}
       lb_policy: round_robin
       load_assignment:
@@ -50,5 +55,5 @@ static_resources:
               - endpoint:
                   address:
                     socket_address:
-                      address: 172.17.0.1
+                      address: 127.0.0.1  # Changed to 127.0.0.1
                       port_value: 50051

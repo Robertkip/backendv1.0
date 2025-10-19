@@ -1,0 +1,24 @@
+import { sequelize } from '../config/connectDb.js';
+import User from './authModel.js';
+import UserProfile from './userProfileModel.js';
+import Post from './postModel.js';
+import Comment from './commentModel.js';
+import Like from './likeModel.js';
+
+// Define associations
+User.hasOne(UserProfile, { foreignKey: 'userId' });
+UserProfile.belongsTo(User, { foreignKey: 'userId' });
+
+UserProfile.hasMany(Post, { foreignKey: 'authorId' });
+Post.belongsTo(UserProfile, { foreignKey: 'authorId' });
+
+Post.hasMany(Comment, { foreignKey: 'postId' });
+Comment.belongsTo(Post, { foreignKey: 'postId' });
+Comment.belongsTo(UserProfile, { foreignKey: 'authorId' });
+
+Post.belongsTo(Post, { as: 'originalPost', foreignKey: 'originalPostId' });
+
+UserProfile.belongsToMany(Post, { through: Like, foreignKey: 'userId' });
+Post.belongsToMany(UserProfile, { through: Like, foreignKey: 'postId' });
+
+export { sequelize, User, UserProfile, Post, Comment, Like };

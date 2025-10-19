@@ -50,36 +50,6 @@ export const Authenticated = async (req, res, next) => {
 };
 
 
-// export const Authenticated = async (req, res, next) => {
-//   try {
-//     const authToken = req.headers["authorization"];
-//     const token = authToken && authToken.split(" ")[1];
-//     if (token === null) {
-//       return res.status(401).send({ msg: "Unauthorized" });
-//     }
-//     const result = Helper.ExtractToken(token);
-//     console.log("Authenticated result is", result.id);
-
-//     if (!result) {
-//       return res.status(401).send({ msg: "Unauthorized" });
-//     }
-
-//     const userId = result.id;
-//     const user = await User.findByPk(userId);
-
-//     console.log("Single User", user);
-
-//     req.user = user;
-
-//     res.locals.userEmail = result?.email;
-//     res.locals.roleId = result?.roleId;
-//     console.log("The locally obtained roleId Is", roleId);
-//     next();
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
-
 export const SuperUser = (req, res, next) => {
   try {
     const roleId = res.locals.roleId;
