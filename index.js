@@ -163,8 +163,12 @@ app.use(
     },
   })
 );
+app.use("/images", (req, res, next) => {
+  res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+  res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+  next();
+}, express.static("Images"));
 
-app.use("/images", express.static("Images"));
 app.use("/swagger-ui", swaggerUi.serve, swaggerUi.setup(options));
 
 app.use("/api/v1", apartmentRouter);
