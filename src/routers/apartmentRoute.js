@@ -14,12 +14,13 @@ router.get("/allapartment/", apartmentController.getAllApartments);
 router.get("/apartment/:id", apartmentController.getApartmentById);
 router.get(
   "/apartmentaccount/:logent_id",
-  apartmentController.getTenantLandlordApartments
+  apartmentController.getLandlordApartments
 );
 router.get(
-  "/apartment/:agent_id",
-  apartmentController.getTenantLandlordApartments
+  "/apartmentaccount/:logent_id",
+  apartmentController.getAgentApartments
 );
+
 
 router.put(
   "/apartment/update/:id",

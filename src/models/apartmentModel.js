@@ -4,17 +4,15 @@ import Landlord from "./landlordModel.js";
 import Agent from "./agentModel.js";
 
 const Apartment = sequelize.define("rental_apartment", {
-  logent_id: {
+  agent_id: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+  },
+   landlord_id: {
     type: DataTypes.INTEGER,
     allowNull: true,
   },
   apartment_name: {
-    type: DataTypes.STRING,
-  },
-  apartment_location: {
-    type: DataTypes.STRING,
-  },
-  apartment_county: {
     type: DataTypes.STRING,
   },
   apartment_type: {
@@ -22,18 +20,6 @@ const Apartment = sequelize.define("rental_apartment", {
   },
   apartment_description: {
     type: DataTypes.TEXT,
-  },
-  apartment_type: {
-    type: DataTypes.STRING,
-  },
-  address: {
-    type: DataTypes.TEXT,
-  },
-  latitude: {
-    type: DataTypes.STRING,
-  },
-  longitude: {
-    type: DataTypes.STRING,
   },
   type1: {
     type: DataTypes.STRING,
@@ -77,7 +63,7 @@ export default Apartment;
 
 Apartment.associations = (models) => {
   Apartment.belongsTo(Landlord, {
-    foreignKey: "logent_id",
+    foreignKey: "landlord_id",
   });
   Apartment.belongsTo(Agent, {
     foreignKey: "logent_id",

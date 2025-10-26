@@ -8,151 +8,26 @@ import Apartment from "../models/apartmentModel.js";
 
 dotenv.config();
 
-const PLACES_API_ENDPOINT = process.env.PLACES_API_ENDPOINT;
-const PLACES_SEARCH_API_ENDPOINT = process.env.PLACES_SEARCH_API_ENDPOINT;
-const API_KEY = process.env.API_KEY;
-const PRODUCTION_IMAGE_ADDRESS = process.env.PRODUCTION_IMAGE_URL
 
-const geocoder = NodeGeocoder({
-  provider: "google",
-  apiKey: API_KEY,
-});
 
-async function geocodeAddress(address) {
-  return geocoder.geocode(address).then((result) => {
-    if (result.length === 0) {
-      throw new Error("Unable to geocode address");
-    }
-    return {
-      latitude: result[0].latitude,
-      longitude: result[0].longitude,
-    };
-  });
-}
 
 export const uploadApartment = async (req, res) => {
   try {
-    if (process.env.NODE_ENV === "development") {
-      const name1 = "http://192.168.1.120:8084/images/" + req.files[0].filename;
-      const name2 = "http://192.168.1.120:8084/images/" + req.files[1].filename;
-      const name3 = "http://192.168.1.120:8084/images/" + req.files[2].filename;
-      const name4 = "http://192.168.1.120:8084/images/" + req.files[3].filename;
+
       const newApartment = new Apartment({
         apartment_name: req.body.apartment_name,
         apartment_location: req.body.apartment_location,
         apartment_description: req.body.apartment_description,
         address: req.body.address,
-        logent_id: req.body.logent_id,
-        type1: req.files.mimetype,
-        name1: name1,
-        type2: req.files.mimetype,
-        name2: name2,
-        type3: req.files.mimetype,
-        name3: name3,
-        type4: req.files.mimetype,
-        name4: name4,
-
-        //   data: fs.readFileSync(
-        //     __basedir + "/Images/" + req.file.filename
-        //   ),
-        //  }).then((image) => {
-        //    fs.writeFileSync(
-        //     __basedir + "/Images/" + image.name,
-        //     image.data
-        //    );
-        //    return res.status(201).send("Apartment Created Successfully");
+        agent_id: req.body.agent_id
       });
       try {
-        // const location = await geocodeAddress(newApartment.address);
-        // newApartment.latitude = location.latitude;
-        // newApartment.longitude = location.longitude;
-
         await newApartment.save();
         console.log("Apartment Created");
       } catch (error) {
         console.log(error);
       }
-    } else if (process.env.NODE_ENV === "production") {
-      const name1 = PRODUCTION_IMAGE_ADDRESS + req.files[0].filename;
-      const name2 = PRODUCTION_IMAGE_ADDRESS + req.files[1].filename;
-      const name3 = PRODUCTION_IMAGE_ADDRESS + req.files[2].filename;
-      const name4 = PRODUCTION_IMAGE_ADDRESS + req.files[3].filename;
-      const newApartment = new Apartment({
-        apartment_name: req.body.apartment_name,
-        apartment_location: req.body.apartment_location,
-        apartment_description: req.body.apartment_description,
-        logent_id: req.body.logent_id,
-        address: req.body.address,
-        type1: req.files.mimetype,
-        name1: name1,
-        type2: req.files.mimetype,
-        name2: name2,
-        type3: req.files.mimetype,
-        name3: name3,
-        type4: req.files.mimetype,
-        name4: name4,
-
-        //   data: fs.readFileSync(
-        //     __basedir + "/Images/" + req.file.filename
-        //   ),
-        //  }).then((image) => {
-        //    fs.writeFileSync(
-        //     __basedir + "/Images/" + image.name,
-        //     image.data
-        //    );
-        //    return res.status(201).send("Apartment Created Successfully");
-      });
-      try {
-        //const location = await geocodeAddress(newApartment.address);
-        //newApartment.latitude = location.latitude;
-        //newApartment.longitude = location.longitude;
-
-        await newApartment.save();
-        console.log("Apartment Created");
-      } catch (error) {
-        console.log(error);
-      }
-    } else {
-      const name1 = "http://192.168.0.37:8084/images/" + req.files[0].filename;
-      const name2 = "http://192.168.0.37:8084/images/" + req.files[1].filename;
-      const name3 = "http://192.168.0.37:8084/images/" + req.files[2].filename;
-      const name4 = "http://192.168.0.37:8084/images/" + req.files[3].filename;
-      const newApartment = new Apartment({
-        apartment_name: req.body.apartment_name,
-        apartment_location: req.body.apartment_location,
-        apartment_description: req.body.apartment_description,
-        logent_id: req.body.logent_id,
-        address: req.body.address,
-        type1: req.files.mimetype,
-        name1: name1,
-        type2: req.files.mimetype,
-        name2: name2,
-        type3: req.files.mimetype,
-        name3: name3,
-        type4: req.files.mimetype,
-        name4: name4,
-
-        //   data: fs.readFileSync(
-        //     __basedir + "/Images/" + req.file.filename
-        //   ),
-        //  }).then((image) => {
-        //    fs.writeFileSync(
-        //     __basedir + "/Images/" + image.name,
-        //     image.data
-        //    );
-        //    return res.status(201).send("Apartment Created Successfully");
-      });
-
-      try {
-        const location = await geocodeAddress(newApartment.address);
-        newApartment.latitude = location.latitude;
-        newApartment.longitude = location.longitude;
-
-        await newApartment.save();
-      } catch (error) {
-        res.send(error);
-      }
-    }
+     
     return res.status(201).send("Apartment Created Successfully");
   }
   catch (error) {
@@ -198,11 +73,11 @@ export const getAllApartments = async (req, res) => {
 // };
 
 
-export const getTenantLandlordApartments = async (req, res) => {
+export const getLandlordApartments = async (req, res) => {
   try {
-    const { logent_id } = req.params;
+    const { landlord_id } = req.params;
     const apartments = await Apartment.findAll({
-      where: { logent_id: logent_id },
+      where: { landlord_id: landlord_id },
     });
     if (apartments) {
       return res.status(200).json({ apartments });
@@ -211,7 +86,19 @@ export const getTenantLandlordApartments = async (req, res) => {
     return res.status(500).send(error.message);
   }
 };
-
+export const getAgentApartments = async (req, res) => {
+  try {
+    const { agent_id } = req.params;
+    const apartments = await Apartment.findAll({
+      where: { agent_id: agent_id },
+    });
+    if (apartments) {
+      return res.status(200).json({ apartments });
+    }
+  } catch (error) {
+    return res.status(500).send(error.message);
+  }
+};
 export const getApartmentById = async (req, res, next) => {
   const p_id = req.params.id;
   Apartment.findByPk(p_id)
@@ -232,10 +119,10 @@ export const updateApartment = async (req, res, next) => {
     apartment_name,
     apartment_location,
     apartment_description,
-    logent_id,
+    agent_id,
   } = req.body;
   await Apartment.update(
-    { apartment_name, apartment_location, apartment_description, logent_id },
+    { apartment_name, apartment_location, apartment_description, agent_id },
     { where: { id: p_id } }
   )
     .then(() => {
