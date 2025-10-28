@@ -1,11 +1,16 @@
 import dotenv from "dotenv";
 import multer from "multer";
 import path from "path";
+import { fileURLToPath } from "url";
 import { Op } from "sequelize";
-import PropertyFiles from "../models/propertyFilesModel";
+import PropertyFiles from "../models/propertyFilesModel.js";
 import fs from "fs";
 
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const __basedir = __dirname;
 
 const PRODUCTION_IMAGE_ADDRESS = process.env.PRODUCTION_IMAGE_URL;
 const DEVELOPMENT_IMAGE_URL = process.env.DEVELOPMENT_IMAGE_URL;
@@ -14,6 +19,7 @@ const uploadDir = path.join(__basedir, "Images");
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
+
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {

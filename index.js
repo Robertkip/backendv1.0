@@ -6,7 +6,7 @@ import helmet from "helmet";
 import logger from "morgan";
 import fs from "fs";
 import path from "path";
-import url from "url";
+import url, {fileURLToPath} from "url";
 import http from "http";
 import { Server as Socket } from "socket.io";
 import grpc from '@grpc/grpc-js';
@@ -34,6 +34,13 @@ import messageRouter from "./src/routers/messageRouter.js";
 import propertyRouter from "./src/routers/propertyRoute.js";
 import ratingRouter from "./src/routers/ratingRoute.js";
 import geoLocationRouter from "./src/routers/geoLocationRoute.js";
+import apartmentFilesRouter from "./src/routers/apartmentFilesRoute.js"
+import apartmentPropertiesRouter from "./src/routers/apartmentPropertiesRoute.js"
+import facilitiesRouter from "./src/routers/facilitiesRoute.js"
+import propertyFacilitiesRouter from "./src/routers/propertyFacilitiesRoute.js"
+import propertyFilesRouter from "./src/routers/propertyFilesRoute.js"
+import propertyLocationRouter from "./src/routers/propertyLocationRoute.js"
+import propertyPropertiesRouter from "./src/routers/propertyPropertiesRoute.js"
 import { initPassport } from "./src/middlewares/initPassport.js";
 import notificationRouter from "./src/routers/notifyRoute.js";
 import User from "./src/models/authModel.js";
@@ -178,6 +185,14 @@ app.use("/api/v1", landlordRouter);
 app.use("/api/v1", tenantRouter);
 app.use("/api/v1", agentRouter);
 app.use("/api/v1", marketRouter);
+app.use("/api/v1", roleRouter);
+app.use("/api/v1", apartmentFilesRouter);
+app.use("/api/v1", apartmentPropertiesRouter);
+app.use("/api/v1", facilitiesRouter);
+app.use("/api/v1", propertyFacilitiesRouter);
+app.use("/api/v1", propertyFilesRouter);
+app.use("/api/v1", propertyLocationRouter);
+app.use("/api/v1", propertyPropertiesRouter);
 app.use("/api/v1", cartRouter);
 app.use("/api/v1/user", userProfileRouter);
 app.use("/api/v1", friendRequestRouter);

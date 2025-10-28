@@ -1,4 +1,4 @@
-import Facility from "../models/facilitiesModel";
+import Facility from "../models/facilitiesModel.js";
 
 export const ApartmentFacility = async (req, res) => {
     try {

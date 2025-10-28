@@ -1,6 +1,6 @@
-import PropertyLocation from "../models/propertyLocationModel";
+import PropertyLocation from "../models/propertyLocationModel.js";
 
-export const PropertyLocation = async (req, res) => {
+export const GetPropertyLocation = async (req, res) => {
     try {
         const propertyLocation = await PropertyLocation.findAll({
          where: {

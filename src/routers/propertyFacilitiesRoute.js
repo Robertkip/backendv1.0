@@ -4,7 +4,7 @@ import * as propertyFacilitiesController from '../controllers/propertyFacilities
 const router = express.Router();
 
 router.post('/addfacility', propertyFacilitiesController.CreatePropertyFacility);
-router.get('/allfacilities', propertyFacilitiesController.PropertyFacility);
+router.get('/allfacilities', propertyFacilitiesController.GetPropertyFacility);
 router.get('/facilities/:id', propertyFacilitiesController.GetPropertyFacilityById);
 router.get('/update/:id', propertyFacilitiesController.UpdatePropertyFacility);
 router.get('/deletefacility/:id', propertyFacilitiesController.DeletePropertyFacility);

@@ -1,6 +1,6 @@
-import ApartementProperties from "../models/apartmentProperties";
+import ApartementProperties from "../models/apartmentProperties.js";
 
-export const ApartementProperties = async (req, res) => {
+export const GetApartementProperties = async (req, res) => {
     try {
         const apartmentProperties = await ApartementProperties.findAll({
          where: {

@@ -1,6 +1,6 @@
-import PropertyProperties from "../models/propertyProperties";
+import PropertyProperties from "../models/propertyProperties.js";
 
-export const PropertyProperties = async (req, res) => {
+export const GetPropertyProperties = async (req, res) => {
     try {
         const propertyProperties = await PropertyProperties.findAll({
          where: {
