@@ -37,10 +37,9 @@ apartment_id: {
 
 export default ApartementProperties;
 
-ApartementProperties.associations = (models) => {
-    ApartementProperties.belongsTo(Apartment, {
-        foreignKey: "apartment_id",
-    });
-    return ApartementProperties;
+ApartementProperties.associate = (models) => {
+  ApartementProperties.belongsTo(Apartment, {
+    foreignKey: "apartment_id",
+    as: "apartment",
+  });
 };
-

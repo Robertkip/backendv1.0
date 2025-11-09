@@ -2,11 +2,7 @@ import PropertyLocation from "../models/propertyLocationModel.js";
 
 export const GetPropertyLocation = async (req, res) => {
     try {
-        const propertyLocation = await PropertyLocation.findAll({
-         where: {
-            active: true
-         }
-        });
+        const propertyLocation = await PropertyLocation.findAll();
         return res.status(200).send({
            status: 200,
            message: 'OK',

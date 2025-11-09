@@ -40,6 +40,7 @@ import facilitiesRouter from "./src/routers/facilitiesRoute.js"
 import propertyFacilitiesRouter from "./src/routers/propertyFacilitiesRoute.js"
 import propertyFilesRouter from "./src/routers/propertyFilesRoute.js"
 import propertyLocationRouter from "./src/routers/propertyLocationRoute.js"
+import apartmentLocationRouter from "./src/routers/locationRoute.js"
 import propertyPropertiesRouter from "./src/routers/propertyPropertiesRoute.js"
 import { initPassport } from "./src/middlewares/initPassport.js";
 import notificationRouter from "./src/routers/notifyRoute.js";
@@ -193,6 +194,7 @@ app.use("/api/v1", facilitiesRouter);
 app.use("/api/v1", propertyFacilitiesRouter);
 app.use("/api/v1", propertyFilesRouter);
 app.use("/api/v1", propertyLocationRouter);
+app.use("/api/v1/location", apartmentLocationRouter);
 app.use("/api/v1", propertyPropertiesRouter);
 app.use("/api/v1", cartRouter);
 app.use("/api/v1/user", userProfileRouter);

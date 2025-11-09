@@ -2,7 +2,7 @@ import { DataTypes } from "sequelize";
 import { sequelize } from "../config/connectDb.js";
 import Apartment from "./apartmentModel.js";
 
-const Location = sequelize.define("apartment_location", {
+const Location = sequelize.define("apartment_locations", {
   country: {
     type: DataTypes.STRING,
     allowNull: true,
@@ -44,9 +44,11 @@ apartment_id: {
 
 export default Location;
 
-Location.associations = (models) => {
-    Location.belongsTo(Apartment, {
-        foreignKey: "apartment_id",
-    });
-    return Location;
+Location.associate = (models) => {
+  Location.belongsTo(Apartment, {
+    foreignKey: "apartment_id",
+    as: "apartment",
+  });
 };
+
+

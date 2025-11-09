@@ -1,4 +1,4 @@
-import Location from "../models/locationModel";
+import Location from "../models/locationModel.js";
 
 export const GetLocations = async (req, res) => {
     try {
@@ -22,11 +22,11 @@ export const GetLocations = async (req, res) => {
 
 export const CreateLocation = async (req, res) => {
     try {
-        const { country, property_id, county, city_town, latitude, longitude, address, location_description } = req.body;
+        const { country, apartment_id, county, city_town, latitude, longitude, address, location_description } = req.body;
 
         const create = await Location.create({
            country,
-           property_id, 
+           apartment_id, 
            county, 
            city_town, 
            latitude, 

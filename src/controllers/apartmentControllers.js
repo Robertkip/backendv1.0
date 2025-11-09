@@ -4,6 +4,8 @@ import path from "path";
 import { Op } from "sequelize";
 import axios from "axios";
 import NodeGeocoder from "node-geocoder";
+
+import { sequelize } from "../config/connectDb.js";
 import Apartment from "../models/apartmentModel.js";
 
 dotenv.config();
@@ -51,18 +53,57 @@ const getPagingData = (data, page, limit) => {
   return { totalItems, apartments, totalPages, currentPage };
 };
 
+
 export const getAllApartments = async (req, res) => {
-  const { page, size } = req.query;
-  const { limit, offset } = getPagination(page, size);
-  await Apartment.findAndCountAll(
-    {
-    limit,
-    offset,
+  try {
+    const { page, size } = req.query;
+    const { limit, offset } = getPagination(page, size);
+
+    const query = `
+      SELECT 
+        a.*,
+        f.first_image, f.second_image, f.third_image, f.fourth_image, f.video_path,
+        l.country, l.county, l.city_town, l.latitude, l.longitude, l.address,
+        p.number_of_units, p.number_of_one_bd, p.number_of_two_bd, p.number_of_three_bd
+      FROM rental_apartments a
+      LEFT JOIN apartment_files f ON a.id = f.apartment_id
+      LEFT JOIN apartment_locations l ON a.id = l.apartment_id
+      LEFT JOIN apartment_properties p ON a.id = p.apartment_id
+      ORDER BY a.id DESC
+      LIMIT :limit OFFSET :offset
+    `;
+
+    const countQuery = `
+      SELECT COUNT(DISTINCT a.id) as total
+      FROM rental_apartments a
+      LEFT JOIN apartment_files f ON a.id = f.apartment_id
+      LEFT JOIN apartment_locations l ON a.id = l.apartment_id
+      LEFT JOIN apartment_properties p ON a.id = p.apartment_id
+    `;
+
+    const [results, [countResult]] = await Promise.all([
+      sequelize.query(query, {
+        replacements: { limit, offset },
+        type: sequelize.QueryTypes.SELECT
+      }),
+      sequelize.query(countQuery, {
+        type: sequelize.QueryTypes.SELECT
+      })
+    ]);
+
+    const totalItems = countResult.total;
+    const response = {
+      totalItems,
+      apartments: results,
+      totalPages: Math.ceil(totalItems / limit),
+      currentPage: page ? +page : 0
+    };
+
+    return res.status(200).json(response);
+  } catch (error) {
+    console.error("SQL Error:", error);
+    return res.status(500).json({ message: "Server error", error: error.message });
   }
-  ).then((data) => {
-    // const response = getPagingData(data, page, limit);
-    return res.status(200).send(data);
-  });
 };
 
 // export const getAllApartments = async (req, res) => {

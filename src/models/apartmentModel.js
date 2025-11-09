@@ -21,52 +21,25 @@ const Apartment = sequelize.define("rental_apartment", {
   apartment_description: {
     type: DataTypes.TEXT,
   },
-  type1: {
-    type: DataTypes.STRING,
+  createdAt: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
+    allowNull: true,
   },
-  name1: {
-    type: DataTypes.STRING,
-  },
-  data1: {
-    type: DataTypes.BLOB,
-  },
-  type2: {
-    type: DataTypes.STRING,
-  },
-  name2: {
-    type: DataTypes.STRING,
-  },
-  data2: {
-    type: DataTypes.BLOB,
-  },
-  type3: {
-    type: DataTypes.STRING,
-  },
-  name3: {
-    type: DataTypes.STRING,
-  },
-  data3: {
-    type: DataTypes.BLOB,
-  },
-  type4: {
-    type: DataTypes.STRING,
-  },
-  name4: {
-    type: DataTypes.STRING,
-  },
-  data4: {
-    type: DataTypes.BLOB,
+  updateAt: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
+    allowNull: true,
   },
 });
 
 export default Apartment;
 
-Apartment.associations = (models) => {
-  Apartment.belongsTo(Landlord, {
-    foreignKey: "landlord_id",
-  });
-  Apartment.belongsTo(Agent, {
-    foreignKey: "logent_id",
-  });
-  return Apartment;
+Apartment.associate = (models) => {
+  Apartment.belongsTo(models.Landlord, { foreignKey: "landlord_id" });
+  Apartment.belongsTo(models.Agent, { foreignKey: "agent_id" }); // Fixed typo
+  Apartment.hasOne(models.ApartmentFiles, { foreignKey: "apartment_id", as: "files" });
+  Apartment.hasOne(models.Location, { foreignKey: "apartment_id", as: "location" });
+  Apartment.hasOne(models.ApartmentProperties, { foreignKey: "apartment_id", as: "properties" });
 };
+
