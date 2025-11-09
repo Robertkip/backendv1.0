@@ -54,9 +54,10 @@ import connectDB from "./src/config/connectMongo.js";
 import { runMigrations } from "./src/config/connectDb.js";
 import options from "./swagger-output.json" assert { type: "json" };
 
-const __filename = url.fileURLToPath(import.meta.url);
+const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-console.log(__dirname);
+const projectRoot = path.resolve(__dirname, "../"); // adjust if server.js is in src/
+const uploadDir = path.join(projectRoot, "Images");
 
 const PROTO_PATH = path.join(__dirname, "./proto/post.proto");
 

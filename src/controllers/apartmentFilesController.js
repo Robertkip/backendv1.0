@@ -9,11 +9,16 @@ import fs from "fs";
 dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const __basedir = __dirname;
+
+const projectRoot = path.resolve(__dirname, "../../");
 const PRODUCTION_IMAGE_ADDRESS = process.env.PRODUCTION_IMAGE_URL;
 const DEVELOPMENT_IMAGE_URL = process.env.DEVELOPMENT_IMAGE_URL;
 
-const uploadDir = path.join(__basedir, "Images");
+const uploadDir = path.join(projectRoot, "Images");
+
+
+console.log("Serving static from✅✅✅:", uploadDir);
+
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
