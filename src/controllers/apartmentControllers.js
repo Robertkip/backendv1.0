@@ -20,6 +20,8 @@ export const uploadApartment = async (req, res) => {
         apartment_name: req.body.apartment_name,
         apartment_location: req.body.apartment_location,
         apartment_description: req.body.apartment_description,
+        apartment_slug: req.body.apartment_slug,
+        rent_amount: req.body.rent_amount,
         address: req.body.address,
         agent_id: req.body.agent_id
       });
@@ -159,11 +161,13 @@ export const updateApartment = async (req, res, next) => {
   const {
     apartment_name,
     apartment_location,
+    apartment_slug,
+    rent_amount,
     apartment_description,
     agent_id,
   } = req.body;
   await Apartment.update(
-    { apartment_name, apartment_location, apartment_description, agent_id },
+    { apartment_name, apartment_location, apartment_slug, rent_amount, apartment_description, agent_id },
     { where: { id: p_id } }
   )
     .then(() => {

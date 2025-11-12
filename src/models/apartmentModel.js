@@ -18,6 +18,13 @@ const Apartment = sequelize.define("rental_apartment", {
   apartment_type: {
     type: DataTypes.STRING
   },
+  apartment_slug: {
+    type: DataTypes.STRING,
+    unique: true,
+  },
+  rent_amount: {
+    type: DataTypes.FLOAT,
+  },
   apartment_description: {
     type: DataTypes.TEXT,
   },
