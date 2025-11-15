@@ -2,6 +2,7 @@ import { DataTypes } from "sequelize";
 import { sequelize } from "../config/connectDb.js";
 import UserProfile from "./userProfileModel.js";
 import Like from "./likeModel.js";
+import Comment from "./commentModel.js";
 
 const Post = sequelize.define('posts', {
   id: {
@@ -46,6 +47,12 @@ const Post = sequelize.define('posts', {
     defaultValue: DataTypes.NOW,
   },
 });
+
+Post.hasMany(Comment, {
+  foreignKey: "postId",
+  as: "comments"
+});
+
 
 export default Post;
 

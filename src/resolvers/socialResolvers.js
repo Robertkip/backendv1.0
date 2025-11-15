@@ -6,60 +6,69 @@ import { v4 as uuidv4 } from 'uuid';
 
 const socialResolvers = {
   Query: {
-    getPosts: async (_, __, { user, roleId }) => {
-      if (!user || !roleId) throw new Error('Unauthorized');
-      const posts = await sequelize.query(
-        `
-        SELECT p.*, up.user_fname, up.user_lname, up.user_avatar
-        FROM "posts" p
-        JOIN "userprofiles" up ON p."authorId" = up."userId"
-        ORDER BY p."createdAt" DESC
-        `,
-        { type: QueryTypes.SELECT }
-      );
-      return Promise.all(
-        posts.map(async (post) => ({
-          ...post,
-          author: {
-            userId: post.authorId,
-            user_fname: post.user_fname,
-            user_lname: post.user_lname,
-            user_avatar: post.user_avatar,
-          },
-          likes: await sequelize.query(
-            `
-            SELECT up.* FROM "userprofiles" up
-            JOIN "Likes" l ON up."userId" = l."userId"
-            WHERE l."postId" = :postId
-            `,
-            { replacements: { postId: post.id }, type: QueryTypes.SELECT }
-          ),
-          comments: await Comment.findAll({
-            where: { postId: post.id },
-            include: [UserProfile],
-          }),
-          likeCount: (
+  getPosts: async (_, __, { user, roleId }) => {
+  if (!user || !roleId) throw new Error('Unauthorized');
+
+  const posts = await sequelize.query(
+    `
+    SELECT p.*, up.user_fname, up.user_lname, up.user_avatar
+    FROM "posts" p
+    JOIN "userprofiles" up ON p."authorId" = up."id"
+    ORDER BY p."createdAt" DESC
+    `,
+    { type: QueryTypes.SELECT }
+  );
+
+  return Promise.all(
+    posts.map(async (post) => ({
+      ...post,
+      author: {
+        userId: post.authorId,
+        user_fname: post.user_fname,
+        user_lname: post.user_lname,
+        user_avatar: post.user_avatar,
+      },
+    likes: await sequelize.query(
+  `
+  SELECT up.*
+  FROM "userprofiles" up
+  JOIN "likes" l ON up."userId" = l."userId"
+  WHERE l."postId" = :postId
+  `,
+  { replacements: { postId: post.id }, type: QueryTypes.SELECT }
+),
+      likeCount: (
+        await sequelize.query(
+          `SELECT COUNT(*) as count FROM "likes" WHERE "postId" = :postId`,
+          { replacements: { postId: post.id }, type: QueryTypes.SELECT }
+        )
+      )[0].count,
+    comments: await Comment.findAll({
+  where: { postId: post.id },
+  include: [
+    {
+      model: UserProfile,
+      as: "author"
+    }
+  ]
+}),
+
+      originalPost: post.originalPostId
+        ? (
             await sequelize.query(
-              `SELECT COUNT(*) as count FROM "Likes" WHERE "postId" = :postId`,
-              { replacements: { postId: post.id }, type: QueryTypes.SELECT }
+              `
+              SELECT p.*, up.user_fname, up.user_lname, up.user_avatar
+              FROM "posts" p
+              JOIN "userprofiles" up ON p."authorId" = up."id"
+              WHERE p.id = :id
+              `,
+              { replacements: { id: post.originalPostId }, type: QueryTypes.SELECT }
             )
-          )[0].count,
-          originalPost: post.originalPostId
-            ? (
-                await sequelize.query(
-                  `
-                  SELECT p.*, up.user_fname, up.user_lname, up.user_avatar
-                  FROM "posts" p
-                  JOIN "userprofiles" up ON p."authorId" = up."userId"
-                  WHERE p.id = :id
-                  `,
-                  { replacements: { id: post.originalPostId }, type: QueryTypes.SELECT }
-                )
-              )[0]
-            : null,
-        }))
-      );
-    },
+          )[0]
+        : null,
+    }))
+  );
+},
     getPost: async (_, { id }, { user, roleId }) => {
       if (!user || !roleId) throw new Error('Unauthorized');
       const [post] = await sequelize.query(
@@ -232,10 +241,16 @@ createPost: async (_, { content, imageUrl, videoUrl, originalPostId }, { user, r
           `,
           { replacements: { postId }, type: QueryTypes.SELECT }
         ),
-        comments: await Comment.findAll({
-          where: { postId },
-          include: [UserProfile],
-        }),
+     comments: await Comment.findAll({
+  where: { postId },
+  include: [
+    {
+      model: UserProfile,
+      as: "author"
+    }
+  ]
+}),
+
         likeCount: (
           await sequelize.query(
             `SELECT COUNT(*) as count FROM "Likes" WHERE "postId" = :postId`,
@@ -292,10 +307,16 @@ createPost: async (_, { content, imageUrl, videoUrl, originalPostId }, { user, r
           `,
           { replacements: { postId }, type: QueryTypes.SELECT }
         ),
-        comments: await Comment.findAll({
-          where: { postId },
-          include: [UserProfile],
-        }),
+      comments: await Comment.findAll({
+  where: { postId },
+  include: [
+    {
+      model: UserProfile,
+      as: "author"
+    }
+  ]
+}),
+
         likeCount: (
           await sequelize.query(
             `SELECT COUNT(*) as count FROM "Likes" WHERE "postId" = :postId`,

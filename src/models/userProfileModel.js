@@ -3,6 +3,7 @@ import { DataTypes } from "sequelize";
 import User from "./authModel.js";
 import Like from "./likeModel.js";
 import Post from "./postModel.js";
+import Comment from "./commentModel.js";
 
 const UserProfile = sequelize.define(
   "userprofile",
@@ -63,6 +64,13 @@ UserProfile.belongsToMany(Post, {
   through: Like,
   foreignKey: "userId",
 });
+
+UserProfile.hasMany(Comment, {
+  foreignKey: "authorId",
+  as: "comments"
+});
+
+Comment.belongsTo(UserProfile, { foreignKey: "authorId", as: "author" });
 
 Post.belongsTo(UserProfile, {
   foreignKey: "authorId",
