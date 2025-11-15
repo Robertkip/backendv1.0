@@ -150,60 +150,52 @@ const socialResolvers = {
     },
   },
   Mutation: {
-    createPost: async (_, { content, imageUrl, videoUrl, originalPostId }, { user, roleId }) => {
-      if (!user || !roleId) throw new Error('Unauthorized');
-      if (!content && !imageUrl && !videoUrl && !originalPostId) {
-        throw new Error('Post must have content, image, video, or be a share');
-      }
-      if (videoUrl && imageUrl) {
-        throw new Error('Post cannot have both image and video');
-      }
-      const postId = uuidv4();
-      const [post] = await sequelize.query(
-        `
-        INSERT INTO "posts" ("id", "content", "imageUrl", "videoUrl", "authorId", "originalPostId", "createdAt")
-        VALUES (:id, :content, :imageUrl, :videoUrl, :authorId, :originalPostId, NOW())
-        RETURNING *
-        `,
-        {
-          replacements: {
-            id: postId,
-            content: content || null,
-            imageUrl: imageUrl || null,
-            videoUrl: videoUrl || null,
-            authorId: user.id,
-            originalPostId: originalPostId || null,
-          },
-          type: QueryTypes.INSERT,
-        }
-      );
-      const [author] = await sequelize.query(
-        `
-        SELECT * FROM "userprofiles" WHERE "userId" = :userId
-        `,
-        { replacements: { userId: user.id }, type: QueryTypes.SELECT }
-      );
-      return {
-        ...post,
-        author,
-        likes: [],
-        comments: [],
-        likeCount: 0,
-        originalPost: post.originalPostId
-          ? (
-              await sequelize.query(
-                `
-                SELECT p.*, up.user_fname, up.user_lname, up.user_avatar
-                FROM "posts" p
-                JOIN "userprofiles" up ON p."authorId" = up."userId"
-                WHERE p.id = :id
-                `,
-                { replacements: { id: post.originalPostId }, type: QueryTypes.SELECT }
-              )
-            )[0]
-            : null,
-      };
-    },
+createPost: async (_, { content, imageUrl, videoUrl, originalPostId }, { user, roleId }) => {
+  if (!user || !roleId) throw new Error('Unauthorized');
+
+  // Fetch the user's profile first
+  const userProfile = await UserProfile.findOne({ where: { userId: user.id } });
+  if (!userProfile) throw new Error('User profile not found');
+
+  if (!content && !imageUrl && !videoUrl && !originalPostId) {
+    throw new Error('Post must have content, image, video, or be a share');
+  }
+  if (videoUrl && imageUrl) {
+    throw new Error('Post cannot have both image and video');
+  }
+
+  const postId = uuidv4();
+  const [result] = await sequelize.query(
+    `
+    INSERT INTO "posts" ("id", "content", "imageUrl", "videoUrl", "authorId", "originalPostId", "createdAt")
+    VALUES (:id, :content, :imageUrl, :videoUrl, :authorId, :originalPostId, NOW())
+    RETURNING *
+    `,
+    {
+      replacements: {
+        id: postId,
+        content: content || null,
+        imageUrl: imageUrl || null,
+        videoUrl: videoUrl || null,
+        authorId: userProfile.id,
+        originalPostId: originalPostId || null,
+      },
+      type: QueryTypes.INSERT,
+    }
+  );
+
+  const post = result[0];
+
+  return {
+    ...post,
+    author: userProfile,
+    likes: [],
+    comments: [],
+    likeCount: 0,
+    originalPost: null,
+  };
+},
+
     likePost: async (_, { postId }, { user, roleId }) => {
       if (!user || !roleId) throw new Error('Unauthorized');
       await sequelize.query(

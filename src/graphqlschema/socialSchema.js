@@ -2,6 +2,15 @@ import { gql } from 'apollo-server-express';
 
 const socialTypeDefs = gql`
 
+  # --- USER PROFILE TYPE (IMPORTANT!) ---
+  type UserProfile {
+    userId: ID!
+    user_fname: String
+    user_lname: String
+    user_avatar: String
+  }
+
+  # --- POST TYPE ---
   type Post {
     id: ID!
     content: String
@@ -15,6 +24,7 @@ const socialTypeDefs = gql`
     createdAt: String!
   }
 
+  # --- COMMENT TYPE ---
   type Comment {
     id: ID!
     content: String!
@@ -23,6 +33,7 @@ const socialTypeDefs = gql`
     createdAt: String!
   }
 
+  # --- QUERIES ---
   type Query {
     getPosts: [Post!]!
     getPost(id: ID!): Post
@@ -30,6 +41,7 @@ const socialTypeDefs = gql`
     getUserProfile(userId: ID!): UserProfile
   }
 
+  # --- MUTATIONS ---
   type Mutation {
     createPost(content: String, imageUrl: String, videoUrl: String, originalPostId: ID): Post!
     likePost(postId: ID!): Post!

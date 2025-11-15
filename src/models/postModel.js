@@ -41,6 +41,10 @@ const Post = sequelize.define('posts', {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW,
   },
+  updatedAt: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
+  },
 });
 
 export default Post;

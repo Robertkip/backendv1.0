@@ -4,73 +4,73 @@ import User from "./authModel.js";
 import Like from "./likeModel.js";
 import Post from "./postModel.js";
 
-const UserProfile = sequelize.define("userprofile", {
-  userId: {
-    type: DataTypes.INTEGER,
-  },
-  user_fname: {
+const UserProfile = sequelize.define(
+  "userprofile",
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    userId: {
+      type: DataTypes.INTEGER,
+    },
+    user_fname: DataTypes.STRING,
+    user_lname: DataTypes.STRING,
+    user_location: DataTypes.STRING,
+    user_phonenumber: DataTypes.BIGINT,
+    user_avatar: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: "https://api.waridi.co/images/userprofile.png",
+    },
     type: DataTypes.STRING,
-  },
-  user_lname: {
-    type: DataTypes.STRING,
-  },
-  user_location: {
-    type: DataTypes.STRING,
-  },
-  user_phonenumber: {
-    type: DataTypes.BIGINT,
-  },
-  user_avatar: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    defaultValue: 'https://api.waridi.co/images/userprofile.png',
-  },
-  type: {
-    type: DataTypes.STRING,
-  },
 
-  followers: {
-    type: DataTypes.ARRAY(DataTypes.INTEGER),
-    defaultValue: [],
-    allowNull: true,
+    followers: {
+      type: DataTypes.ARRAY(DataTypes.INTEGER),
+      defaultValue: [],
+    },
+    following: {
+      type: DataTypes.ARRAY(DataTypes.INTEGER),
+      defaultValue: [],
+    },
+    pendingConnections: {
+      type: DataTypes.ARRAY(DataTypes.INTEGER),
+      defaultValue: [],
+    },
+    acceptedConnections: {
+      type: DataTypes.ARRAY(DataTypes.INTEGER),
+      defaultValue: [],
+    },
+    rejectedConnections: {
+      type: DataTypes.ARRAY(DataTypes.INTEGER),
+      defaultValue: [],
+    },
   },
-  following: {
-    type: DataTypes.ARRAY(DataTypes.INTEGER),
-    defaultValue: [],
-    allowNull: true,
-  },
-
-  pendingConnections: {
-    type: DataTypes.ARRAY(DataTypes.INTEGER),
-    defaultValue: [],
-    allowNull: true,
-  },
-  acceptedConnections: {
-    type: DataTypes.ARRAY(DataTypes.INTEGER),
-    defaultValue: [],
-    allowNull: true,
-  },
-  rejectedConnections: {
-    type: DataTypes.ARRAY(DataTypes.INTEGER),
-    defaultValue: [],
-    allowNull: true,
+  {
+    tableName: "userprofiles",  // EXACT table name
+    freezeTableName: true,      // DO NOT pluralize/capitalize
+    timestamps: true,
   }
+);
+
+// Correct associations
+UserProfile.belongsTo(User, { foreignKey: "userId" });
+
+UserProfile.hasMany(Post, { foreignKey: "authorId" });
+
+UserProfile.belongsToMany(Post, {
+  through: Like,
+  foreignKey: "userId",
 });
 
+Post.belongsTo(UserProfile, {
+  foreignKey: "authorId",
+});
 
-UserProfile.associations = (models) => {
-  UserProfile.belongsTo(User, {
-    foreignKey: "userId",
-  });
-  return UserProfile;
-};
+Post.belongsToMany(UserProfile, {
+  through: Like,
+  foreignKey: "postId",
+});
 
 export default UserProfile;
-
-
-UserProfile.hasMany(Post, { foreignKey: 'authorId' });
-UserProfile.belongsToMany(Post, { through: Like, foreignKey: 'userId' });
-
-Post.belongsTo(UserProfile, { foreignKey: 'authorId' });
-
-Post.belongsToMany(UserProfile, { through: Like, foreignKey: 'postId' });

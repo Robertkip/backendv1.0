@@ -1,29 +1,28 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../config/connectDb.js";
-import UserProfile from "./userProfileModel.js";
-import Post from "./postModel.js";
 
-const Like = sequelize.define('likes', {
-  userId: {
-    type: DataTypes.INTEGER,
-    references: {
-      model: 'userprofiles',
-      key: 'id',
+const Like = sequelize.define(
+  "like",
+  {
+    id: {
+      type: DataTypes.UUID,
+      primaryKey: true,
+      defaultValue: DataTypes.UUIDV4,
     },
-    primaryKey: true,
-  },
-  postId: {
-    type: DataTypes.UUID,
-    references: {
-      model: Post,
-      key: 'id',
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
     },
-    primaryKey: true,
+    postId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+    },
   },
-  createdAt: {
-    type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW,
-  },
-});
+  {
+    tableName: "likes",
+    freezeTableName: true,     // <-- ADD THIS
+    timestamps: true,
+  }
+);
 
 export default Like;

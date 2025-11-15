@@ -70,20 +70,25 @@ connectDB();
 
 app.use(cors());
 app.use(express.json());
-app.use('/graphql', graphqlUploadExpress());
 
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  context: ({ req }) => {
-    return {
-      user: req.user,
-    };
-  },
+  uploads: false,
+  context: ({ req }) => ({
+    user: req.user,
+    roleId: req.res?.locals?.roleId,
+  }),
 });
 
+app.use('/graphql', Authenticated);
+
+app.use(graphqlUploadExpress());
+
+// Start Apollo
 await server.start();
 server.applyMiddleware({ app });
+
 
 global.__basedir = __dirname;
 console.log(__basedir);
