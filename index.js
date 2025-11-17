@@ -40,8 +40,9 @@ import facilitiesRouter from "./src/routers/facilitiesRoute.js"
 import propertyFacilitiesRouter from "./src/routers/propertyFacilitiesRoute.js"
 import propertyFilesRouter from "./src/routers/propertyFilesRoute.js"
 import propertyLocationRouter from "./src/routers/propertyLocationRoute.js"
-import apartmentLocationRouter from "./src/routers/locationRoute.js"
-import propertyPropertiesRouter from "./src/routers/propertyPropertiesRoute.js"
+import apartmentLocationRouter from "./src/routers/locationRoute.js";
+import propertyPropertiesRouter from "./src/routers/propertyPropertiesRoute.js";
+import postMediaRouter from "./src/routers/postMediaRouter.js";
 import { initPassport } from "./src/middlewares/initPassport.js";
 import notificationRouter from "./src/routers/notifyRoute.js";
 import User from "./src/models/authModel.js";
@@ -81,13 +82,6 @@ const server = new ApolloServer({
   }),
 });
 
-app.use('/graphql', Authenticated);
-
-app.use(graphqlUploadExpress());
-
-// Start Apollo
-await server.start();
-server.applyMiddleware({ app });
 
 
 global.__basedir = __dirname;
@@ -124,8 +118,8 @@ const postProto = grpc.loadPackageDefinition(packageDefinition).post;
 const grpcserver = new grpc.Server();
 
 grpcserver.addService(postProto.PostService.service, {
-  CreatePost: createPost,     // ✅ directly pass the controller
-  GetTimeline: getTimeline,   // ✅ directly pass the controller
+  CreatePost: createPost,
+  GetTimeline: getTimeline,
 });
 
 
@@ -193,6 +187,7 @@ app.use("/api/v1", tenantRouter);
 app.use("/api/v1", agentRouter);
 app.use("/api/v1", marketRouter);
 app.use("/api/v1", roleRouter);
+app.use("/api/v1/posts", postMediaRouter);
 app.use("/api/v1", apartmentFilesRouter);
 app.use("/api/v1", apartmentPropertiesRouter);
 app.use("/api/v1", facilitiesRouter);
@@ -210,6 +205,15 @@ app.use("/api/v1", notificationRouter);
 app.use("/api/v1", messageRouter);
 app.use("/api/v1", propertyRouter);
 app.use("/api/v1", geoLocationRouter);
+
+
+app.use('/graphql', Authenticated);
+
+app.use(graphqlUploadExpress());
+
+// Start Apollo
+await server.start();
+server.applyMiddleware({ app });
 
 const httpServer = http.createServer(app);
 
