@@ -122,30 +122,32 @@ const socialResolvers = {
             : null,
       };
     },
-    getComments: async (_, { postId }, { user, roleId }) => {
-      if (!user || !roleId) throw new Error('Unauthorized');
-      return await sequelize.query(
-        `
-        SELECT c.*, up.user_fname, up.user_lname, up.user_avatar
-        FROM "Comments" c
-        JOIN "userprofiles" up ON c."authorId" = up."userId"
-        WHERE c."postId" = :postId
-        ORDER BY c."createdAt" DESC
-        `,
-        { replacements: { postId }, type: QueryTypes.SELECT }
-      ).then(comments =>
-        comments.map(c => ({
-          ...c,
-          author: {
-            userId: c.authorId,
-            user_fname: c.user_fname,
-            user_lname: c.user_lname,
-            user_avatar: c.user_avatar,
-          },
-          post: { id: c.postId },
-        }))
-      );
-    },
+getComments: async (_, { postId }, { user, roleId }) => {
+  if (!user || !roleId) throw new Error('Unauthorized');
+
+  return await sequelize.query(
+    `
+    SELECT c.*, up.user_fname, up.user_lname, up.user_avatar
+    FROM "comments" c
+    JOIN "userprofiles" up ON c."authorId" = up."id"
+    WHERE c."postId" = :postId
+    ORDER BY c."createdAt" DESC
+    `,
+    { replacements: { postId }, type: QueryTypes.SELECT }
+  ).then(comments =>
+    comments.map(c => ({
+      ...c,
+      author: {
+        userId: c.authorId,
+        user_fname: c.user_fname,
+        user_lname: c.user_lname,
+        user_avatar: c.user_avatar,
+      },
+      post: { id: c.postId },
+    }))
+  );
+},
+
     getUserProfile: async (_, { userId }, { user, roleId }) => {
       if (!user || !roleId) throw new Error('Unauthorized');
       const [profile] = await sequelize.query(
@@ -205,73 +207,91 @@ createPost: async (_, { content, imageUrl, videoUrl, originalPostId }, { user, r
   };
 },
 
-    likePost: async (_, { postId }, { user, roleId }) => {
-      if (!user || !roleId) throw new Error('Unauthorized');
-      await sequelize.query(
-        `
-        INSERT INTO "Likes" ("userId", "postId", "createdAt")
-        VALUES (:userId, :postId, NOW())
-        ON CONFLICT DO NOTHING
-        `,
-        { replacements: { userId: user.id, postId }, type: QueryTypes.INSERT }
-      );
-      const [post] = await sequelize.query(
-        `
-        SELECT p.*, up.user_fname, up.user_lname, up.user_avatar
-        FROM "posts" p
-        JOIN "userprofiles" up ON p."authorId" = up."userId"
-        WHERE p.id = :id
-        `,
-        { replacements: { id: postId }, type: QueryTypes.SELECT }
-      );
-      if (!post) throw new Error('Post not found');
-      return {
-        ...post,
-        author: {
-          userId: post.authorId,
-          user_fname: post.user_fname,
-          user_lname: post.user_lname,
-          user_avatar: post.user_avatar,
-        },
-        likes: await sequelize.query(
-          `
-          SELECT up.* FROM "userprofiles" up
-          JOIN "Likes" l ON up."userId" = l."userId"
-          WHERE l."postId" = :postId
-          `,
-          { replacements: { postId }, type: QueryTypes.SELECT }
-        ),
-     comments: await Comment.findAll({
-  where: { postId },
-  include: [
-    {
-      model: UserProfile,
-      as: "author"
-    }
-  ]
-}),
+ likePost: async (_, { postId }, { user, roleId }) => {
+  if (!user || !roleId) throw new Error('Unauthorized');
 
-        likeCount: (
-          await sequelize.query(
-            `SELECT COUNT(*) as count FROM "Likes" WHERE "postId" = :postId`,
-            { replacements: { postId }, type: QueryTypes.SELECT }
-          )
-        )[0].count,
-        originalPost: post.originalPostId
-          ? (
-              await sequelize.query(
-                `
-                SELECT p.*, up.user_fname, up.user_lname, up.user_avatar
-                FROM "posts" p
-                JOIN "userprofiles" up ON p."authorId" = up."userId"
-                WHERE p.id = :id
-                `,
-                { replacements: { id: post.originalPostId }, type: QueryTypes.SELECT }
-              )
-            )[0]
-            : null,
-      };
+// 1. Get the user profile
+const profile = await UserProfile.findOne({ where: { userId: user.id } });
+if (!profile) throw new Error("User profile not found");
+
+// 2. Insert like using profile.id
+await sequelize.query(
+  `
+  INSERT INTO "likes" ("userId", "postId", "createdAt", "updatedAt")
+  VALUES (:userId, :postId, NOW(), NOW())
+  ON CONFLICT DO NOTHING
+  `,
+  { replacements: { userId: profile.id, postId }, type: QueryTypes.INSERT }
+);
+
+  // Fetch post with correct join key
+  const [post] = await sequelize.query(
+    `
+    SELECT p.*, up.user_fname, up.user_lname, up.user_avatar
+    FROM "posts" p
+    JOIN "userprofiles" up ON p."authorId" = up."id"
+    WHERE p.id = :id
+    `,
+    { replacements: { id: postId }, type: QueryTypes.SELECT }
+  );
+
+  if (!post) throw new Error("Post not found");
+
+  // Fetch likes
+  const likes = await sequelize.query(
+    `
+    SELECT up.*
+    FROM "userprofiles" up
+    JOIN "likes" l ON up."userId" = l."userId"
+    WHERE l."postId" = :postId
+    `,
+    { replacements: { postId }, type: QueryTypes.SELECT }
+  );
+
+  // Count likes
+  const [{ count }] = await sequelize.query(
+    `SELECT COUNT(*) AS count FROM "likes" WHERE "postId" = :postId`,
+    { replacements: { postId }, type: QueryTypes.SELECT }
+  );
+
+  return {
+    ...post,
+    author: {
+      userId: post.authorId,
+      user_fname: post.user_fname,
+      user_lname: post.user_lname,
+      user_avatar: post.user_avatar
     },
+    likes,
+    comments: await Comment.findAll({
+      where: { postId },
+      include: [
+        {
+          model: UserProfile,
+          as: "author"
+        }
+      ]
+    }),
+    likeCount: count,
+    originalPost: post.originalPostId
+      ? (
+          await sequelize.query(
+            `
+            SELECT p.*, up.user_fname, up.user_lname, up.user_avatar
+            FROM "posts" p
+            JOIN "userprofiles" up ON p."authorId" = up."id"
+            WHERE p.id = :id
+            `,
+            {
+              replacements: { id: post.originalPostId },
+              type: QueryTypes.SELECT
+            }
+          )
+        )[0]
+      : null
+  };
+},
+
     unlikePost: async (_, { postId }, { user, roleId }) => {
       if (!user || !roleId) throw new Error('Unauthorized');
       await sequelize.query(
@@ -338,32 +358,55 @@ createPost: async (_, { content, imageUrl, videoUrl, originalPostId }, { user, r
             : null,
       };
     },
-    createComment: async (_, { postId, content }, { user, roleId }) => {
-      if (!user || !roleId) throw new Error('Unauthorized');
-      const commentId = uuidv4();
-      const [comment] = await sequelize.query(
-        `
-        INSERT INTO "Comments" ("id", "content", "authorId", "postId", "createdAt")
-        VALUES (:id, :content, :authorId, :postId, NOW())
-        RETURNING *
-        `,
-        {
-          replacements: { id: commentId, content, authorId: user.id, postId },
-          type: QueryTypes.INSERT,
-        }
-      );
-      const [author] = await sequelize.query(
-        `
-        SELECT * FROM "userprofiles" WHERE "userId" = :userId
-        `,
-        { replacements: { userId: user.id }, type: QueryTypes.SELECT }
-      );
-      return {
-        ...comment,
-        author,
-        post: { id: postId },
-      };
-    },
+createComment: async (_, { postId, content }, { user, roleId }) => {
+  if (!user || !roleId) throw new Error('Unauthorized');
+
+  const commentId = uuidv4();
+
+  // 1. Get profile
+  const [profileRows] = await sequelize.query(
+    `
+    SELECT * FROM "userprofiles"
+    WHERE "userId" = :userId
+    `,
+    {
+      replacements: { userId: user.id },
+      type: QueryTypes.SELECT
+    }
+  );
+
+  const profile = profileRows ?? profileRows[0];
+  if (!profile) throw new Error("User profile not found");
+
+  // 2. Insert comment
+  const [rows] = await sequelize.query(
+    `
+    INSERT INTO "comments" 
+      ("id", "content", "authorId", "postId", "createdAt", "updatedAt")
+    VALUES 
+      (:id, :content, :authorId, :postId, NOW(), NOW())
+    RETURNING *
+    `,
+    {
+      replacements: {
+        id: commentId,
+        content,
+        authorId: profile.id,
+        postId
+      },
+      type: QueryTypes.INSERT,
+    }
+  );
+
+  const comment = rows[0];  // <-- THIS IS THE FIX
+
+  return {
+    ...comment,
+    author: profile,
+    post: { id: postId }
+  };
+},
+
   },
 };
 
