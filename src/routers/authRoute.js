@@ -21,7 +21,7 @@ import * as authController from "../controllers/authController.js";
 
 const router = express.Router();
 
-const CLIENT_URL = "https://api.waridi.co/";
+const CLIENT_URL = "https://api.waridi.org/";
 
 router.post("/signup", Signup);
 router.post("/signin", Signin);

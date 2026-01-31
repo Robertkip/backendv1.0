@@ -48,7 +48,7 @@ const userResolvers = {
         stream.pipe(writeStream).on("finish", resolve).on("error", reject)
       );
   
-      const imageUrl = `https://api.waridi.co/${filePath}`;
+      const imageUrl = `https://api.waridi.org/${filePath}`;
   
       // 🔥 Update user profile avatar
       const profile = await UserProfile.findOne({ where: { userId } });

@@ -10,7 +10,7 @@ export const registerLandlord = async (req, res) => {
     const landlord_phonenumber = req.body.landlord_phonenumber;
     const landlord_idno = req.body.landlord_idno;
     const landlord_location = req.body.landlord_location;
-    const landlord_avatar = "https://api.waridi.co/" + req.file.filename;
+    const landlord_avatar = "https://api.waridi.org/" + req.file.filename;
 
     const landlord = await Landlord.findOne({where: { [Op.or]: [{landlord_idno}, {landlord_phonenumber}]}})
 

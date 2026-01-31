@@ -13,7 +13,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "https://api.waridi.co/api/v1/google/callback",
+      callbackURL: "https://api.waridi.org/api/v1/google/callback",
     },
     function (accessToken, refreshToken, profile, done) {
       console.log(profile);
@@ -27,7 +27,7 @@ passport.use(
     {
       clientID: FACEBOOK_ID,
       clientSecret: FACEBOOK_SECRET,
-      callbackURL: "https://api.waridi.co/api/v1/facebook/callback",
+      callbackURL: "https://api.waridi.org/api/v1/facebook/callback",
     },
     function (accessToken, refreshToken, profile, done) {
       console.log(profile);

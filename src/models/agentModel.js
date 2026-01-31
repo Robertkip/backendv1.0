@@ -11,7 +11,7 @@ const Agent = sequelize.define("agents", {
     type: DataTypes.STRING,
   },
   agent_lname: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
   },
   agent_phonenumber: {
     type: DataTypes.STRING,
