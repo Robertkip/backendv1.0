@@ -10,7 +10,6 @@ import Apartment from "../models/apartmentModel.js";
 
 dotenv.config();
 
-/* ----------------------------- PATH SETUP ----------------------------- */
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -25,8 +24,6 @@ const BASE_IMAGE_URL =
   process.env.NODE_ENV === "development"
     ? process.env.DEVELOPMENT_IMAGE_URL
     : process.env.PRODUCTION_IMAGE_URL;
-
-/* ----------------------------- MULTER SETUP ----------------------------- */
 
 const storage = multer.diskStorage({
   destination: (_, __, cb) => cb(null, UPLOAD_DIR),
@@ -46,8 +43,6 @@ export const upload = multer({
     cb(isValid ? null : new Error("Invalid file type"), isValid);
   },
 }).array("files", 2);
-
-/* ----------------------------- REGISTER AGENT ----------------------------- */
 
 export const registerAgent = async (req, res) => {
   try {
@@ -115,7 +110,6 @@ export const registerAgent = async (req, res) => {
   }
 };
 
-/* ----------------------------- GET ALL AGENTS ----------------------------- */
 
 export const getAllAgents = async (_, res) => {
   try {
@@ -126,7 +120,6 @@ export const getAllAgents = async (_, res) => {
   }
 };
 
-/* ----------------------------- GET AGENT BY ID ----------------------------- */
 
 export const getAgentById = async (req, res) => {
   try {
@@ -142,7 +135,6 @@ export const getAgentById = async (req, res) => {
   }
 };
 
-/* ----------------------------- GET AGENT BY USER ID ----------------------------- */
 
 export const getSingleAgent = async (req, res) => {
   try {
