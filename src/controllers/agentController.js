@@ -7,6 +7,8 @@ import { fileURLToPath } from "url";
 
 import Agent from "../models/agentModel.js";
 import Apartment from "../models/apartmentModel.js";
+import { sequelize } from "../config/connectDb.js";
+import User from "../models/authModel.js";
 
 dotenv.config();
 
@@ -152,7 +154,39 @@ export const getSingleAgent = async (req, res) => {
   }
 };
 
-/* ----------------------------- GET APARTMENTS BY AGENT ----------------------------- */
+
+export const getAgentByUserId = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+  const [agent] = await sequelize.query(
+  `
+  SELECT 
+    a.*,
+    u.id AS user_id,
+    u.email,
+    u."roleId" 
+  FROM agents a
+  INNER JOIN users u ON u.id = a."userId" -- Use "userId" with quotes for case sensitivity
+  WHERE a."userId" = :userId
+  LIMIT 1
+  `,
+  {
+    replacements: { userId },
+    type: sequelize.QueryTypes.SELECT,
+  }
+);
+    if (!agent) {
+      return res.status(404).json({
+        message: "Agent not found for this user",
+      });
+    }
+
+    return res.status(200).json(agent);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
 
 export const getAllApartmentsByAgent = async (req, res) => {
   try {

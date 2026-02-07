@@ -4,6 +4,8 @@ import UserProfile from './userProfileModel.js';
 import Post from './postModel.js';
 import Comment from './commentModel.js';
 import Like from './likeModel.js';
+import Agent from './agentModel.js';
+import Apartment from './apartmentModel.js';
 
 // Define associations
 User.hasOne(UserProfile, { foreignKey: 'userId' });
@@ -21,4 +23,10 @@ Post.belongsTo(Post, { as: 'originalPost', foreignKey: 'originalPostId' });
 UserProfile.belongsToMany(Post, { through: Like, foreignKey: 'userId' });
 Post.belongsToMany(UserProfile, { through: Like, foreignKey: 'postId' });
 
-export { sequelize, User, UserProfile, Post, Comment, Like };
+User.hasOne(Agent, { foreignKey: 'userId' });
+Agent.belongsTo(User, { foreignKey: 'userId' });
+
+Agent.hasMany(Apartment, { foreignKey: 'agentId', as: 'apartments' });
+Apartment.belongsTo(Agent, { foreignKey: 'agentId' });
+
+export { sequelize, User, UserProfile, Post, Comment, Like, Agent, Apartment };

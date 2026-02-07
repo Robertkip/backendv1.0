@@ -69,16 +69,3 @@ const Agent = sequelize.define("agents", {
 
 export default Agent;
 
-
-Agent.associations = (models) => {
-  Agent.belongsTo(User, {
-    foreignKey: "userId",
-  });
-
-  Agent.hasMany(Apartment, {
-    foreignKey: "id",
-    as: "apartments",
-  });
-
-  return Agent;
-};
