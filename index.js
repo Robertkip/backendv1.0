@@ -45,9 +45,12 @@ import propertyPropertiesRouter from "./src/routers/propertyPropertiesRoute.js";
 import postMediaRouter from "./src/routers/postMediaRouter.js";
 import { initPassport } from "./src/middlewares/initPassport.js";
 import notificationRouter from "./src/routers/notifyRoute.js";
+import rentPricingRouter from "./src/routers/rentalPriceRoute.js";
 import User from "./src/models/authModel.js";
 import { createPost, getTimeline } from "./src/controllers/postController.js";
 import Message from "./src/models/messageModel.js";
+import RentPricing from "./src/models/rentalPriceModel.js";
+import { sequelize } from "./src/config/connectDb.js";
 import resolvers from "./src/resolvers/index.js";
 import typeDefs from "./src/graphqlschema/index.js";
 import connectSocket from "./src/socket/ConnectSocket.js";
@@ -104,6 +107,9 @@ const redisClient = createClient({
   legacyMode: true, // Keep for connect-redis compatibility
 });
 redisClient.connect().catch(console.error);
+
+await sequelize.sync({ alter: true });
+
 
 const redisStore = new RedisStore({
   client: redisClient,
@@ -208,6 +214,7 @@ app.use("/api/v1", cartRouter);
 app.use("/api/v1/user", userProfileRouter);
 app.use("/api/v1", friendRequestRouter);
 app.use("/api/v1/token", notificationDeviceRouter);
+app.use("/api/v1", rentPricingRouter);
 app.use("/api/v1", ratingRouter);
 app.use("/api/v1", notificationRouter);
 app.use("/api/v1", messageRouter);

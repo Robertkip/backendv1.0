@@ -2,16 +2,16 @@ import { DataTypes } from "sequelize";
 import { sequelize } from "../config/connectDb.js";
 import Apartment from "./apartmentModel.js";
 
-const Facility = sequelize.define("rental_facilities", {
-    facility_name: {
+const RentPricing = sequelize.define("rent_pricing", {
+    unit_type: {
         type: DataTypes.STRING,
         allowNull: true,
     },
-    service_provider: {
+    rent_time_rate: {
         type: DataTypes.STRING,
         allowNull: true,
     },
-    provider_contact: {
+    unit_rent_price: {
         type: DataTypes.STRING,
         allowNull: true,
     },
@@ -29,12 +29,12 @@ const Facility = sequelize.define("rental_facilities", {
     },
 });
 
-export default Facility;
+export default RentPricing;
 
 
-Facility.associations = (models) => {
-    Facility.belongsTo(Apartment, {
+RentPricing.associations = (models) => {
+    RentPricing.belongsTo(Apartment, {
         foreignKey: "apartment_id",
     });
-    return Facility;
+    return RentPricing;
 };

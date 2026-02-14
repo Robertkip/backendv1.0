@@ -1,16 +1,16 @@
 import Facility from "../models/facilitiesModel.js";
 
-export const ApartmentFacility = async (req, res) => {
+export const ApartmentFacility = async(req, res) => {
     try {
         const apartmentProperties = await Facility.findAll({
-         where: {
-            active: true
-         }
+            where: {
+                active: true
+            }
         });
         return res.status(200).send({
-           status: 200,
-           message: 'OK',
-           data: apartmentProperties 
+            status: 200,
+            message: 'OK',
+            data: apartmentProperties
         })
     } catch (error) {
         return res.status(500).send({
@@ -20,19 +20,22 @@ export const ApartmentFacility = async (req, res) => {
     }
 }
 
-export const CreateApartmentFacility = async (req, res) => {
+export const CreateApartmentFacility = async(req, res) => {
     try {
-        const { facility_name, property_id } = req.body;
 
-        const create = await Facility.create({
-           facility_name,
-           property_id
+        const { facility_name, service_provider, provider_contact, apartment_id } = req.body;
+
+        const newFacility = await Facility.create({
+            facility_name,
+            service_provider,
+            provider_contact,
+            apartment_id
         });
 
         return res.status(201).send({
             status: 201,
             message: "Created",
-            data: create
+            data: newFacility
         });
     } catch (error) {
         return res.status(500).send({
@@ -42,11 +45,12 @@ export const CreateApartmentFacility = async (req, res) => {
     }
 }
 
-export const UpdateApartmentFacility = async (req, res) => {
+
+export const UpdateApartmentFacility = async(req, res) => {
     try {
         const { id } = req.params;
-  
-        const { facility_name } = req.body;
+
+        const { facility_name, service_provider, provider_contact, apartment_id } = req.body;
 
         const propertyFacitilities = await Facility.findByPk(id);
 
@@ -59,6 +63,9 @@ export const UpdateApartmentFacility = async (req, res) => {
         }
 
         propertyFacitilities.facility_name = facility_name;
+        propertyFacitilities.service_provider = service_provider;
+        propertyFacitilities.provider_contact = provider_contact;
+        propertyFacitilities.apartment_id = apartment_id;
 
         await propertyFacitilities.save();
 
@@ -75,7 +82,7 @@ export const UpdateApartmentFacility = async (req, res) => {
     }
 };
 
-export const DeleteApartmentFacility = async (req, res) => {
+export const DeleteApartmentFacility = async(req, res) => {
     try {
         const { id } = req.params;
 
@@ -104,7 +111,7 @@ export const DeleteApartmentFacility = async (req, res) => {
     }
 }
 
-export const GetApartmentFacilityById = async (req, res) => {
+export const GetApartmentFacilityById = async(req, res) => {
     try {
         const { id } = req.params;
 
@@ -128,8 +135,7 @@ export const GetApartmentFacilityById = async (req, res) => {
         return res.status(500).send({
             status: 500,
             message: "Internal server error",
-    
+
         });
     }
 }
-
