@@ -12,7 +12,6 @@ dotenv.config();
 
 
 
-
 export const uploadApartment = async (req, res) => {
   try {
 
@@ -23,7 +22,7 @@ export const uploadApartment = async (req, res) => {
         apartment_slug: req.body.apartment_slug,
         rent_amount: req.body.rent_amount,
         address: req.body.address,
-        agent_id: req.body.agent_id
+        agent_id: req.user.id
       });
       try {
         await newApartment.save();
