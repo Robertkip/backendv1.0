@@ -150,6 +150,18 @@ export const getAgentApartments = async (req, res) => {
     return res.status(500).send(error.message);
   }
 };
+
+export const getApartmentByUser = (req, res) => {
+  const userId = req.user.id;
+  Apartment.findAll({ where: { agent_id: userId } })
+    .then((apartments) => {
+      res.status(200).json(apartments);
+    })
+    .catch((error) => {
+      res.status(500).json({ message: "Error retrieving apartments", error });
+    });
+};
+
 export const getApartmentById = async (req, res, next) => {
   const p_id = req.params.id;
   Apartment.findByPk(p_id)

@@ -11,18 +11,21 @@ router.post(
   apartmentController.uploadApartment
 );
 
+router.get("/userapartment", Authorization.Authenticated, apartmentController.getApartmentByUser);
+
 router.get("/allapartment/", apartmentController.getAllApartments);
 
 router.get("/apartment/:id", apartmentController.getApartmentById);
+
 router.get(
   "/apartmentaccount/:logent_id",
   apartmentController.getLandlordApartments
 );
+
 router.get(
   "/apartmentaccount/:logent_id",
   apartmentController.getAgentApartments
 );
-
 
 router.put(
   "/apartment/update/:id",
