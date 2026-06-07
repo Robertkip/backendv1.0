@@ -192,12 +192,6 @@ export const getAllApartments = async (req, res) => {
   });
 };
 
-// export const getAllApartments = async (req, res) => {
-//   await Apartment.findAll().then((data) => {
-//     console.log("Apartment Data Is",data);
-//     return res.status(200).json(data);
-//   });
-// };
 
 
 export const getTenantLandlordApartments = async (req, res) => {

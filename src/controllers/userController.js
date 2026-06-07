@@ -83,7 +83,6 @@ export const getSingleUser = async (req, res) => {
 };
 
 export const searchUserQuery = async (req, res, next) => {
-  // Retrieve all Tutorials from the database.
   const title = req.query.username;
   var condition = title ? { username: { [Op.like]: `%${title}%` } } : null;
 
