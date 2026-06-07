@@ -6,9 +6,11 @@ const router = express.Router();
 
 router.post(
   "/apartment",
+  Authorization.Authenticated,
   apartmentController.upload,
   apartmentController.uploadApartment
 );
+
 router.get("/allapartment/", apartmentController.getAllApartments);
 
 router.get("/apartment/:id", apartmentController.getApartmentById);

@@ -3,6 +3,7 @@ import multer from "multer";
 import path from "path";
 import { Op } from "sequelize";
 import axios from "axios";
+import slugify from "slugify";
 import NodeGeocoder from "node-geocoder";
 
 import { sequelize } from "../config/connectDb.js";
@@ -13,20 +14,29 @@ dotenv.config();
 
 
 export const uploadApartment = async (req, res) => {
+
+
+   const apartment_name = req.body.apartment_name;
+    if (!apartment_name) {
+      return res.status(400).send({ message: "apartment_name is required" });
+    }
+
+
+  const apartment_slug = await generateUniqueSlug(apartment_name);
+
   try {
 
       const newApartment = new Apartment({
-        apartment_name: req.body.apartment_name,
+        apartment_name: apartment_name,
         apartment_location: req.body.apartment_location,
         apartment_description: req.body.apartment_description,
-        apartment_slug: req.body.apartment_slug,
+        apartment_slug: apartment_slug,
         rent_amount: req.body.rent_amount,
         address: req.body.address,
         agent_id: req.user.id
       });
       try {
         await newApartment.save();
-        console.log("Apartment Created");
       } catch (error) {
         console.log(error);
       }
@@ -34,7 +44,6 @@ export const uploadApartment = async (req, res) => {
     return res.status(201).send("Apartment Created Successfully");
   }
   catch (error) {
-    console.error("Error saving apartment:", error);
     return res.status(500).send({ message: "Internal Server Error", error });
 }
 };
@@ -242,6 +251,18 @@ async function getPlaceCoordinates(place) {
     return null;
   }
 }
+
+const generateUniqueSlug = async (baseName) => {
+  let slug = slugify(baseName, { lower: true, strict: true });
+  let uniqueSlug = slug;
+  let counter = 1;
+
+  while (await Apartment.findOne({ where: { apartment_slug: uniqueSlug } })) {
+    uniqueSlug = `${slug}-${counter}`;
+    counter++;
+  }
+  return uniqueSlug;
+};
 
 export async function searchApartmentInPlace(req, res, next) {
   const { place } = req.query;

@@ -59,6 +59,7 @@
     "pg-hstore": "^2.3.4",
     "redis": "^4.6.7",
     "sequelize": "^6.37.5",
+    "slugify": "^1.6.9",
     "socket.io": "^4.5.4",
     "swagger-autogen": "^2.23.4",
     "swagger-jsdoc": "^6.2.8",
