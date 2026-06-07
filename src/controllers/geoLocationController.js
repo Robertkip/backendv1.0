@@ -23,7 +23,6 @@ export const userGeolocation = async (req, res) => {
             throw new Error('Latitude and longitude are required.');
         }
 
-        // Save coordinates to Redis
         await setAsync('user_coordinates', JSON.stringify({ id, latitude, longitude, timestamp }));
         console.log('Coordinates saved successfully.');
 
@@ -39,7 +38,6 @@ export const userGeolocation = async (req, res) => {
 
 export const getUserCoordinates =async (req, res) => {
 
-    // Create a new Redis client for each request
     const client = redis.createClient({
         legacyMode: true,
         host: "localhost",
