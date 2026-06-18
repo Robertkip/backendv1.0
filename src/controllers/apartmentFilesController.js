@@ -50,7 +50,10 @@ export const upload = multer({
 
 export const uploadApartment = async (req, res) => {
   try {
-    const { apartment_id, uploaded_by } = req.body;
+    const { apartment_id } = req.body;
+
+    const uploaded_by = req.user.id;
+    
     const files = req.files;
 
     if (!apartment_id || !uploaded_by) {
