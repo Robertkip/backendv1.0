@@ -47,7 +47,7 @@ export const upload = multer({
 }).array("files", 5);
 
 export const uploadApartment = async (req, res) => {
-  try {
+  // try {
     const { apartment_id, uploaded_by } = req.body;
     const files = req.files;
 
@@ -82,10 +82,10 @@ export const uploadApartment = async (req, res) => {
       message: "Apartment files uploaded successfully",
       data: newApartment,
     });
-  } catch (error) {
-    console.error("Error saving apartment files:", error);
-    return res.status(500).json({ message: "Internal Server Error", error: error.message });
-  }
+  // } catch (error) {
+  //   console.error("Error saving apartment files:", error);
+  //   return res.status(500).json({ message: "Internal Server Error", error: error.message });
+  // }
 };
 
 export const getPagination = (page, size) => {
