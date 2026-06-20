@@ -52,12 +52,16 @@ export const uploadApartment = async (req, res) => {
   try {
     const { apartment_id } = req.body;
 
+    console.log("Apartment ID:", apartment_id);
+
     const uploaded_by = req.user.id;
+
+    console.log("Uploaded by:", uploaded_by);
     
     const files = req.files;
 
     if (!apartment_id || !uploaded_by) {
-      return res.status(400).json({ message: "apartment_id and uploaded_by are required" });
+      return res.status(400).json({ message: "Apartment and Uploader are required" });
     }
 
     if (!files || files.length < 1) {
