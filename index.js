@@ -42,6 +42,7 @@ import propertyFilesRouter from "./src/routers/propertyFilesRoute.js"
 import propertyLocationRouter from "./src/routers/propertyLocationRoute.js"
 import apartmentLocationRouter from "./src/routers/locationRoute.js";
 import propertyPropertiesRouter from "./src/routers/propertyPropertiesRoute.js";
+import apartmentVerifyRouter from "./src/routers/apartmentVerifyRoute.js";
 import postMediaRouter from "./src/routers/postMediaRouter.js";
 import { initPassport } from "./src/middlewares/initPassport.js";
 import notificationRouter from "./src/routers/notifyRoute.js";
@@ -220,6 +221,7 @@ app.use("/api/v1", notificationRouter);
 app.use("/api/v1", messageRouter);
 app.use("/api/v1", propertyRouter);
 app.use("/api/v1", geoLocationRouter);
+app.use("/api/v1/verify-apartment", apartmentVerifyRouter);
 
 
 app.use('/graphql', Authenticated);
