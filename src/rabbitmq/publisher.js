@@ -18,19 +18,16 @@ function getRabbitMQUrl() {
 
 export const connectRabbitMQ = async (retries = 5) => {
   const url = getRabbitMQUrl();
-  console.log(`🔗 Connecting to RabbitMQ at ${url.replace(/:\/\/.*@/, '://****:****@')}`);
-
   try {
     connection = await amqp.connect(url);
     channel = await connection.createChannel();
 
-    // ✅ Match the queue declaration from the email service
     await channel.assertQueue(process.env.EMAIL_QUEUE, {
       durable: true,
       arguments: {
         'x-dead-letter-exchange': 'email-dlx',
         'x-dead-letter-routing-key': process.env.DEAD_LETTER_QUEUE,
-        'x-message-ttl': 60000, // must match email service
+        'x-message-ttl': 60000, 
       },
     });
 

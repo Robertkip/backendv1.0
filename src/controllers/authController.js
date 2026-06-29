@@ -19,25 +19,25 @@ import UserProfile from "../models/userProfileModel.js";
 
 dotenv.config();
 
-const {
-  GOOGLE_CLIENT_ID,
-  GOOGLE_CLIENT_SECRET,
-  MAILING_SERVICE_REFRESH_TOKEN,
-  SENDER_EMAIL_ADDRESS,
-  SENDER_PASSWORD,
-} = process.env;
+// const {
+//   GOOGLE_CLIENT_ID,
+//   GOOGLE_CLIENT_SECRET,
+//   MAILING_SERVICE_REFRESH_TOKEN,
+//   SENDER_EMAIL_ADDRESS,
+//   SENDER_PASSWORD,
+// } = process.env;
 
 
 
-const { OAuth2 } = google.auth;
-const OAUTH_PLAYGROUND = "https://developers.google.com/oauthplayground";
+// const { OAuth2 } = google.auth;
+// const OAUTH_PLAYGROUND = "https://developers.google.com/oauthplayground";
 
-const oauth2Client = new OAuth2(
-  GOOGLE_CLIENT_ID,
-  GOOGLE_CLIENT_SECRET,
-  MAILING_SERVICE_REFRESH_TOKEN,
-  OAUTH_PLAYGROUND
-);
+// const oauth2Client = new OAuth2(
+//   GOOGLE_CLIENT_ID,
+//   GOOGLE_CLIENT_SECRET,
+//   MAILING_SERVICE_REFRESH_TOKEN,
+//   OAUTH_PLAYGROUND
+// );
 export const Signup = async (req, res) => {
   try {
     const username = req.body.username;
@@ -266,34 +266,34 @@ export const Signin = async (req, res) => {
 };
 
 
-oauth2Client.setCredentials({
-  refresh_token: MAILING_SERVICE_REFRESH_TOKEN,
-});
+// oauth2Client.setCredentials({
+//   refresh_token: MAILING_SERVICE_REFRESH_TOKEN,
+// });
 
-const accessToken = oauth2Client.getAccessToken();
+// const accessToken = oauth2Client.getAccessToken();
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    type: "OAuth2",
-    user: SENDER_EMAIL_ADDRESS,
-    pass: SENDER_PASSWORD,
-    clientId: GOOGLE_CLIENT_ID,
-    clientSecret: GOOGLE_CLIENT_SECRET,
-    refreshToken: MAILING_SERVICE_REFRESH_TOKEN,
-    accessToken,
-  },
-});
+// const transporter = nodemailer.createTransport({
+//   service: "gmail",
+//   auth: {
+//     type: "OAuth2",
+//     user: SENDER_EMAIL_ADDRESS,
+//     pass: SENDER_PASSWORD,
+//     clientId: GOOGLE_CLIENT_ID,
+//     clientSecret: GOOGLE_CLIENT_SECRET,
+//     refreshToken: MAILING_SERVICE_REFRESH_TOKEN,
+//     accessToken,
+//   },
+// });
 
-//Testing Success
-transporter.verify((error, success) => {
-  if (error) {
-    console.log(error);
-  } else {
-    console.log("Ready for Messages");
-    console.log(success);
-  }
-});
+// //Testing Success
+// transporter.verify((error, success) => {
+//   if (error) {
+//     console.log(error);
+//   } else {
+//     console.log("Ready for Messages");
+//     console.log(success);
+//   }
+// });
 
 
 export const sendOtpVerification = async (email) => {

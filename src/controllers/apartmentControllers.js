@@ -31,7 +31,6 @@ export const uploadApartment = async (req, res) => {
         apartment_location: req.body.apartment_location,
         apartment_description: req.body.apartment_description,
         apartment_slug: apartment_slug,
-        rent_amount: req.body.rent_amount,
         address: req.body.address,
         agent_id: req.user.id
       });
