@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../config/connectDb.js";
 import Landlord from "./landlordModel.js";
-import Agent from "./agentModel.js";
+import AgentProfile from "./agentProfileModel.js";
 
 const Apartment = sequelize.define("rental_apartment", {
   agent_id: {
@@ -41,7 +41,7 @@ export default Apartment;
 
 Apartment.associate = (models) => {
   Apartment.belongsTo(models.Landlord, { foreignKey: "landlord_id" });
-  Apartment.belongsTo(models.Agent, { foreignKey: "agent_id" }); // Fixed typo
+  Apartment.belongsTo(models.AgentProfile, { foreignKey: "agent_id" }); 
   Apartment.hasOne(models.ApartmentFiles, { foreignKey: "apartment_id", as: "files" });
   Apartment.hasOne(models.Location, { foreignKey: "apartment_id", as: "location" });
   Apartment.hasOne(models.ApartmentProperties, { foreignKey: "apartment_id", as: "properties" });

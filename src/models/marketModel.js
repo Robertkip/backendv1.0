@@ -2,7 +2,7 @@ import { DataTypes } from "sequelize";
 import { sequelize } from "../config/connectDb.js";
 import User from "./authModel.js";
 import Landlord from "./landlordModel.js";
-import Agent from "./agentModel.js";
+import AgentProfile from "./agentProfileModel.js";
 import Tenant from "./tenantModel.js";
 import CartItem from "./cartItemModel.js";
 
@@ -51,7 +51,7 @@ Market.associations = (models) => {
   Market.belongsTo(Landlord, {
     foreignKey: "sellerId",
   });
-  Market.belongsTo(Agent, {
+  Market.belongsTo(AgentProfile, {
     foreignKey: "sellerId",
   });
   Market.belongsTo(Tenant, {

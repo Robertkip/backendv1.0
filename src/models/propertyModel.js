@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../config/connectDb.js";
 import Landlord from "./landlordModel.js";
-import Agent from "./agentModel.js";
+import AgentProfile from "./agentProfileModel.js";
 
 const Property = sequelize.define("property", {
   agent_id: {
@@ -82,7 +82,7 @@ const Property = sequelize.define("property", {
 export default Property;
 
 Property.associations = (models) => {
-    Property.belongsTo(Agent, {
+    Property.belongsTo(AgentProfile, {
     foreignKey: "agent_id",
   });
 
