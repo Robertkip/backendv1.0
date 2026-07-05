@@ -1,7 +1,6 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../config/connectDb.js";
-import User from "./authModel.js";
-import Apartment from "./apartmentModel.js";
+import AgentProfile from "./agentProfileModel.js";
 
 const AgentLocation = sequelize.define("agent_location", {
   agent_profile_id: {
@@ -36,9 +35,9 @@ const AgentLocation = sequelize.define("agent_location", {
 
 
 AgentLocation.associate = (models) => {
-  AgentLocation.belongsTo(models.Agent, {
+  AgentLocation.belongsTo(models.AgentProfile, {
     foreignKey: "agent_profile_id",
-    as: "agent",
+    as: "agent_profile",
   });
 };
 

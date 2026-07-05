@@ -11,8 +11,15 @@ const ApartmentPaymentPlan = sequelize.define("apartment_payment_plan", {
     type: DataTypes.INTEGER,
     allowNull: true,
   },
+  plan_duration: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   pricing_amount: {
     type: DataTypes.STRING,
+  },
+  plan_description: {
+    type: DataTypes.TEXT,
   },
   currency_type: {
     type: DataTypes.STRING

@@ -46,11 +46,14 @@ import apartmentVerifyRouter from "./src/routers/apartmentVerifyRoute.js";
 import postMediaRouter from "./src/routers/postMediaRouter.js";
 import { initPassport } from "./src/middlewares/initPassport.js";
 import notificationRouter from "./src/routers/notifyRoute.js";
-import rentPricingRouter from "./src/routers/rentalPriceRoute.js";
-import User from "./src/models/authModel.js";
+import agentCommentRouter from "./src/routers/agentCommentRoute.js";
+import agentLocationRouter from "./src/routers/agentLocationRoute.js";
+import agentDocumentsRouter from "./src/routers/agentDocumentsRoute.js";
+import apartmentCommentRouter from "./src/routers/apartmentCommentRoute.js";
+import apartmentPaymentPlanRouter from "./src/routers/apartmentPaymentRoute.js";
+import agentProfileRouter from "./src/routers/agentProfileRoute.js";
+
 import { createPost, getTimeline } from "./src/controllers/postController.js";
-import Message from "./src/models/messageModel.js";
-import RentPricing from "./src/models/rentalPriceModel.js";
 import { sequelize } from "./src/config/connectDb.js";
 import resolvers from "./src/resolvers/index.js";
 import typeDefs from "./src/graphqlschema/index.js";
@@ -70,6 +73,7 @@ const PROTO_PATH = path.join(__dirname, "./proto/post.proto");
 dotenv.config();
 
 const app = express();
+
 
 connectDB();
 
@@ -108,8 +112,6 @@ const redisClient = createClient({
   legacyMode: true, // Keep for connect-redis compatibility
 });
 redisClient.connect().catch(console.error);
-
-await sequelize.sync({ alter: true });
 
 
 const redisStore = new RedisStore({
@@ -215,13 +217,20 @@ app.use("/api/v1", cartRouter);
 app.use("/api/v1/user", userProfileRouter);
 app.use("/api/v1", friendRequestRouter);
 app.use("/api/v1/token", notificationDeviceRouter);
-app.use("/api/v1", rentPricingRouter);
+// app.use("/api/v1", rentPricingRouter);
 app.use("/api/v1", ratingRouter);
 app.use("/api/v1", notificationRouter);
 app.use("/api/v1", messageRouter);
 app.use("/api/v1", propertyRouter);
 app.use("/api/v1", geoLocationRouter);
 app.use("/api/v1/verify-apartment", apartmentVerifyRouter);
+app.use("/api/v1", agentProfileRouter);
+app.use("/api/v1", agentCommentRouter);
+app.use("/api/v1", agentDocumentsRouter);
+app.use("/api/v1", agentLocationRouter);
+app.use("/api/v1", apartmentCommentRouter);
+app.use("/api/v1", apartmentPaymentPlanRouter);
+
 
 
 app.use('/graphql', Authenticated);

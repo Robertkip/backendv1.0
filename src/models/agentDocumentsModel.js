@@ -1,6 +1,6 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../config/connectDb.js";
-
+import Apartment from "./apartmentModel.js";  
 import AgentProfile from "./agentProfileModel.js";
 
 const AgentDocuments = sequelize.define(
@@ -15,7 +15,7 @@ const AgentDocuments = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: Property,
+        model: Apartment,
         key: "id",
       },
     },
@@ -53,10 +53,6 @@ const AgentDocuments = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: true,
     },
-    uploaded_by: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
     upload_date: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
@@ -71,7 +67,7 @@ const AgentDocuments = sequelize.define(
 AgentDocuments.associate = (models) => {
   AgentDocuments.belongsTo(models.AgentProfile, {
     foreignKey: "agent_profile_id",
-    as: "agentProfile",
+    as: "agent_profile",
   });
 };
 

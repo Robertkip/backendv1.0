@@ -22,20 +22,8 @@ export const sequelize = new Sequelize({
     logging: process.env.NODE_ENV === 'development' ? console.log : false
 });
 
-// Create Umzug instance with proper configuration
-// export const umzug = new Umzug({
-//     migrations: {
-//         glob: path.join(__dirname, 'migrations', '*.js'),
-//     },
-//     context: sequelize.getQueryInterface(),
-//     storage: new SequelizeStorage({ // Use the built-in SequelizeStorage
-//         sequelize,
-//         modelName: 'migration_meta', // Customize if needed
-//     }),
-//     logger: console,
-// });
 
-// Function to run pending migrations
+
 export const runMigrations = async() => {
     try {
         await sequelize.authenticate();
