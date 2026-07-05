@@ -5,11 +5,11 @@ import UserProfile from "./userProfileModel.js";
 
 
 const ApartmentComment = sequelize.define('apartment_comments', {
-  id: {
-    type: DataTypes.UUID,
-    defaultValue: DataTypes.UUIDV4,
-    primaryKey: true,
-  },
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
   content: {
     type: DataTypes.TEXT,
     allowNull: false,
@@ -44,10 +44,10 @@ export default ApartmentComment;
 
 
 ApartmentComment.associate = (models) => {
-  ApartmentComment.belongsTo(Apartment, {
-    foreignKey: "apartment_id",
-    as: "apartment",
-  });
+ApartmentComment.belongsTo(Apartment, {
+  foreignKey: "apartment_id",
+  as: "apartment",
+});
 
   ApartmentComment.belongsTo(UserProfile, {
     foreignKey: "user_id",
