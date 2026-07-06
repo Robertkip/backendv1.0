@@ -1,0 +1,38 @@
+<!-- templates/layouts/registration-otp.ejs -->
+<h2>Verify Your Email Address</h2>
+
+<p>Hello <strong><%= name || 'User' %></strong>,</p>
+
+<p>
+  Thank you for registering with <strong>Waridi</strong>! To complete your registration and start using our platform, please verify your email address using the one‑time password (OTP) below.
+</p>
+
+<div style="text-align: center; margin: 30px 0;">
+  <span style="display: inline-block; font-size: 34px; font-weight: 700; color: #1a202c; background: #f7fafc; padding: 16px 40px; border-radius: 12px; letter-spacing: 8px; border: 2px dashed #3182ce; font-family: 'Courier New', monospace;">
+    <%= otp %>
+  </span>
+</div>
+
+<p>This OTP is valid for <strong><%= expiryMinutes || 5 %> minutes</strong>.</p>
+
+<% if (typeof verificationUrl !== 'undefined' && verificationUrl) { %>
+  <p style="text-align: center; margin: 24px 0;">
+    <a href="<%= verificationUrl %>" style="background-color: #3182ce; color: #ffffff; padding: 12px 32px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600; font-size: 16px;">
+      Verify Email
+    </a>
+  </p>
+  <p style="font-size: 14px; color: #718096; text-align: center;">
+    Or enter the OTP manually on the verification page.
+  </p>
+<% } else { %>
+  <p>Please enter this code on the verification page to complete your registration.</p>
+<% } %>
+
+<p style="margin-top: 8px;">
+  If you did not create an account with Waridi, please ignore this email.
+</p>
+
+<p style="margin-top: 28px;">
+  Best regards,<br>
+  <strong>The Waridi Team</strong>
+</p>

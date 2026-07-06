@@ -14,10 +14,17 @@ import Otp from "../models/otpModel.js";
 import { Authenticated } from "../middlewares/authorizationPermission.js";
 import Connection from "../models/connectionsModel.js";
 import Role from "../models/role.js";
+import ejs from 'ejs';
+import { fileURLToPath } from 'url';
+
+import { publishEmailJob } from "../rabbitmq/publisher.js";
 
 import UserProfile from "../models/userProfileModel.js";
 
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // const {
 //   GOOGLE_CLIENT_ID,
@@ -40,59 +47,44 @@ dotenv.config();
 // );
 export const Signup = async (req, res) => {
   try {
-    const username = req.body.username;
-    const email = req.body.email;
-    const password = req.body.password;
-    const confirm_password = req.body.confirm_password;
-    const active = req.body.active;
-    const verified = req.body.verified;
-    const roleId = req.body.roleId;
+    const { username, email, password, confirm_password, active, verified, roleId } = req.body;
 
-    let user = await User.findOne({
+    // 1. Validate required fields
+    if (!email || !password || !confirm_password || !username) {
+      return res.status(400).json({ msg: "Please provide all fields" });
+    }
+
+    // 2. Check if user already exists
+    const existingUser = await User.findOne({
       where: { [Op.or]: [{ username }, { email }] },
     });
+    if (existingUser) {
+      return res.status(422).json({ msg: "Username or Email Already Exists" });
+    }
 
-    let optuser = await Otp.findOne({
-      where: {email}
-    })
-    const settings = {
-      notification: {
-        push: true,
-        email: true,
+    // 3. Check password match
+    if (password !== confirm_password) {
+      return res.status(400).json({ msg: "Passwords do not match" });
+    }
+
+    // 4. Hash password
+    const hashedPassword = bcryptjs.hashSync(password, 8);
+
+    // 5. Create new user
+    const newUser = await User.create({
+      email,
+      username,
+      password: hashedPassword,
+      active: active ?? false,
+      verified: verified ?? false,
+      roleId: roleId ?? 1,
+      settings: {
+        notification: { push: true, email: true },
       },
-    };
+    });
 
-    if (!req.body.email) {
-      res.status(400).send({
-        msg: "Please provide all fields",
-      });
-    } else if (user) {
-      res.status(422).send({ msg: "Username or Email Already Exists" });
-    } else if (password !== confirm_password) {
-      console.log("Passwords Do not Match");
-    } else if (!email || !password || !confirm_password) {
-      console.log("Please Provide All Fields");
-    } else {
-
-      await sendOtpVerification(req.body.email).then(res => {
-        console.log("Sender Response Is", res);
-      });
-
-
-      const newUser = new User({
-        email: email,
-        username: username,
-        password: bcryptjs.hashSync(password, 8),
-        active: active,
-        verified: verified,
-        roleId: roleId,
-        settings,
-      });
-
-
-     await newUser.save();
-
-     await UserProfile.create({
+    // 6. Create user profile
+    await UserProfile.create({
       userId: newUser.id,
       user_fname: username,
       user_lname: '',
@@ -104,19 +96,43 @@ export const Signup = async (req, res) => {
       type: '',
     });
 
+    // 7. Generate and save OTP
+    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+    await Otp.create({
+      email: newUser.email,
+      code: otpCode,
+      createdAt: new Date(),
+      expireIn: expiresAt,
+    });
 
-      // .then((res) => {
-      //   console.log("Response After Saving Is", res);
-      //   sendOtpVerification(res.dataValues.email);
-      // });     
+    // 8. Render OTP template (if using your existing welcome.ejs)
+    const templatePath = path.join(__dirname, '../templates/layouts/registration-otp.ejs');
+    const html = await ejs.renderFile(templatePath, {
+      name: newUser.username || 'User',
+      otp: otpCode,
+      expiryMinutes: 5,
+    });
 
-      return res.status(201).send(newUser);
-    }
+    // 9. Publish email job with pre‑rendered HTML
+    await publishEmailJob({
+      to: newUser.email,
+      subject: 'Verify Your Waridi Account',
+      html,        // 👈 rendered HTML
+      text: `Your OTP is ${otpCode}. Please verify your email within 5 minutes.`,
+    });
+
+    // 10. Respond
+    return res.status(201).json({
+      message: 'User registered successfully. Please check your email for the OTP.',
+      user: { id: newUser.id, email: newUser.email, username: newUser.username },
+    });
+
   } catch (err) {
-    res.status(500).send({ message: err.message });
+    console.error('Signup error:', err);
+    return res.status(500).json({ message: err.message || 'Internal server error' });
   }
 };
-
 
 // export const Signin = async (req, res) => {
 //   try {
