@@ -14,6 +14,10 @@ const Otp = sequelize.define("otp", {
     type: DataTypes.DATE,
     allowNull: true,
   },
+  expired: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+  },
   expireIn: {
     type: DataTypes.DATE,
     allowNull: true,

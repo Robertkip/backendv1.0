@@ -344,25 +344,33 @@ export const sendOtpVerification = async (email) => {
 export const verifyOtpCode = async (req, res) => {
   const { email, code } = req.body;
 
-  const useremail = await Otp.findOne({ where: { email } });
+  try {
+    // 1. Find the OTP record by email and code
+    const otpRecord = await Otp.findOne({ where: { email, code } });
 
-  console.log("Email From Otp Is", useremail);
+    if (!otpRecord) {
+      return res.status(404).json({ message: "Invalid OTP or email not found" });
+    }
 
-  if (!useremail) {
-    return res.status(404).send({ message: "Email not found" });
+    // 2. Check if already expired (either by flag or by time)
+    const now = new Date();
+    const isExpired = otpRecord.expired || (otpRecord.expireIn && now > otpRecord.expireIn);
+
+    if (isExpired) {
+      await otpRecord.update({ expired: true });
+      return res.status(400).json({ message: "OTP has expired" });
+    }
+
+    await User.update({ verified: true }, { where: { email } });
+
+    await otpRecord.destroy();
+
+    return res.status(200).json({ message: "Code Verified" });
+  } catch (error) {
+    console.error("Error verifying OTP:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
-
-  if (useremail.code !== code) {
-    return res.status(400).send({ message: "Code does not match" });
-  }
-
-  await User.update({ verified: true }, { where: { email } });
-
-  await Otp.destroy({ where: { email } });
-
-  return res.status(200).send({ message: "Code Verified" });
 };
-
 
 export const forgotPassword = async (req, res) => {
   
