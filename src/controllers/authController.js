@@ -345,14 +345,12 @@ export const verifyOtpCode = async (req, res) => {
   const { email, code } = req.body;
 
   try {
-    // 1. Find the OTP record by email and code
     const otpRecord = await Otp.findOne({ where: { email, code } });
 
     if (!otpRecord) {
       return res.status(404).json({ message: "Invalid OTP or email not found" });
     }
 
-    // 2. Check if already expired (either by flag or by time)
     const now = new Date();
     const isExpired = otpRecord.expired || (otpRecord.expireIn && now > otpRecord.expireIn);
 
