@@ -238,7 +238,6 @@ app.use('/graphql', Authenticated);
 app.post('/locations', (req, res) => {
   const payload = req.body;
   console.log('Received location', payload);
-  // broadcast to clients
   io.emit('location:update', payload);
   res.json({ ok: true });
 });

@@ -69,7 +69,7 @@ export const AdminRole = (req, res, next) => {
     const roleId = res.locals.roleId;
     console.log("AdminRole Middleware - roleId:", roleId);
 
-    if (roleId !== 5) { // Ensure `5` is the correct roleId for an admin.
+    if (roleId !== 5) { 
       return res.status(403).send({ msg: "Forbidden - Admin role required" });
     }
     next();
@@ -117,7 +117,7 @@ export const SalesRole = (req, res, next) => {
     const roleId = res.locals.roleId;
     console.log("AdminRole Middleware - roleId:", roleId);
 
-    if (roleId !== 4) { // Ensure `5` is the correct roleId for an admin.
+    if (roleId !== 4) {
       return res.status(403).send({ msg: "Forbidden - Admin role required" });
     }
     next();
