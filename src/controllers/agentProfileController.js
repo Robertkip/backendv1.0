@@ -3,7 +3,10 @@ import AgentProfile from "../models/agentProfileModel.js";
 export const createAgentProfile = async (req, res) => {
   try {
     const user_id = req.user.id;
-    const { agent_fname, agent_lname, agent_mname, agent_phonenumber, agent_idno, agent_gender } = req.body;
+
+        console.log("User ID from  Create Profile request:", user_id);
+
+    const { agent_fname, agent_lname, agent_mname, agent_phonenumber, agent_idno, agent_gender, agent_description } = req.body;
 
     const newAgentProfile = await AgentProfile.create({
       user_id,

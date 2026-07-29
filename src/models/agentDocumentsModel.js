@@ -15,9 +15,11 @@ const AgentDocuments = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: Apartment,
+        model: AgentProfile,
         key: "id",
       },
+      onUpdate: "CASCADE",
+      onDelete: "CASCADE",
     },
     agent_passport_photo: {
       type: DataTypes.STRING,

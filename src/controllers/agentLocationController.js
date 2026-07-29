@@ -8,9 +8,10 @@ export const createAgentLocation = async (req, res) => {
 
         const user = req.user.id;
     
+        console.log("User ID from request:", user);
         const agent = await AgentProfile.findOne({ where: { user_id: user } });
     
-        const agent_id = agent.id;
+        const agent_profile_id = agent.id;
 
     const {agent_county, agent_subcounty, agent_town, agent_street, agent_location_description } = req.body;
 
@@ -19,7 +20,7 @@ export const createAgentLocation = async (req, res) => {
     }
 
     const newLocation = await AgentLocation.create({
-      agent_profile_id: agent_id,
+      agent_profile_id,
       agent_county,
       agent_subcounty,
       agent_town,

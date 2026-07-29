@@ -8,6 +8,9 @@
     "prod:server": "NODE_ENV=production nodemon index.js",
     "dev:server": "NODE_ENV=development nodemon index.js",
     "swagger-autogen": "node swagger.js",
+    "db:migrate": "npx sequelize-cli db:migrate",
+    "db:migrate:undo": "npx sequelize-cli db:migrate:undo",
+    "db:migrate:status": "npx sequelize-cli db:migrate:status",
     "test": "test"
   },
   "keywords": [

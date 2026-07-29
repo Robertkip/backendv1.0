@@ -54,6 +54,10 @@ export const createAgentDocument = async (req, res) => {
 
     const agent = await AgentProfile.findOne({ where: { user_id: user } });
 
+    if (!agent) {
+      return res.status(404).json({ message: "Agent profile not found" });
+    }
+
     const agent_id = agent.id;
 
     console.log("Uploaded by:", user);
@@ -74,9 +78,9 @@ export const createAgentDocument = async (req, res) => {
       file_size: files.reduce((total, file) => total + file.size, 0),
     };
 
-    if (files[0]) fileData.first_image = baseUrl + files[0].filename;
-    if (files[1]) fileData.second_image = baseUrl + files[1].filename;
-    if (files[2]) fileData.third_image = baseUrl + files[2].filename;
+    if (files[0]) fileData.agent_passport_photo = baseUrl + files[0].filename;
+    if (files[1]) fileData.front_id_photo = baseUrl + files[1].filename;
+    if (files[2]) fileData.back_id_photo = baseUrl + files[2].filename;
 
     const agentFiles = await AgentDocuments.create(fileData);
 
@@ -146,7 +150,7 @@ export const deleteAgentDocument = async (req, res) => {
     }
 
     // Delete the files from the filesystem
-    const filesToDelete = [document.first_image, document.second_image, document.third_image];
+    const filesToDelete = [document.agent_passport_photo, document.front_id_photo, document.back_id_photo];
     filesToDelete.forEach(filePath => {
       if (filePath) {
         const fullPath = path.join(uploadDir, path.basename(filePath));
