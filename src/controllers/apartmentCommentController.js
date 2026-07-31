@@ -7,7 +7,7 @@ export const createApartmentComment = async (req, res) => {
     const userId = req.user.id;
 
     const newComment = await ApartmentComment.create({
-      apartmentId: apartmentId,
+      apartment_id: apartmentId,
       user_id: userId,
       content: content
     });
@@ -24,7 +24,7 @@ export const getApartmentComments = async (req, res) => {
     const { apartmentId } = req.params;
 
     const comments = await ApartmentComment.findAll({
-      where: { apartmentId }
+      where: { apartment_id: apartmentId }
     });
 
     return res.status(200).json(comments);
