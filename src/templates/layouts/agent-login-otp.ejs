@@ -1,0 +1,19 @@
+<!-- templates/layouts/agent-login-otp.ejs -->
+<h2>Agent Login Verification</h2>
+
+<p>Hello <strong><%= name || 'Agent' %></strong>,</p>
+
+<p>You requested a login code for your Waridi agent account. Use the one-time password below to complete sign-in:</p>
+
+<div style="text-align: center; margin: 30px 0;">
+  <span style="display: inline-block; font-size: 34px; font-weight: 700; color: #1a202c; background: #f7fafc; padding: 16px 40px; border-radius: 12px; letter-spacing: 8px; border: 2px dashed #3182ce; font-family: 'Courier New', monospace;">
+    <%= otp %>
+  </span>
+</div>
+
+<p>This code is valid for <strong><%= expiryMinutes || 5 %> minutes</strong>.</p>
+
+<p>If you did not attempt to log in, please ignore this email.</p>
+
+<p>Best regards,<br>
+<strong>The Waridi Team</strong></p>

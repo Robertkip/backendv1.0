@@ -37,10 +37,21 @@ const AgentProfile = sequelize.define("agent_profile", {
     type: DataTypes.STRING,
   },
 
+  agent_description: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
+
   agent_verified: {
     type: DataTypes.ENUM("PENDING", "APPROVED", "REJECTED"),
     defaultValue: "PENDING",
     allowNull: false,
+  },
+
+  is_agent_verified: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
   }
 });
 

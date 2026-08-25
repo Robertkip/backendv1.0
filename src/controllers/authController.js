@@ -19,6 +19,7 @@ import { fileURLToPath } from 'url';
 
 import { publishEmailJob } from "../rabbitmq/publisher.js";
 
+import AgentProfile from "../models/agentProfileModel.js";
 import UserProfile from "../models/userProfileModel.js";
 
 dotenv.config();
@@ -104,6 +105,7 @@ export const Signup = async (req, res) => {
       code: otpCode,
       createdAt: new Date(),
       expireIn: expiresAt,
+      purpose: "account_verification",
     });
 
     // 8. Render OTP template (if using your existing welcome.ejs)
@@ -154,7 +156,77 @@ export const Signin = async (req, res) => {
     }
 
     if (user.verified == false) {
-      return res.status(403).send({ msg: "Verify Account to Login" });
+      return res.status(403).send({ msg: "Please verify your account before login." });
+    }
+
+    const role = await Role.findByPk(user.roleId);
+    if (!role) {
+      return res.status(500).send({ msg: "User role not found." });
+    }
+
+    if (user.roleId === 2 || user.roleId === 3) {
+      const agentProfile = await AgentProfile.findOne({ where: { user_id: user.id } });
+      const roleLabel = role.roleName === "LANDLORD" ? "landlord" : "agent";
+      if (!agentProfile) {
+        const dataUser = {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          roleId: user.roleId,
+          verified: user.verified,
+          active: user.active,
+        };
+        const token = Helper.GenerateToken(dataUser);
+
+        return res.status(200).send({
+          message: `Complete your ${roleLabel} onboarding before accessing the dashboard.`,
+          onboardingRequired: true,
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          roleId: role.roleName,
+          verified: user.verified,
+          active: user.active,
+          token,
+        });
+      }
+
+      if (agentProfile.agent_verified !== "APPROVED" || !agentProfile.is_agent_verified) {
+        return res.status(403).send({
+          msg: `Your ${roleLabel} onboarding is pending approval. Dashboard access will be enabled after approval.`,
+        });
+      }
+
+      const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+      const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+
+      await Otp.create({
+        email: user.email,
+        code: otpCode,
+        createdAt: new Date(),
+        expireIn: expiresAt,
+        purpose: "agent_login",
+      });
+
+      const otpTemplatePath = path.join(__dirname, "../templates/layouts/agent-login-otp.ejs");
+      const html = await ejs.renderFile(otpTemplatePath, {
+        name: user.username || "Agent",
+        otp: otpCode,
+        expiryMinutes: 5,
+      });
+
+      await publishEmailJob({
+        to: user.email,
+        subject: `Your Waridi ${roleLabel} login OTP`,
+        html,
+        text: `Your ${roleLabel} login OTP is ${otpCode}. It expires in 5 minutes.`,
+      });
+
+      return res.status(200).send({
+        message: `Login OTP sent to your email. Verify the code to complete ${roleLabel} login.`,
+        requiresOtp: true,
+        email: user.email,
+      });
     }
 
     const dataUser = {
@@ -169,10 +241,6 @@ export const Signin = async (req, res) => {
     };
 
     console.log("Role ID Data User is", dataUser.roleId);
-
-    // Use await to resolve the promise
-    const role = await Role.findByPk(dataUser.roleId);
-
     console.log("Role By ID IS", role);
 
     const token = Helper.GenerateToken(dataUser);
@@ -190,7 +258,7 @@ export const Signin = async (req, res) => {
       id: user.id,
       username: user.username,
       email: user.email,
-      roleId: role.roleName, // This will now be the resolved role object
+      roleId: role.roleName,
       verified: user.verified,
       active: user.active,
       token: token,
@@ -267,7 +335,9 @@ export const verifyOtpCode = async (req, res) => {
   const { email, code } = req.body;
 
   try {
-    const otpRecord = await Otp.findOne({ where: { email, code } });
+    const otpRecord = await Otp.findOne({
+      where: { email, code, purpose: "account_verification" },
+    });
 
     if (!otpRecord) {
       return res.status(404).json({ message: "Invalid OTP or email not found" });
@@ -285,10 +355,82 @@ export const verifyOtpCode = async (req, res) => {
 
     await otpRecord.destroy();
 
-    return res.status(200).json({ message: "Code Verified" });
+    return res.status(200).json({ message: "Email verified successfully." });
   } catch (error) {
     console.error("Error verifying OTP:", error);
     return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const verifyAgentLoginOtp = async (req, res) => {
+  const { email, code } = req.body;
+
+  try {
+    const otpRecord = await Otp.findOne({
+      where: { email, code, purpose: "agent_login" },
+    });
+
+    if (!otpRecord) {
+      return res.status(404).json({ message: "Invalid OTP or email not found." });
+    }
+
+    const now = new Date();
+    const isExpired = otpRecord.expired || (otpRecord.expireIn && now > otpRecord.expireIn);
+
+    if (isExpired) {
+      await otpRecord.update({ expired: true });
+      return res.status(400).json({ message: "OTP has expired." });
+    }
+
+    const user = await User.findOne({ where: { email } });
+    if (!user) {
+      return res.status(404).json({ message: "User not found for this email." });
+    }
+
+    const agentProfile = await AgentProfile.findOne({ where: { user_id: user.id } });
+    if (!agentProfile || agentProfile.agent_verified !== "APPROVED" || !agentProfile.is_agent_verified) {
+      return res.status(403).json({ message: "Agent access is not approved. Please wait for verification." });
+    }
+
+    const role = await Role.findByPk(user.roleId);
+    const dataUser = {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      roleId: user.roleId,
+      password: user.password,
+      confirm_password: user.confirm_password,
+      verified: user.verified,
+      active: user.active,
+    };
+
+    const token = Helper.GenerateToken(dataUser);
+    const refreshToken = Helper.GenerateRefreshToken(dataUser);
+
+    user.accessToken = refreshToken;
+    await user.save();
+    await otpRecord.destroy();
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+
+    return res.status(200).json({
+      message: "Agent login verified successfully.",
+      token,
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        role: role?.roleName || user.roleId,
+        verified: user.verified,
+        active: user.active,
+      },
+    });
+  } catch (error) {
+    console.error("Error verifying agent login OTP:", error);
+    return res.status(500).json({ message: "Internal server error." });
   }
 };
 

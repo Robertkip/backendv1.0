@@ -9,6 +9,7 @@ import {
   upload,
   getSingleUser,
   verifyOtpCode,
+  verifyAgentLoginOtp,
   sentConnectionRequest,
   receivedConnectionRequest,
   userConnections,
@@ -27,6 +28,7 @@ router.post("/signup", Signup);
 router.post("/signin", Signin);
 router.put("/updateprofile/", authController.upload, updateUserProfile);
 router.post("/verify", verifyOtpCode);
+router.post("/verify-agent-login", verifyAgentLoginOtp);
 router.put("/changepassword/:id", changePassword);
 router.post("/forgotpassword", forgotPassword);
 router.get("/users", getAllUsers);

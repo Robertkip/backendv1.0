@@ -22,6 +22,10 @@ const Otp = sequelize.define("otp", {
     type: DataTypes.DATE,
     allowNull: true,
   },
+  purpose: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
 });
 
 export default Otp;
