@@ -26,6 +26,8 @@ const Otp = sequelize.define("otp", {
     type: DataTypes.STRING,
     allowNull: true,
   },
+}, {
+  tableName: "otps",
 });
 
 export default Otp;
