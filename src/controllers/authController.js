@@ -24,6 +24,17 @@ import UserProfile from "../models/userProfileModel.js";
 
 dotenv.config();
 
+const DEFAULT_ROLE_NAMES = ["USER", "LANDLORD", "AGENT"];
+
+const ensureDefaultRoles = async () => {
+  for (const roleName of DEFAULT_ROLE_NAMES) {
+    const existingRole = await Role.findOne({ where: { roleName } });
+    if (!existingRole) {
+      await Role.create({ roleName, active: true });
+    }
+  }
+};
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -48,6 +59,8 @@ const __dirname = path.dirname(__filename);
 // );
 export const Signup = async (req, res) => {
   try {
+    await ensureDefaultRoles();
+
     const { username, email, password, confirm_password, active, verified, roleId } = req.body;
 
     // 1. Validate required fields
@@ -68,6 +81,10 @@ export const Signup = async (req, res) => {
       return res.status(400).json({ msg: "Passwords do not match" });
     }
 
+    const validRole = await Role.findByPk(roleId);
+    const fallbackRole = await Role.findOne({ where: { roleName: "USER" } });
+    const resolvedRoleId = validRole ? roleId : (fallbackRole?.id ?? 1);
+
     // 4. Hash password
     const hashedPassword = bcryptjs.hashSync(password, 8);
 
@@ -78,7 +95,7 @@ export const Signup = async (req, res) => {
       password: hashedPassword,
       active: active ?? false,
       verified: verified ?? false,
-      roleId: roleId ?? 1,
+      roleId: resolvedRoleId,
       settings: {
         notification: { push: true, email: true },
       },
@@ -176,12 +193,20 @@ export const Signin = async (req, res) => {
       });
     }
 
-    const role = await Role.findByPk(user.roleId);
+    let role = await Role.findByPk(user.roleId);
     if (!role) {
-      return res.status(500).json({
-        msg: "User role not found.",
-        message: "User role not found.",
-      });
+      const fallbackRole = await Role.findOne({ where: { roleName: "USER" } });
+
+      if (fallbackRole) {
+        user.roleId = fallbackRole.id;
+        await user.save();
+        role = fallbackRole;
+      } else {
+        return res.status(500).json({
+          msg: "User role not found.",
+          message: "User role not found.",
+        });
+      }
     }
 
     if (user.roleId === 2 || user.roleId === 3) {
