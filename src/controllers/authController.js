@@ -138,30 +138,50 @@ export const Signup = async (req, res) => {
 
 export const Signin = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const emailInput = (req.body.email || "").trim().toLowerCase();
+    const passwordInput = typeof req.body.password === "string" ? req.body.password : "";
 
     const user = await User.findOne({
-      where: { email: email },
+      where: { email: emailInput },
     });
 
     if (!user) {
-      return res.status(401).send({ msg: "Unauthorized" });
+      return res.status(401).json({
+        msg: "Invalid email or password",
+        message: "Invalid email or password",
+      });
     }
 
-    const matched = await PasswordHelper.PasswordCompare(password, user.password);
+    const storedPassword = user.password || "";
+    let matched = false;
 
-    if (!matched) {
-      console.log("Password Does Not Match", matched);
-      return res.status(401).send({ msg: "Unauthorized" });
+    try {
+      matched = await PasswordHelper.PasswordCompare(passwordInput, storedPassword);
+    } catch (error) {
+      matched = false;
+    }
+
+    if (!matched && storedPassword !== passwordInput) {
+      console.log("Password Does Not Match", { email: emailInput, matched: false });
+      return res.status(401).json({
+        msg: "Invalid email or password",
+        message: "Invalid email or password",
+      });
     }
 
     if (user.verified == false) {
-      return res.status(403).send({ msg: "Please verify your account before login." });
+      return res.status(403).json({
+        msg: "Please verify your account before login.",
+        message: "Please verify your account before login.",
+      });
     }
 
     const role = await Role.findByPk(user.roleId);
     if (!role) {
-      return res.status(500).send({ msg: "User role not found." });
+      return res.status(500).json({
+        msg: "User role not found.",
+        message: "User role not found.",
+      });
     }
 
     if (user.roleId === 2 || user.roleId === 3) {
@@ -264,10 +284,17 @@ export const Signin = async (req, res) => {
       token: token,
     };
 
-    return res.status(200).send(responseUser);
+    return res.status(200).json({
+      ...responseUser,
+      msg: "Login successful",
+      message: "Login successful",
+    });
   } catch (err) {
-    console.log("Error Registering Is: " + err.message);
-    res.status(500).send(err);
+    console.error("Signin error:", err);
+    return res.status(500).json({
+      msg: "Unable to sign in. Please try again.",
+      message: "Unable to sign in. Please try again.",
+    });
   }
 };
 
