@@ -115,6 +115,10 @@ export const getAllApartments = async (req, res) => {
   }
 };
 
+export const getAllRentals = async (req, res) => {
+  return getAllApartments(req, res);
+};
+
 // export const getAllApartments = async (req, res) => {
 //   await Apartment.findAll().then((data) => {
 //     console.log("Apartment Data Is",data);

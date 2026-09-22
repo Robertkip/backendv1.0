@@ -9,7 +9,10 @@ router.post(
   apartmentController.upload,
   apartmentController.uploadApartment
 );
-router.get("/allproperty", apartmentController.getAllApartments);
+router.get("/allproperty", apartmentController.getAllProperties);
+router.get("/properties", apartmentController.getAllProperties);
+router.get("/lands", apartmentController.getAllProperties);
+router.get("/allproperty/", apartmentController.getAllProperties);
 
 router.get("/property/:id", apartmentController.getApartmentById);
 router.get(

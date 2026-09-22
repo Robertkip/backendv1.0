@@ -12,8 +12,11 @@ router.post(
 );
 
 router.get("/userapartment", Authorization.Authenticated, apartmentController.getApartmentByUser);
-
+router.get("/user-apartments", Authorization.Authenticated, apartmentController.getApartmentByUser);
+router.get("/apartments", apartmentController.getAllRentals);
+router.get("/rentals", apartmentController.getAllRentals);
 router.get("/allapartment/", apartmentController.getAllApartments);
+router.get("/allapartment", apartmentController.getAllApartments);
 
 router.get("/apartment/:id", apartmentController.getApartmentById);
 

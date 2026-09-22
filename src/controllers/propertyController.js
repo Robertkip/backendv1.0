@@ -192,6 +192,10 @@ export const getAllApartments = async (req, res) => {
   });
 };
 
+export const getAllProperties = async (req, res) => {
+  return getAllApartments(req, res);
+};
+
 
 
 export const getTenantLandlordApartments = async (req, res) => {
