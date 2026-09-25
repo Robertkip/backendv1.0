@@ -244,7 +244,7 @@ app.post('/locations', (req, res) => {
 
 app.use(graphqlUploadExpress());
 
-// Start Apollo
+// Start Apollo Server and apply middleware
 await server.start();
 server.applyMiddleware({ app });
 
