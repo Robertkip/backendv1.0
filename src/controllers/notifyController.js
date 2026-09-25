@@ -1,8 +1,10 @@
 import admin from "firebase-admin";
-import serviceAccount from "../../waridi-793c4-firebase-adminsdk-4z45i-cf675a6b0d.json" assert { type: "json" };
+import fs from "fs";
 import NotificationToken from "../models/notificationTokenModel.js";
 
 import Notify from "../models/notifyModel.js";
+
+const serviceAccount = JSON.parse(fs.readFileSync(new URL("../../waridi-793c4-firebase-adminsdk-4z45i-cf675a6b0d.json", import.meta.url), "utf8"));
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),

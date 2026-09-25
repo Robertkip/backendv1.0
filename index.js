@@ -61,7 +61,7 @@ import connectSocket from "./src/socket/ConnectSocket.js";
 import { Authenticated } from "./src/middlewares/authorizationPermission.js";
 import connectDB from "./src/config/connectMongo.js";
 import { runMigrations } from "./src/config/connectDb.js";
-import options from "./swagger-output.json" assert { type: "json" };
+const options = JSON.parse(fs.readFileSync(new URL("./swagger-output.json", import.meta.url), "utf8"));
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

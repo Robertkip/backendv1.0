@@ -3,6 +3,20 @@
 ## Overview
 This is a real estate mobile application that connects users to LandLords, Property Owners and a possibility of becoming a tenant. It also connects users to users to come to  an agreement if they can be on a budget to co-exist or become room mates.
 
+## Requirements
+
+- Node.js 20 or newer
+- PostgreSQL
+- Redis
+
+Verify the Node.js version before installing dependencies:
+
+```bash
+node --version
+```
+
+The project declares Node.js `>=20.0.0` in `package.json`.
+
 ## Table of Content
            
    ### . Local Project Setup
