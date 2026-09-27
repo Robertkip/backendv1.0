@@ -1,7 +1,7 @@
 {
   "name": "backendv1.2",
   "version": "1.0.0",
-  "description": "Waridi JS Retrieve",
+  "description": "Waridi Real Estate Backends",
   "main": "index.js",
   "type": "module",
   "engines": {
