@@ -13,7 +13,7 @@ export const initPassport = (app) => {
     session({
       resave: false,
       saveUninitialized: true,
-      secret: process.env.SECRET,
+      secret: process.env.SECRET || process.env.REDIS_SESSION_SECRET || "your-secret-here",
     })
   );
   //init passport
@@ -38,21 +38,27 @@ export const initPassport = (app) => {
 // );
 
 ////////// GOOGLE //////////
-passport.use(
-  new GoogleStrategy(
-    {
-      clientID: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "https://api.waridi.org/api/v1/google/callback",
-    },
-    google,
-    async (accessToken, refreshToken, profile, done) => {
-      console.log(profile);
-      //done(err, user) will return the user we got from fb
-      done(null, profile);
-    }
-  )
-);
+// Google sign-in is optional: without credentials the strategy constructor
+// throws at import time and the whole server fails to start.
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+  passport.use(
+    new GoogleStrategy(
+      {
+        clientID: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        callbackURL: "https://api.waridi.org/api/v1/google/callback",
+      },
+      google,
+      async (accessToken, refreshToken, profile, done) => {
+        console.log(profile);
+        //done(err, user) will return the user we got from fb
+        done(null, profile);
+      }
+    )
+  );
+} else {
+  console.warn("GOOGLE_CLIENT_ID/GOOGLE_CLIENT_SECRET not set, Google sign-in disabled");
+}
 
 // Serialize user into the sessions
 passport.serializeUser((user, done) => done(null, user));
