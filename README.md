@@ -17,7 +17,7 @@ This is a real estate mobile application that connects users to LandLords, Prope
 3. Copy `env.example` to `.env` and set at least `DATABASE_PASSWORD`. `DATABASE_HOST`, `DATABASE_PORT`, `DATABASE_USER` and `DATABASE_NAME` default to `localhost`, `5432`, `postgres` and `waridi`; `MONGO_URI` defaults to `mongodb://localhost:27017/waridi` and `REDIS_URL` to `redis://localhost:6379`.
 4. `npm run dev:server`
 
-When there are no files in `migrations/`, startup creates any missing tables from the Sequelize models. Google sign-in is turned on only when `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` are set. Insert the roles listed under **Configure Database** below before registering users.
+When there are no files in `migrations/`, startup creates any missing tables from the Sequelize models. Google sign-in is turned on only when `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` are set. Push notifications need a Firebase service account key: get it from an administrator and set `FIREBASE_SERVICE_ACCOUNT_PATH` to its location (default `waridi-793c4-firebase-adminsdk-4z45i-cf675a6b0d.json` in the project root). Without it the server starts with push notifications disabled. Never commit this file or `.env`. Insert the roles listed under **Configure Database** below before registering users.
 
 Verify the Node.js version before installing dependencies:
 
@@ -104,11 +104,11 @@ The project declares Node.js `>=20.0.0` in `package.json`.
 
              /password
 
-         INSERT INTO "Roles" ("id", "roleName", "active", "createdAt", "updatedAt") 
+         INSERT INTO "roles" ("id", "roleName", "active", "createdAt", "updatedAt") 
        VALUES 
           (1, 'USER', true, NOW(), NOW()),
            (2, 'AGENT', true, NOW(), NOW()),
-          (3, 'LANDLORD', true, NOW(), NOW())
+          (3, 'LANDLORD', true, NOW(), NOW()),
           (4, 'SALES', true, NOW(), NOW()),
           (5, 'ADMIN', true, NOW(), NOW()),
           (6, 'SUPERADMIN', true, NOW(), NOW());
