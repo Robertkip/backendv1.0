@@ -26,7 +26,7 @@ const AgentComment = sequelize.define('agent_comments', {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: 'agent_profile',
+      model: AgentProfile,
       key: 'id',
     },
   },

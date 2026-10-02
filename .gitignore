@@ -2,7 +2,7 @@ node_modules/
 migrations/
 .env
 Images/
-config/
+/config/
 seeders/
 .vscode/
 AgentDocuments/

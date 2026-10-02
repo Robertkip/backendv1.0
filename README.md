@@ -8,6 +8,16 @@ This is a real estate mobile application that connects users to LandLords, Prope
 - Node.js 20 or newer
 - PostgreSQL
 - Redis
+- MongoDB (posts and chat messages; the rest of the API runs without it)
+
+### Quick start
+
+1. `npm install --legacy-peer-deps`
+2. Create an empty Postgres database (default name `waridi`).
+3. Copy `env.example` to `.env` and set at least `DATABASE_PASSWORD`. `DATABASE_HOST`, `DATABASE_PORT`, `DATABASE_USER` and `DATABASE_NAME` default to `localhost`, `5432`, `postgres` and `waridi`; `MONGO_URI` defaults to `mongodb://localhost:27017/waridi` and `REDIS_URL` to `redis://localhost:6379`.
+4. `npm run dev:server`
+
+When there are no files in `migrations/`, startup creates any missing tables from the Sequelize models. Google sign-in is turned on only when `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` are set. Insert the roles listed under **Configure Database** below before registering users.
 
 Verify the Node.js version before installing dependencies:
 
