@@ -36,7 +36,7 @@ router.put(
   Authorization.AdminRole,
   apartmentController.updateApartment
 );
-router.delete("/apartment/delete/:id", apartmentController.deleteApartment);
+router.delete("/apartment/delete/:id", Authorization.Authenticated, apartmentController.deleteApartment);
 router.delete(
   "/apartment/delete/all",
   Authorization.Authenticated,

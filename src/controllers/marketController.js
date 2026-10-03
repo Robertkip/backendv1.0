@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 import multer from "multer";
 import path from "path";
 import Market from "../models/marketModel.js";
+import { canModify, sendForbidden } from "../helpers/ownership.js";
 
 dotenv.config();
 
@@ -59,6 +60,13 @@ export const getMarketBySellerId = async () => {
 
 export const deleteMarket = async (req, res, next) => {
   const p_id = req.params.id;
+  const product = await Market.findByPk(p_id);
+  if (!product) {
+    return res.status(404).json({ message: "Market product not found" });
+  }
+  if (!canModify(req.user, product.sellerId)) {
+    return sendForbidden(res);
+  }
   await Market.destroy({ where: { id: p_id } })
     .then(() => {
       res.status(200).json({ message: "Market deleted successfully" });

@@ -1,4 +1,5 @@
 import AgentProfile from "../models/agentProfileModel.js";
+import { canModify, sendForbidden } from "../helpers/ownership.js";
 import ejs from "ejs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -113,6 +114,9 @@ export const updateAgentProfile = async (req, res) => {
     if (!agentProfile) {
       return res.status(404).json({ message: "Agent profile not found" });
     }
+    if (!canModify(req.user, agentProfile.user_id)) {
+      return sendForbidden(res);
+    }
 
     await agentProfile.update({
       agent_name,
@@ -135,6 +139,9 @@ export const deleteAgentProfile = async (req, res) => {
 
     if (!agentProfile) {
       return res.status     (404).json({ message: "Agent profile not found" });
+    }
+    if (!canModify(req.user, agentProfile.user_id)) {
+      return sendForbidden(res);
     }
 
     await agentProfile.destroy();

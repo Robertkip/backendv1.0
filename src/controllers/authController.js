@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 import bcryptjs from "bcryptjs";
-import { Op, literal, where } from "sequelize";
+import { Op, where } from "sequelize";
 import nodemailer from "nodemailer";
 import { google } from "googleapis";
 import multer from "multer";
@@ -10,6 +10,7 @@ import { sequelize } from "../config/connectDb.js";
 import User from "../models/authModel.js";
 import * as PasswordHelper from "../helpers/passwordHelper.js";
 import * as Helper from "../helpers/helper.js";
+import { canModify, sendForbidden } from "../helpers/ownership.js";
 import Otp from "../models/otpModel.js";
 import { Authenticated } from "../middlewares/authorizationPermission.js";
 import Connection from "../models/connectionsModel.js";
@@ -24,7 +25,20 @@ import UserProfile from "../models/userProfileModel.js";
 
 dotenv.config();
 
+// The only roles a user can choose at signup; staff roles are granted separately.
 const DEFAULT_ROLE_NAMES = ["USER", "LANDLORD", "AGENT"];
+
+// Bcrypt hashes start with $2a$, $2b$ or $2y$ followed by the cost.
+const isBcryptHash = (value) => /^\$2[aby]\$\d{2}\$/.test(value);
+
+const tokenPayload = (user) => ({
+  id: user.id,
+  username: user.username,
+  email: user.email,
+  roleId: user.roleId,
+  verified: user.verified,
+  active: user.active,
+});
 
 const ensureDefaultRoles = async () => {
   for (const roleName of DEFAULT_ROLE_NAMES) {
@@ -61,7 +75,7 @@ export const Signup = async (req, res) => {
   try {
     await ensureDefaultRoles();
 
-    const { username, email, password, confirm_password, active, verified, roleId } = req.body;
+    const { username, email, password, confirm_password, roleId } = req.body;
 
     // 1. Validate required fields
     if (!email || !password || !confirm_password || !username) {
@@ -81,9 +95,11 @@ export const Signup = async (req, res) => {
       return res.status(400).json({ msg: "Passwords do not match" });
     }
 
-    const validRole = await Role.findByPk(roleId);
+    const requestedRole = roleId ? await Role.findByPk(roleId) : null;
     const fallbackRole = await Role.findOne({ where: { roleName: "USER" } });
-    const resolvedRoleId = validRole ? roleId : (fallbackRole?.id ?? 1);
+    const resolvedRoleId = DEFAULT_ROLE_NAMES.includes(requestedRole?.roleName)
+      ? requestedRole.id
+      : (fallbackRole?.id ?? 1);
 
     // 4. Hash password
     const hashedPassword = bcryptjs.hashSync(password, 8);
@@ -93,8 +109,8 @@ export const Signup = async (req, res) => {
       email,
       username,
       password: hashedPassword,
-      active: active ?? false,
-      verified: verified ?? false,
+      active: false,
+      verified: false,
       roleId: resolvedRoleId,
       settings: {
         notification: { push: true, email: true },
@@ -158,7 +174,7 @@ export const Signin = async (req, res) => {
     const emailInput = (req.body.email || "").trim().toLowerCase();
     const passwordInput = typeof req.body.password === "string" ? req.body.password : "";
 
-    const user = await User.findOne({
+    const user = await User.scope("withPassword").findOne({
       where: { email: emailInput },
     });
 
@@ -170,15 +186,17 @@ export const Signin = async (req, res) => {
     }
 
     const storedPassword = user.password || "";
-    let matched = false;
+    let matched = await PasswordHelper.PasswordCompare(passwordInput, storedPassword);
 
-    try {
-      matched = await PasswordHelper.PasswordCompare(passwordInput, storedPassword);
-    } catch (error) {
-      matched = false;
+    // Older accounts may still hold a plain-text password: accept it once and
+    // replace it with a hash. A stored hash is never accepted as the password.
+    if (!matched && storedPassword && !isBcryptHash(storedPassword) && storedPassword === passwordInput) {
+      user.password = await PasswordHelper.PasswordHashing(passwordInput);
+      await user.save();
+      matched = true;
     }
 
-    if (!matched && storedPassword !== passwordInput) {
+    if (!matched) {
       console.log("Password Does Not Match", { email: emailInput, matched: false });
       return res.status(401).json({
         msg: "Invalid email or password",
@@ -213,15 +231,7 @@ export const Signin = async (req, res) => {
       const agentProfile = await AgentProfile.findOne({ where: { user_id: user.id } });
       const roleLabel = role.roleName === "LANDLORD" ? "landlord" : "agent";
       if (!agentProfile) {
-        const dataUser = {
-          id: user.id,
-          username: user.username,
-          email: user.email,
-          roleId: user.roleId,
-          verified: user.verified,
-          active: user.active,
-        };
-        const token = Helper.GenerateToken(dataUser);
+        const token = Helper.GenerateToken(tokenPayload(user));
 
         return res.status(200).send({
           message: `Complete your ${roleLabel} onboarding before accessing the dashboard.`,
@@ -274,16 +284,7 @@ export const Signin = async (req, res) => {
       });
     }
 
-    const dataUser = {
-      id: user.id,
-      username: user.username,
-      email: user.email,
-      roleId: user.roleId,
-      password: user.password,
-      confirm_password: user.confirm_password,
-      verified: user.verified,
-      active: user.active,
-    };
+    const dataUser = tokenPayload(user);
 
     console.log("Role ID Data User is", dataUser.roleId);
     console.log("Role By ID IS", role);
@@ -445,16 +446,7 @@ export const verifyAgentLoginOtp = async (req, res) => {
     }
 
     const role = await Role.findByPk(user.roleId);
-    const dataUser = {
-      id: user.id,
-      username: user.username,
-      email: user.email,
-      roleId: user.roleId,
-      password: user.password,
-      confirm_password: user.confirm_password,
-      verified: user.verified,
-      active: user.active,
-    };
+    const dataUser = tokenPayload(user);
 
     const token = Helper.GenerateToken(dataUser);
     const refreshToken = Helper.GenerateRefreshToken(dataUser);
@@ -513,6 +505,9 @@ export const forgotPassword = async (req, res) => {
 
 export const updateUserProfile = async (req, res) => {
    const userId = req.query.id;
+   if (!canModify(req.user, userId)) {
+     return sendForbidden(res);
+   }
 
    console.log("Updating user profile Id Is", userId)
    const username = req.body.username;
@@ -586,6 +581,10 @@ export const changePassword = async (req, res) => {
     const { id } = req.params;
     const { password, confirmPassword } = req.body;
 
+    if (!canModify(req.user, id)) {
+      return sendForbidden(res);
+    }
+
     if (!password || !confirmPassword) {
       return res.status(400).json({ msg: "Password fields are required" });
     }
@@ -621,6 +620,9 @@ export const generateOtp = async () => {
 
 export const changeImage = async (req, res) => {
   const id = req.params.id;
+  if (!canModify(req.user, id)) {
+    return sendForbidden(res);
+  }
   const user_avatar = PRODUCTION_IMAGE_ADDRESS + req.file.filename;
 
   await User.findOne({ where: { id: id } }).then((updateImage) => {
@@ -644,14 +646,10 @@ export const getSingleUser = async (req, res, next) => {
   // Retrieve all Tutorials from the database.
 
   const id = req.query.id;
-  var condition = id
-    ? {
-        [Op.and]: [
-          literal(`CAST("id" AS TEXT) LIKE '%${id}%'`),
-          literal(`"id" IS NOT NULL`),
-        ],
-      }
-    : null;
+  if (id !== undefined && !/^\d+$/.test(id)) {
+    return res.status(400).send({ message: "id must be a number" });
+  }
+  const condition = id !== undefined ? { id: Number(id) } : null;
 
   await User.findAll({ where: condition })
     .then((data) => {

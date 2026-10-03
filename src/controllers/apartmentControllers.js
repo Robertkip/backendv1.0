@@ -8,6 +8,7 @@ import NodeGeocoder from "node-geocoder";
 
 import { sequelize } from "../config/connectDb.js";
 import Apartment from "../models/apartmentModel.js";
+import { canModifyApartment, sendForbidden } from "../helpers/ownership.js";
 
 dotenv.config();
 
@@ -201,6 +202,13 @@ export const updateApartment = async (req, res, next) => {
 
 export const deleteApartment = async (req, res, next) => {
   const p_id = req.params.id;
+  const apartment = await Apartment.findByPk(p_id);
+  if (!apartment) {
+    return res.status(404).json({ message: "Apartment not found" });
+  }
+  if (!(await canModifyApartment(req.user, apartment))) {
+    return sendForbidden(res);
+  }
   await Apartment.destroy({ where: { id: p_id } })
     .then(() => {
       res.status(200).json({ message: "Apartment deleted successfully" });

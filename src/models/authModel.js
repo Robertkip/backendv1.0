@@ -70,6 +70,17 @@ const User = sequelize.define("users", {
     type: DataTypes.ARRAY(DataTypes.INTEGER),
     allowNull: true,
   },
+}, {
+  // Keep credentials out of every query result that could reach a response.
+  // Use User.scope("withPassword") where the password must be checked.
+  defaultScope: {
+    attributes: {
+      exclude: ["password", "confirm_password", "accessToken", "resetPasswordToken", "resetPasswordExpires"],
+    },
+  },
+  scopes: {
+    withPassword: {},
+  },
 });
 
 User.associations = (models) => {

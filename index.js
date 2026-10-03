@@ -19,39 +19,8 @@ import protoLoader from '@grpc/proto-loader';
 import session from "express-session";
 import { detectDevice } from "./src/middlewares/authorizationPermission.js";
 import swaggerUi from "swagger-ui-express";
-import apartmentRouter from "./src/routers/apartmentRoute.js";
-import authRouter from "./src/routers/authRoute.js";
-import roleRouter from "./src/routers/roleRoute.js";
-import marketRouter from "./src/routers/marketRoute.js";
-import landlordRouter from "./src/routers/landlordRoute.js";
-import tenantRouter from "./src/routers/tenantRoute.js";
-// import agentRouter from "./src/routers/agentRoute.js";
-import cartRouter from "./src/routers/cartRoute.js";
-import userProfileRouter from "./src/routers/userProfileRoute.js";
-import friendRequestRouter from "./src/routers/friendrequestRouter.js";
-import notificationDeviceRouter from "./src/routers/notificationTokenRoute.js";
-import messageRouter from "./src/routers/messageRouter.js";
-import propertyRouter from "./src/routers/propertyRoute.js";
-import ratingRouter from "./src/routers/ratingRoute.js";
-import geoLocationRouter from "./src/routers/geoLocationRoute.js";
-import apartmentFilesRouter from "./src/routers/apartmentFilesRoute.js"
-import apartmentPropertiesRouter from "./src/routers/apartmentPropertiesRoute.js"
-import facilitiesRouter from "./src/routers/facilitiesRoute.js"
-import propertyFacilitiesRouter from "./src/routers/propertyFacilitiesRoute.js"
-import propertyFilesRouter from "./src/routers/propertyFilesRoute.js"
-import propertyLocationRouter from "./src/routers/propertyLocationRoute.js"
-import apartmentLocationRouter from "./src/routers/locationRoute.js";
-import propertyPropertiesRouter from "./src/routers/propertyPropertiesRoute.js";
-import apartmentVerifyRouter from "./src/routers/apartmentVerifyRoute.js";
-import postMediaRouter from "./src/routers/postMediaRouter.js";
+import { mountApiRoutes } from "./src/routers/index.js";
 import { initPassport } from "./src/middlewares/initPassport.js";
-import notificationRouter from "./src/routers/notifyRoute.js";
-import agentCommentRouter from "./src/routers/agentCommentRoute.js";
-import agentLocationRouter from "./src/routers/agentLocationRoute.js";
-import agentDocumentsRouter from "./src/routers/agentDocumentsRoute.js";
-import apartmentCommentRouter from "./src/routers/apartmentCommentRoute.js";
-import apartmentPaymentPlanRouter from "./src/routers/apartmentPaymentRoute.js";
-import agentProfileRouter from "./src/routers/agentProfileRoute.js";
 
 import { createPost, getTimeline } from "./src/controllers/postController.js";
 import { sequelize } from "./src/config/connectDb.js";
@@ -196,40 +165,7 @@ app.use("/Posts", (req, res, next) => {
 
 app.use("/swagger-ui", swaggerUi.serve, swaggerUi.setup(options));
 
-app.use("/api/v1", apartmentRouter);
-app.use("/api/v1", authRouter);
-app.use("/api/v1", roleRouter);
-app.use("/api/v1", landlordRouter);
-app.use("/api/v1", tenantRouter);
-// app.use("/api/v1", agentRouter);
-app.use("/api/v1", marketRouter);
-app.use("/api/v1", roleRouter);
-app.use("/api/v1/posts", postMediaRouter);
-app.use("/api/v1/apartment", apartmentFilesRouter);
-app.use("/api/v1", apartmentPropertiesRouter);
-app.use("/api/v1", facilitiesRouter);
-app.use("/api/v1", propertyFacilitiesRouter);
-app.use("/api/v1/property", propertyFilesRouter);
-app.use("/api/v1", propertyLocationRouter);
-app.use("/api/v1/location", apartmentLocationRouter);
-app.use("/api/v1", propertyPropertiesRouter);
-app.use("/api/v1", cartRouter);
-app.use("/api/v1/user", userProfileRouter);
-app.use("/api/v1", friendRequestRouter);
-app.use("/api/v1/token", notificationDeviceRouter);
-// app.use("/api/v1", rentPricingRouter);
-app.use("/api/v1", ratingRouter);
-app.use("/api/v1", notificationRouter);
-app.use("/api/v1", messageRouter);
-app.use("/api/v1", propertyRouter);
-app.use("/api/v1", geoLocationRouter);
-app.use("/api/v1/verify-apartment", apartmentVerifyRouter);
-app.use("/api/v1", agentProfileRouter);
-app.use("/api/v1", agentCommentRouter);
-app.use("/api/v1", agentDocumentsRouter);
-app.use("/api/v1", agentLocationRouter);
-app.use("/api/v1", apartmentCommentRouter);
-app.use("/api/v1", apartmentPaymentPlanRouter);
+mountApiRoutes(app);
 
 
 

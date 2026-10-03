@@ -1,4 +1,5 @@
 import ApartmentComment from "../models/apartmentCommentModel.js";
+import { canModify, sendForbidden } from "../helpers/ownership.js";
 
 export const createApartmentComment = async (req, res) => {
   try {
@@ -44,6 +45,9 @@ export const updateApartmentComment = async (req, res) => {
     if (!apartmentComment) {
       return res.status(404).json({ message: "Comment not found" });
     }
+    if (!canModify(req.user, apartmentComment.user_id)) {
+      return sendForbidden(res);
+    }
 
     await apartmentComment.update({ content });
 
@@ -61,6 +65,9 @@ export const deleteApartmentComment = async (req, res) => {
 
     if (!apartmentComment) {
       return res.status(404).json({ message: "Comment not found" });
+    }
+    if (!canModify(req.user, apartmentComment.user_id)) {
+      return sendForbidden(res);
     }
 
     await apartmentComment.destroy();
