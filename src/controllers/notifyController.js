@@ -1,14 +1,24 @@
 import admin from "firebase-admin";
 import fs from "fs";
+import { fileURLToPath } from "url";
 import NotificationToken from "../models/notificationTokenModel.js";
 
 import Notify from "../models/notifyModel.js";
 
-const serviceAccount = JSON.parse(fs.readFileSync(new URL("../../waridi-793c4-firebase-adminsdk-4z45i-cf675a6b0d.json", import.meta.url), "utf8"));
+// The service account key is a secret and is not committed; without it the
+// server still starts and only push notifications are disabled.
+const serviceAccountPath = process.env.FIREBASE_SERVICE_ACCOUNT_PATH ||
+  fileURLToPath(new URL("../../waridi-793c4-firebase-adminsdk-4z45i-cf675a6b0d.json", import.meta.url));
+const firebaseEnabled = fs.existsSync(serviceAccountPath);
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-});
+if (firebaseEnabled) {
+  const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, "utf8"));
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+  });
+} else {
+  console.warn(`Firebase service account not found at ${serviceAccountPath}, push notifications disabled`);
+}
 
 let onlineUsers = [];
 let tokens = [];
@@ -58,6 +68,10 @@ export const getUser = (username) => {
 
 
 export const sendTokenInformation = async (req, res) => {
+  if (!firebaseEnabled) {
+    return res.status(503).json({ message: "Push notifications are not configured" });
+  }
+
   try {
     const userId = req.user?.id;
 

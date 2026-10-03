@@ -6,3 +6,6 @@ Images/
 seeders/
 .vscode/
 AgentDocuments/
+/yes
+/yes.pub
+*firebase-adminsdk*.json
