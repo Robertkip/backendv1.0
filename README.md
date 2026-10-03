@@ -19,6 +19,15 @@ This is a real estate mobile application that connects users to LandLords, Prope
 
 When there are no files in `migrations/`, startup creates any missing tables from the Sequelize models. Google sign-in is turned on only when `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` are set. Push notifications need a Firebase service account key: get it from an administrator and set `FIREBASE_SERVICE_ACCOUNT_PATH` to its location (default `waridi-793c4-firebase-adminsdk-4z45i-cf675a6b0d.json` in the project root). Without it the server starts with push notifications disabled. Never commit this file or `.env`. Insert the roles listed under **Configure Database** below before registering users.
 
+### Running tests
+
+Tests drop and recreate tables, so they only run against a database whose name ends in `_test` (default `waridi_test`; override with `TEST_DATABASE_NAME`).
+
+1. Create the test database once: `CREATE DATABASE waridi_test;`
+2. `npm test`
+
+The connection uses the same `DATABASE_HOST`, `DATABASE_PORT`, `DATABASE_USER` and `DATABASE_PASSWORD` as the app.
+
 Verify the Node.js version before installing dependencies:
 
 ```bash

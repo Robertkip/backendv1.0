@@ -5,6 +5,7 @@ import { fileURLToPath } from "url";
 import AgentDocuments from "../models/agentDocumentsModel.js";
 import fs from "fs";
 import AgentProfile from "../models/agentProfileModel.js";
+import { canModifyAgentRecord, sendForbidden } from "../helpers/ownership.js";
 
 
 dotenv.config();
@@ -147,6 +148,9 @@ export const deleteAgentDocument = async (req, res) => {
 
     if (!document) {
       return res.status(404).json({ message: "Document not found" });
+    }
+    if (!(await canModifyAgentRecord(req.user, document.agent_profile_id))) {
+      return sendForbidden(res);
     }
 
     // Delete the files from the filesystem

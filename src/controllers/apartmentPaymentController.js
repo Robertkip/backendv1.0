@@ -1,4 +1,12 @@
 import ApartmentPaymentPlan from "../models/apartmentPaymentPlanModel.js";
+import Apartment from "../models/apartmentModel.js";
+import { canModifyApartment, isAdmin, sendForbidden } from "../helpers/ownership.js";
+
+// A payment plan belongs to whoever owns its apartment.
+const canModifyPaymentPlan = async (user, paymentPlan) => {
+  const apartment = await Apartment.findByPk(paymentPlan.apartment_id);
+  return apartment ? canModifyApartment(user, apartment) : isAdmin(user);
+};
 
 export const createApartmentPaymentPlan = async (req, res) => {
   try {
@@ -57,6 +65,9 @@ export const updateApartmentPaymentPlan = async (req, res) => {
     if (!paymentPlan) {
       return res.status(404).json({ message: "Payment plan not found" });
     }
+    if (!(await canModifyPaymentPlan(req.user, paymentPlan))) {
+      return sendForbidden(res);
+    }
 
     await paymentPlan.update({
       unit_type,
@@ -80,6 +91,9 @@ export const deleteApartmentPaymentPlan = async (req, res) => {
 
     if (!paymentPlan) {
       return res.status(404).json({ message: "Payment plan not found" });
+    }
+    if (!(await canModifyPaymentPlan(req.user, paymentPlan))) {
+      return sendForbidden(res);
     }
 
     await paymentPlan.destroy();

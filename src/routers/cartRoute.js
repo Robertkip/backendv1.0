@@ -4,12 +4,9 @@ import { Authenticated } from "../middlewares/authorizationPermission.js";
 
 const router = express.Router();
 
-router.use(Authenticated);
-
-
-router.post("/cart/:productId", cartController.postCartItem);
-router.get("/allcart", cartController.getCartItems);
-router.delete("/cart/:productId", cartController.removeCartItem);
-router.put("/cart/:id", cartController.updateQuantity);
+router.post("/cart/:productId", Authenticated, cartController.postCartItem);
+router.get("/allcart", Authenticated, cartController.getCartItems);
+router.delete("/cart/:productId", Authenticated, cartController.removeCartItem);
+router.put("/cart/:id", Authenticated, cartController.updateQuantity);
 
 export default router;

@@ -1,5 +1,6 @@
 import AgentLocation from "../models/agentLocationModel.js";
 import AgentProfile from "../models/agentProfileModel.js";
+import { canModifyAgentRecord, sendForbidden } from "../helpers/ownership.js";
 
 
 export const createAgentLocation = async (req, res) => {
@@ -71,6 +72,9 @@ export const updateAgentLocation = async (req, res) => {
     if (!location) {
       return res.status(404).json({ message: "Agent location not found" });
     }
+    if (!(await canModifyAgentRecord(req.user, location.agent_profile_id))) {
+      return sendForbidden(res);
+    }
 
     await location.update({
       agent_county,
@@ -94,6 +98,9 @@ export const deleteAgentLocation = async (req, res) => {
 
     if (!location) {
       return res.status(404).json({ message: "Agent location not found" });
+    }
+    if (!(await canModifyAgentRecord(req.user, location.agent_profile_id))) {
+      return sendForbidden(res);
     }
 
     await location.destroy();

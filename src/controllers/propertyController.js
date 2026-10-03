@@ -5,6 +5,7 @@ import { Op } from "sequelize";
 import axios from "axios";
 import NodeGeocoder from "node-geocoder";
 import Property from "../models/propertyModel.js";
+import { canModify, sendForbidden } from "../helpers/ownership.js";
 
 dotenv.config();
 
@@ -38,6 +39,7 @@ export const uploadApartment = async (req, res) => {
       const name3 = "http://192.168.1.120:8084/images/" + req.files[2].filename;
       const name4 = "http://192.168.1.120:8084/images/" + req.files[3].filename;
       const newApartment = new Property({
+        agent_id: req.user.id,
         apartment_name: req.body.apartment_name,
         apartment_location: req.body.apartment_location,
         apartment_description: req.body.apartment_description,
@@ -79,6 +81,7 @@ export const uploadApartment = async (req, res) => {
       const name3 = PRODUCTION_IMAGE_ADDRESS + req.files[2].filename;
       const name4 = PRODUCTION_IMAGE_ADDRESS + req.files[3].filename;
       const newApartment = new Property({
+        agent_id: req.user.id,
         apartment_name: req.body.apartment_name,
         apartment_location: req.body.apartment_location,
         apartment_description: req.body.apartment_description,
@@ -120,6 +123,7 @@ export const uploadApartment = async (req, res) => {
       const name3 = "http://192.168.0.37:8084/images/" + req.files[2].filename;
       const name4 = "http://192.168.0.37:8084/images/" + req.files[3].filename;
       const newApartment = new Property({
+        agent_id: req.user.id,
         apartment_name: req.body.apartment_name,
         apartment_location: req.body.apartment_location,
         apartment_description: req.body.apartment_description,
@@ -246,6 +250,14 @@ export const updateApartment = async (req, res, next) => {
 
 export const deleteApartment = async (req, res, next) => {
   const p_id = req.params.id;
+  const property = await Property.findByPk(p_id);
+  if (!property) {
+    return res.status(404).json({ message: "Property not found" });
+  }
+  // Properties created before owners were recorded have no agent_id: admins only.
+  if (!canModify(req.user, property.agent_id)) {
+    return sendForbidden(res);
+  }
   await Property.destroy({ where: { id: p_id } })
     .then(() => {
       res.status(200).json({ message: "Apartment deleted successfully" });

@@ -19,6 +19,7 @@ import {
 } from "../controllers/authController.js";
 
 import * as authController from "../controllers/authController.js";
+import { Authenticated } from "../middlewares/authorizationPermission.js";
 
 const router = express.Router();
 
@@ -26,19 +27,19 @@ const CLIENT_URL = "https://api.waridi.org/";
 
 router.post("/signup", Signup);
 router.post("/signin", Signin);
-router.put("/updateprofile/", authController.upload, updateUserProfile);
+router.put("/updateprofile/", Authenticated, authController.upload, updateUserProfile);
 router.post("/verify", verifyOtpCode);
 router.post("/verify-agent-login", verifyAgentLoginOtp);
-router.put("/changepassword/:id", changePassword);
+router.put("/changepassword/:id", Authenticated, changePassword);
 router.post("/forgotpassword", forgotPassword);
-router.get("/users", getAllUsers);
-router.get("/get-single-user", getSingleUser);
-router.get("/social-users/", allSocialUsers);
-router.post("/send-connection-request", sentConnectionRequest);
-router.post("/receive-connection-request", receivedConnectionRequest);
-router.get("/get-connections/", authController.getConnections);
-router.get("/user-connections:/id", userConnections);
-router.put("/user/:id", upload, changeImage);
+router.get("/users", Authenticated, getAllUsers);
+router.get("/get-single-user", Authenticated, getSingleUser);
+router.get("/social-users/", Authenticated, allSocialUsers);
+router.post("/send-connection-request", Authenticated, sentConnectionRequest);
+router.post("/receive-connection-request", Authenticated, receivedConnectionRequest);
+router.get("/get-connections/", Authenticated, authController.getConnections);
+router.get("/user-connections:/id", Authenticated, userConnections);
+router.put("/user/:id", Authenticated, upload, changeImage);
 router.get("/google", passport.authenticate("google", { scope: ["profile"] }));
 router.get(
   "/facebook",
