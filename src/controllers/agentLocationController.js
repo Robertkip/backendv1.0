@@ -7,12 +7,11 @@ export const createAgentLocation = async (req, res) => {
   try {
 
 
-        const user = req.user.id;
-    
-        console.log("User ID from request:", user);
-        const agent = await AgentProfile.findOne({ where: { user_id: user } });
-    
-        const agent_profile_id = agent.id;
+    const agent = await AgentProfile.findOne({ where: { user_id: req.user.id } });
+    if (!agent) {
+      return res.status(404).json({ message: "Agent profile not found" });
+    }
+    const agent_profile_id = agent.id;
 
     const {agent_county, agent_subcounty, agent_town, agent_street, agent_location_description } = req.body;
 

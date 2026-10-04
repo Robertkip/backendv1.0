@@ -20,19 +20,20 @@ import {
 
 import * as authController from "../controllers/authController.js";
 import { Authenticated } from "../middlewares/authorizationPermission.js";
+import { createAuthRateLimit } from "../middlewares/rateLimit.js";
 
 const router = express.Router();
 
 const CLIENT_URL = "https://api.waridi.org/";
 
-router.post("/signup", Signup);
-router.post("/signin", Signin);
+router.post("/signup", createAuthRateLimit(), Signup);
+router.post("/signin", createAuthRateLimit(), Signin);
 router.put("/updateprofile/", Authenticated, authController.upload, updateUserProfile);
-router.post("/verify", verifyOtpCode);
-router.post("/verify-agent-login", verifyAgentLoginOtp);
+router.post("/verify", createAuthRateLimit(), verifyOtpCode);
+router.post("/verify-agent-login", createAuthRateLimit(), verifyAgentLoginOtp);
 router.put("/changepassword/:id", Authenticated, changePassword);
-router.post("/forgotpassword", forgotPassword);
-router.post("/resetpassword", authController.resetPassword);
+router.post("/forgotpassword", createAuthRateLimit(), forgotPassword);
+router.post("/resetpassword", createAuthRateLimit(), authController.resetPassword);
 router.get("/users", Authenticated, getAllUsers);
 router.get("/get-single-user", Authenticated, getSingleUser);
 router.get("/social-users/", Authenticated, allSocialUsers);

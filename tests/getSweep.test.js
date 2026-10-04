@@ -30,6 +30,7 @@ const EXTERNAL = [
   "GET /api/v1/google/callback",
   "GET /api/v1/facebook",
   "GET /api/v1/facebook/callback",
+  "POST /api/v1/send-notification",
 ];
 
 // Extra query strings to try on top of the bare route.
@@ -81,6 +82,8 @@ let token;
 beforeAll(async () => {
   await sequelize.sync({ force: true });
   await Role.bulkCreate(ROLES.map((roleName, i) => ({ id: i + 1, roleName, active: true })));
+  // Rows inserted with explicit ids do not advance the id sequence.
+  await sequelize.query(`SELECT setval(pg_get_serial_sequence('roles', 'id'), 6)`);
   const user = await User.create({ email: "sweep@example.com", username: "sweep", roleId: 5, verified: true });
   await UserProfile.create({ userId: user.id });
   const apartment = await Apartment.create({ apartment_name: "Flat", agent_id: user.id });
@@ -94,11 +97,36 @@ afterAll(async () => {
   await sequelize.close();
 });
 
+// Every other route, called with an empty body: a missing field must give a
+// client error, never a crash, a timeout or a 500.
+const writeCases = [];
+for (const [prefix, router] of apiRoutes) {
+  for (const layer of router.stack) {
+    if (!layer.route) continue;
+    for (const method of Object.keys(layer.route.methods).filter((m) => m !== "get")) {
+      const path = `${prefix}${layer.route.path}`;
+      const key = `${method.toUpperCase()} ${path}`;
+      for (const value of /:\w+/.test(path) ? PARAM_VALUES : [""]) {
+        writeCases.push({ key, method, url: path.replace(/:(\w+)/g, value) });
+      }
+    }
+  }
+}
+
 describe("GET sweep with a valid token", () => {
   it.each(cases)("$url", async ({ key, url }) => {
     const res = await request(app).get(url).set("authorization", `Bearer ${token}`).timeout(5000);
 
     const accepted = EXTERNAL.includes(key) ? [...ACCEPTED, 503] : ACCEPTED;
     expect(accepted).toContain(res.status);
+  });
+});
+
+describe("POST, PUT and DELETE sweep with an empty body", () => {
+  it.each(writeCases)("$method $url", async ({ key, method, url }) => {
+    const res = await request(app)[method](url).set("authorization", `Bearer ${token}`).timeout(5000);
+
+    if (EXTERNAL.includes(key) && res.status === 503) return;
+    expect(res.status).toBeLessThan(500);
   });
 });

@@ -61,8 +61,6 @@ export const createAgentDocument = async (req, res) => {
 
     const agent_id = agent.id;
 
-    console.log("Uploaded by:", user);
-
     const files = req.files;
 
     if (!files || files.length < 1) {

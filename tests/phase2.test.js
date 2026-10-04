@@ -369,3 +369,18 @@ describe("GET /rating/:itemId", () => {
     expect(res.body).toEqual({ average: 3, count: 2 });
   });
 });
+
+describe("apartment creation codes", () => {
+  it("are sent to the logged-in user and only accepted from them", async () => {
+    const sent = await send(owner, "post", "/api/v1/verify-apartment/send-verification-code", { email: "attacker@example.com" });
+    const { code } = await Otp.findOne({ where: { email: owner.email, purpose: "apartment_creation" } });
+
+    const stolen = await send(otherUser, "post", "/api/v1/verify-apartment/verify-apartment-creation", { code });
+    const own = await send(owner, "post", "/api/v1/verify-apartment/verify-apartment-creation", { code });
+
+    expect(sent.status).toBe(200);
+    expect(publishEmailJob.mock.calls[0][0].to).toBe(owner.email);
+    expect(stolen.status).toBe(400);
+    expect(own.status).toBe(200);
+  });
+});

@@ -1,61 +1,634 @@
 {
   "swagger": "2.0",
   "info": {
-    "version": "1.0.0",
-    "title": "REST API",
-    "description": ""
+    "title": "Waridi API",
+    "description": "Generated from the mounted routes by swagger.js.",
+    "version": "1.0.0"
   },
-  "host": "localhost:8084",
   "basePath": "/",
   "schemes": [
+    "https",
     "http"
   ],
+  "securityDefinitions": {
+    "bearerAuth": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header",
+      "description": "Bearer <token>"
+    }
+  },
   "paths": {
-    "/agent": {
+    "/api/v1/agent-comment": {
       "post": {
-        "description": "",
-        "parameters": [
+        "tags": [
+          "agent-comment"
+        ],
+        "parameters": [],
+        "security": [
           {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "userId": {
-                  "example": "any"
-                },
-                "agent_fname": {
-                  "example": "any"
-                },
-                "agent_lname": {
-                  "example": "any"
-                },
-                "agent_phonenumber": {
-                  "example": "any"
-                },
-                "agent_idno": {
-                  "example": "any"
-                },
-                "agent_location": {
-                  "example": "any"
-                }
-              }
-            }
+            "bearerAuth": []
           }
         ],
         "responses": {
-          "201": {
-            "description": "Created"
+          "200": {
+            "description": "OK"
           },
-          "400": {
-            "description": "Bad Request"
+          "401": {
+            "description": "Login required"
           }
         }
       }
     },
-    "/allagent": {
+    "/api/v1/agent-comment/{id}": {
       "get": {
-        "description": "",
+        "tags": [
+          "agent-comment"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "agent-comment"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "agent-comment"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/agent-comments/{agentId}": {
+      "get": {
+        "tags": [
+          "agent-comments"
+        ],
+        "parameters": [
+          {
+            "name": "agentId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/agent-documents": {
+      "post": {
+        "tags": [
+          "agent-documents"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "agent-documents"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/agent-documents/{id}": {
+      "get": {
+        "tags": [
+          "agent-documents"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "agent-documents"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/agent-location": {
+      "post": {
+        "tags": [
+          "agent-location"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "agent-location"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/agent-location/{id}": {
+      "get": {
+        "tags": [
+          "agent-location"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "agent-location"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "agent-location"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/agent-payment": {
+      "post": {
+        "tags": [
+          "agent-payment"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "agent-payment"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/agent-payment/{id}": {
+      "get": {
+        "tags": [
+          "agent-payment"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "agent-payment"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "agent-payment"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/agent-profile": {
+      "post": {
+        "tags": [
+          "agent-profile"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "agent-profile"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/agent-profile/{id}": {
+      "get": {
+        "tags": [
+          "agent-profile"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "agent-profile"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "agent-profile"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/agent-profile/me": {
+      "get": {
+        "tags": [
+          "agent-profile"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/allapartment": {
+      "get": {
+        "tags": [
+          "allapartment"
+        ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "OK"
@@ -63,9 +636,262 @@
         }
       }
     },
-    "/agent/{id}": {
+    "/api/v1/allcart": {
       "get": {
-        "description": "",
+        "tags": [
+          "allcart"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/alllandlord": {
+      "get": {
+        "tags": [
+          "alllandlord"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/allmarket": {
+      "get": {
+        "tags": [
+          "allmarket"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/allproperty": {
+      "get": {
+        "tags": [
+          "allproperty"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/alltenant": {
+      "get": {
+        "tags": [
+          "alltenant"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/apartment": {
+      "post": {
+        "tags": [
+          "apartment"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/apartment-comment": {
+      "post": {
+        "tags": [
+          "apartment-comment"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/apartment-comment/{id}": {
+      "get": {
+        "tags": [
+          "apartment-comment"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "apartment-comment"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "apartment-comment"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/apartment-facilities": {
+      "get": {
+        "tags": [
+          "apartment-facilities"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "apartment-facilities"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/apartment-facilities/{id}": {
+      "get": {
+        "tags": [
+          "apartment-facilities"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -77,107 +903,99 @@
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "404": {
-            "description": "Not Found"
           }
         }
-      }
-    },
-    "/agentuser/{userId}": {
-      "get": {
-        "description": "",
+      },
+      "put": {
+        "tags": [
+          "apartment-facilities"
+        ],
         "parameters": [
           {
-            "name": "userId",
+            "name": "id",
             "in": "path",
             "required": true,
             "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
           }
         ],
         "responses": {
           "200": {
             "description": "OK"
           },
-          "500": {
-            "description": "Internal Server Error"
+          "401": {
+            "description": "Login required"
           }
         }
-      }
-    },
-    "agentapartment/{apartmentId}": {
-      "get": {
-        "description": "",
+      },
+      "delete": {
+        "tags": [
+          "apartment-facilities"
+        ],
         "parameters": [
           {
-            "name": "apartmentId",
+            "name": "id",
             "in": "path",
             "required": true,
             "type": "string"
           }
         ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
-          "default": {
-            "description": ""
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
           }
         }
       }
     },
-    "/apartment": {
+    "/api/v1/apartment-properties": {
+      "get": {
+        "tags": [
+          "apartment-properties"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
       "post": {
-        "description": "",
-        "parameters": [
+        "tags": [
+          "apartment-properties"
+        ],
+        "parameters": [],
+        "security": [
           {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "apartment_name": {
-                  "example": "any"
-                },
-                "apartment_location": {
-                  "example": "any"
-                },
-                "apartment_description": {
-                  "example": "any"
-                },
-                "address": {
-                  "example": "any"
-                },
-                "logent_id": {
-                  "example": "any"
-                }
-              }
-            }
+            "bearerAuth": []
           }
         ],
         "responses": {
           "200": {
             "description": "OK"
           },
-          "201": {
-            "description": "Created"
-          },
-          "500": {
-            "description": "Internal Server Error"
+          "401": {
+            "description": "Login required"
           }
         }
       }
     },
-    "/allapartment": {
+    "/api/v1/apartment-properties/{id}": {
       "get": {
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/apartment/{id}": {
-      "get": {
-        "description": "",
+        "tags": [
+          "apartment-properties"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -189,16 +1007,185 @@
         "responses": {
           "200": {
             "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "apartment-properties"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
           },
-          "404": {
-            "description": "Not Found"
+          "401": {
+            "description": "Login required"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "apartment-properties"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
           }
         }
       }
     },
-    "/apartmentaccount/{logent_id}": {
+    "/api/v1/apartment/{id}": {
       "get": {
-        "description": "",
+        "tags": [
+          "apartment"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/apartment/addfiles": {
+      "post": {
+        "tags": [
+          "apartment"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/apartment/delete/{id}": {
+      "delete": {
+        "tags": [
+          "apartment"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/apartment/delete/all": {
+      "delete": {
+        "tags": [
+          "apartment"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/apartment/update/{id}": {
+      "put": {
+        "tags": [
+          "apartment"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/apartmentaccount/{logent_id}": {
+      "get": {
+        "tags": [
+          "apartmentaccount"
+        ],
         "parameters": [
           {
             "name": "logent_id",
@@ -210,69 +1197,39 @@
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "500": {
-            "description": "Internal Server Error"
           }
         }
       }
     },
-    "/apartment/{agent_id}": {
+    "/api/v1/apartments": {
       "get": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "agent_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
+        "tags": [
+          "apartments"
         ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "500": {
-            "description": "Internal Server Error"
           }
         }
       }
     },
-    "/apartment/update/{id}": {
+    "/api/v1/cart/{id}": {
       "put": {
-        "description": "",
+        "tags": [
+          "cart"
+        ],
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
             "type": "string"
-          },
+          }
+        ],
+        "security": [
           {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "apartment_name": {
-                  "example": "any"
-                },
-                "apartment_location": {
-                  "example": "any"
-                },
-                "apartment_description": {
-                  "example": "any"
-                },
-                "logent_id": {
-                  "example": "any"
-                }
-              }
-            }
+            "bearerAuth": []
           }
         ],
         "responses": {
@@ -280,340 +1237,16 @@
             "description": "OK"
           },
           "401": {
-            "description": "Unauthorized"
-          },
-          "500": {
-            "description": "Internal Server Error"
+            "description": "Login required"
           }
         }
       }
     },
-    "/apartment/delete/{id}": {
-      "delete": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/apartment/delete/all": {
-      "delete": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/": {
-      "get": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "user_fname",
-            "in": "query",
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/signup": {
+    "/api/v1/cart/{productId}": {
       "post": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "username": {
-                  "example": "any"
-                },
-                "email": {
-                  "example": "any"
-                },
-                "password": {
-                  "example": "any"
-                },
-                "confirm_password": {
-                  "example": "any"
-                },
-                "active": {
-                  "example": "any"
-                },
-                "verified": {
-                  "example": "any"
-                },
-                "roleId": {
-                  "example": "any"
-                }
-              }
-            }
-          }
+        "tags": [
+          "cart"
         ],
-        "responses": {
-          "400": {
-            "description": "Bad Request"
-          },
-          "422": {
-            "description": "Unprocessable Entity"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/signin": {
-      "post": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "email": {
-                  "example": "any"
-                },
-                "password": {
-                  "example": "any"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/send/{to}": {
-      "get": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "to",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/verify/{to}/{code}": {
-      "get": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "to",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "code",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/changepassword": {
-      "post": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "email": {
-                  "example": "any"
-                },
-                "otpCode": {
-                  "example": "any"
-                },
-                "password": {
-                  "example": "any"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/users": {
-      "get": {
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/get-single-user": {
-      "get": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "query",
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/user/{id}": {
-      "put": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "description": {
-                  "example": "any"
-                },
-                "dateofbirth": {
-                  "example": "any"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/google": {
-      "get": {
-        "description": "",
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        }
-      }
-    },
-    "/facebook": {
-      "get": {
-        "description": "",
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        }
-      }
-    },
-    "/google/callback": {
-      "get": {
-        "description": "",
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        }
-      }
-    },
-    "/facebook/callback": {
-      "get": {
-        "description": "",
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        }
-      }
-    },
-    "/cart/{productId}": {
-      "post": {
-        "description": "",
         "parameters": [
           {
             "name": "productId",
@@ -622,50 +1255,9 @@
             "type": "string"
           }
         ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "404": {
-            "description": "Not Found"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/allcart": {
-      "get": {
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/cart/{id}": {
-      "delete": {
-        "description": "",
-        "parameters": [
+        "security": [
           {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
+            "bearerAuth": []
           }
         ],
         "responses": {
@@ -673,90 +1265,42 @@
             "description": "OK"
           },
           "401": {
-            "description": "Unauthorized"
-          },
-          "404": {
-            "description": "Not Found"
-          },
-          "500": {
-            "description": "Internal Server Error"
+            "description": "Login required"
           }
         }
       },
-      "put": {
-        "description": "",
+      "delete": {
+        "tags": [
+          "cart"
+        ],
         "parameters": [
           {
-            "name": "id",
+            "name": "productId",
             "in": "path",
             "required": true,
             "type": "string"
-          },
+          }
+        ],
+        "security": [
           {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "action": {
-                  "example": "any"
-                }
-              }
-            }
+            "bearerAuth": []
           }
         ],
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request"
           },
           "401": {
-            "description": "Unauthorized"
-          },
-          "404": {
-            "description": "Not Found"
-          },
-          "500": {
-            "description": "Internal Server Error"
+            "description": "Login required"
           }
         }
       }
     },
-    "/send/{id}": {
-      "post": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "chat": {
-                  "example": "any"
-                }
-              }
-            }
-          }
+    "/api/v1/changepassword/{id}": {
+      "put": {
+        "tags": [
+          "changepassword"
         ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/show/{id}": {
-      "get": {
-        "description": "",
         "parameters": [
           {
             "name": "id",
@@ -765,88 +1309,48 @@
             "type": "string"
           }
         ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/friend": {
-      "post": {
-        "description": "",
-        "parameters": [
+        "security": [
           {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "senderId": {
-                  "example": "any"
-                },
-                "receiverId": {
-                  "example": "any"
-                }
-              }
-            }
+            "bearerAuth": []
           }
         ],
         "responses": {
           "200": {
             "description": "OK"
           },
-          "500": {
-            "description": "Internal Server Error"
+          "401": {
+            "description": "Login required"
           }
         }
       }
     },
-    "/landlord": {
+    "/api/v1/create-message": {
       "post": {
-        "description": "",
-        "parameters": [
+        "tags": [
+          "create-message"
+        ],
+        "parameters": [],
+        "security": [
           {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "userId": {
-                  "example": "any"
-                },
-                "landlord_fname": {
-                  "example": "any"
-                },
-                "landlord_lname": {
-                  "example": "any"
-                },
-                "landlord_phonenumber": {
-                  "example": "any"
-                },
-                "landlord_idno": {
-                  "example": "any"
-                },
-                "landlord_location": {
-                  "example": "any"
-                }
-              }
-            }
+            "bearerAuth": []
           }
         ],
         "responses": {
-          "201": {
-            "description": "Created"
+          "200": {
+            "description": "OK"
           },
-          "400": {
-            "description": "Bad Request"
+          "401": {
+            "description": "Login required"
           }
         }
       }
     },
-    "/alllandlord": {
+    "/api/v1/facebook": {
       "get": {
-        "description": "",
+        "tags": [
+          "facebook"
+        ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "OK"
@@ -854,9 +1358,231 @@
         }
       }
     },
-    "/landlordid/{id}": {
+    "/api/v1/facebook/callback": {
       "get": {
-        "description": "",
+        "tags": [
+          "facebook"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/forgotpassword": {
+      "post": {
+        "tags": [
+          "forgotpassword"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/friend": {
+      "post": {
+        "tags": [
+          "friend"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/get-all-messages": {
+      "get": {
+        "tags": [
+          "get-all-messages"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/get-connections": {
+      "get": {
+        "tags": [
+          "get-connections"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/get-location": {
+      "get": {
+        "tags": [
+          "get-location"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/get-messages": {
+      "get": {
+        "tags": [
+          "get-messages"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/get-notification": {
+      "get": {
+        "tags": [
+          "get-notification"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/get-single-user": {
+      "get": {
+        "tags": [
+          "get-single-user"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/google": {
+      "get": {
+        "tags": [
+          "google"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/google/callback": {
+      "get": {
+        "tags": [
+          "google"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/landlord": {
+      "post": {
+        "tags": [
+          "landlord"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/landlordid/{id}": {
+      "get": {
+        "tags": [
+          "landlordid"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -865,16 +1591,26 @@
             "type": "string"
           }
         ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
           }
         }
       }
     },
-    "/landlorduser/{userId}": {
+    "/api/v1/landlorduser/{userId}": {
       "get": {
-        "description": "",
+        "tags": [
+          "landlorduser"
+        ],
         "parameters": [
           {
             "name": "userId",
@@ -883,58 +1619,90 @@
             "type": "string"
           }
         ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/market": {
-      "post": {
-        "description": "",
-        "parameters": [
+        "security": [
           {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "sellerId": {
-                  "example": "any"
-                },
-                "product_name": {
-                  "example": "any"
-                },
-                "product_description": {
-                  "example": "any"
-                },
-                "product_quantity": {
-                  "example": "any"
-                },
-                "product_price": {
-                  "example": "any"
-                }
-              }
-            }
+            "bearerAuth": []
           }
         ],
         "responses": {
-          "201": {
-            "description": "Created"
+          "200": {
+            "description": "OK"
           },
-          "400": {
-            "description": "Bad Request"
+          "401": {
+            "description": "Login required"
           }
         }
       }
     },
-    "/allmarket": {
+    "/api/v1/lands": {
       "get": {
-        "description": "",
+        "tags": [
+          "lands"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/location": {
+      "post": {
+        "tags": [
+          "location"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/location/addlocation": {
+      "post": {
+        "tags": [
+          "location"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/location/alllocations": {
+      "get": {
+        "tags": [
+          "location"
+        ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "OK"
@@ -942,9 +1710,199 @@
         }
       }
     },
-    "/marketproducts/{sellerId}": {
+    "/api/v1/location/locations": {
       "get": {
-        "description": "",
+        "tags": [
+          "location"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/location/locations/{id}": {
+      "get": {
+        "tags": [
+          "location"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "location"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "location"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/location/locations/name/{name}": {
+      "get": {
+        "tags": [
+          "location"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/location/locations/search": {
+      "get": {
+        "tags": [
+          "location"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/market": {
+      "post": {
+        "tags": [
+          "market"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/market/delete/{id}": {
+      "delete": {
+        "tags": [
+          "market"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/market/delete/all": {
+      "delete": {
+        "tags": [
+          "market"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/marketproducts/{sellerId}": {
+      "get": {
+        "tags": [
+          "marketproducts"
+        ],
         "parameters": [
           {
             "name": "sellerId",
@@ -954,142 +1912,711 @@
           }
         ],
         "responses": {
-          "default": {
-            "description": ""
+          "200": {
+            "description": "OK"
           }
         }
       }
     },
-    "/store-device-token": {
+    "/api/v1/posts/media": {
       "post": {
-        "description": "",
-        "parameters": [
+        "tags": [
+          "posts"
+        ],
+        "parameters": [],
+        "security": [
           {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "userId": {
-                  "example": "any"
-                },
-                "deviceToken": {
-                  "example": "any"
-                }
-              }
-            }
+            "bearerAuth": []
           }
         ],
         "responses": {
           "200": {
             "description": "OK"
           },
-          "400": {
-            "description": "Bad Request"
-          },
-          "500": {
-            "description": "Internal Server Error"
+          "401": {
+            "description": "Login required"
           }
         }
       }
     },
-    "/role": {
-      "post": {
-        "description": "",
-        "parameters": [
+    "/api/v1/properties": {
+      "get": {
+        "tags": [
+          "properties"
+        ],
+        "parameters": [],
+        "security": [
           {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "roleName": {
-                  "example": "any"
-                },
-                "active": {
-                  "example": "any"
-                }
-              }
-            }
+            "bearerAuth": []
           }
         ],
         "responses": {
-          "201": {
-            "description": "Created"
+          "200": {
+            "description": "OK"
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/property": {
+      "post": {
+        "tags": [
+          "property"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
           },
-          "500": {
-            "description": "Internal Server Error"
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/property-facilities": {
+      "get": {
+        "tags": [
+          "property-facilities"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "property-facilities"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/property-facilities/{id}": {
+      "get": {
+        "tags": [
+          "property-facilities"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "property-facilities"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "property-facilities"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/property-locations": {
+      "get": {
+        "tags": [
+          "property-locations"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "property-locations"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/property-locations/{id}": {
+      "get": {
+        "tags": [
+          "property-locations"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "property-locations"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "property-locations"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/property-properties": {
+      "get": {
+        "tags": [
+          "property-properties"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "property-properties"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/property-properties/{id}": {
+      "get": {
+        "tags": [
+          "property-properties"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "property-properties"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "property-properties"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/property/{id}": {
+      "get": {
+        "tags": [
+          "property"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/property/addfiles": {
+      "post": {
+        "tags": [
+          "property"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/property/agent/{agent_id}": {
+      "get": {
+        "tags": [
+          "property"
+        ],
+        "parameters": [
+          {
+            "name": "agent_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/property/delete/{id}": {
+      "delete": {
+        "tags": [
+          "property"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/property/delete/all": {
+      "delete": {
+        "tags": [
+          "property"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/property/update/{id}": {
+      "put": {
+        "tags": [
+          "property"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/propertyaccount/{logent_id}": {
+      "get": {
+        "tags": [
+          "propertyaccount"
+        ],
+        "parameters": [
+          {
+            "name": "logent_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/rating": {
+      "post": {
+        "tags": [
+          "rating"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/rating/{itemId}": {
+      "get": {
+        "tags": [
+          "rating"
+        ],
+        "parameters": [
+          {
+            "name": "itemId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/receive-connection-request": {
+      "post": {
+        "tags": [
+          "receive-connection-request"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/register": {
+      "post": {
+        "tags": [
+          "register"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/rentals": {
+      "get": {
+        "tags": [
+          "rentals"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/resetpassword": {
+      "post": {
+        "tags": [
+          "resetpassword"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/role": {
+      "post": {
+        "tags": [
+          "role"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
           }
         }
       },
       "get": {
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/tenant": {
-      "post": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "userId": {
-                  "example": "any"
-                },
-                "tenant_fname": {
-                  "example": "any"
-                },
-                "tenant_lname": {
-                  "example": "any"
-                },
-                "tenant_idno": {
-                  "example": "any"
-                },
-                "tenant_phonenumber": {
-                  "example": "any"
-                },
-                "tenant_location": {
-                  "example": "any"
-                }
-              }
-            }
-          }
+        "tags": [
+          "role"
         ],
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "422": {
-            "description": "Unprocessable Entity"
-          }
-        }
-      }
-    },
-    "/alltenant": {
-      "get": {
-        "description": "",
+        "parameters": [],
         "responses": {
           "200": {
             "description": "OK"
@@ -1097,9 +2624,11 @@
         }
       }
     },
-    "/tenant/{id}": {
+    "/api/v1/role/{id}": {
       "get": {
-        "description": "",
+        "tags": [
+          "role"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -1111,82 +2640,92 @@
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "404": {
-            "description": "Not Found"
           }
         }
       }
     },
-    "/tenantuser/{userId}": {
+    "/api/v1/search-apartment": {
       "get": {
-        "description": "",
-        "parameters": [
+        "tags": [
+          "search-apartment"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/search-property": {
+      "get": {
+        "tags": [
+          "search-property"
+        ],
+        "parameters": [],
+        "security": [
           {
-            "name": "userId",
-            "in": "path",
-            "required": true,
-            "type": "string"
+            "bearerAuth": []
           }
         ],
         "responses": {
           "200": {
             "description": "OK"
           },
-          "500": {
-            "description": "Internal Server Error"
+          "401": {
+            "description": "Login required"
           }
         }
       }
     },
-    "/userprofile": {
+    "/api/v1/send-connection-request": {
       "post": {
-        "description": "",
-        "parameters": [
+        "tags": [
+          "send-connection-request"
+        ],
+        "parameters": [],
+        "security": [
           {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "userId": {
-                  "example": "any"
-                },
-                "user_fname": {
-                  "example": "any"
-                },
-                "user_lname": {
-                  "example": "any"
-                },
-                "user_phonenumber": {
-                  "example": "any"
-                },
-                "user_location": {
-                  "example": "any"
-                },
-                "followers": {
-                  "example": "any"
-                },
-                "following": {
-                  "example": "any"
-                }
-              }
-            }
+            "bearerAuth": []
           }
         ],
         "responses": {
-          "201": {
-            "description": "Created"
+          "200": {
+            "description": "OK"
           },
-          "400": {
-            "description": "Bad Request"
+          "401": {
+            "description": "Login required"
           }
         }
       }
     },
-    "/alluserprofile": {
-      "get": {
-        "description": "",
+    "/api/v1/send-notification": {
+      "post": {
+        "tags": [
+          "send-notification"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/signin": {
+      "post": {
+        "tags": [
+          "signin"
+        ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "OK"
@@ -1194,9 +2733,100 @@
         }
       }
     },
-    "/userprofile/{id}": {
+    "/api/v1/signup": {
+      "post": {
+        "tags": [
+          "signup"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/single-apartment": {
       "get": {
-        "description": "",
+        "tags": [
+          "single-apartment"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/single-property": {
+      "get": {
+        "tags": [
+          "single-property"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/social-users": {
+      "get": {
+        "tags": [
+          "social-users"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/tenant": {
+      "post": {
+        "tags": [
+          "tenant"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/tenant/{id}": {
+      "get": {
+        "tags": [
+          "tenant"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -1205,19 +2835,26 @@
             "type": "string"
           }
         ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
           },
-          "404": {
-            "description": "Not Found"
+          "401": {
+            "description": "Login required"
           }
         }
       }
     },
-    "/singleuser/{userId}": {
+    "/api/v1/tenantuser/{userId}": {
       "get": {
-        "description": "",
+        "tags": [
+          "tenantuser"
+        ],
         "parameters": [
           {
             "name": "userId",
@@ -1226,12 +2863,386 @@
             "type": "string"
           }
         ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
           },
-          "500": {
-            "description": "Internal Server Error"
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/token": {
+      "get": {
+        "tags": [
+          "token"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/token/store-device-token": {
+      "post": {
+        "tags": [
+          "token"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/updateprofile": {
+      "put": {
+        "tags": [
+          "updateprofile"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/user": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/user-apartments": {
+      "get": {
+        "tags": [
+          "user-apartments"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/user-connections/{id}": {
+      "get": {
+        "tags": [
+          "user-connections"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/user/{id}": {
+      "put": {
+        "tags": [
+          "user"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/user/alluserprofile": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/user/singleuser/{userId}": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/user/userprofile": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/user/userprofile/{id}": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/userapartment": {
+      "get": {
+        "tags": [
+          "userapartment"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/users": {
+      "get": {
+        "tags": [
+          "users"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/verify": {
+      "post": {
+        "tags": [
+          "verify"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/verify-agent-login": {
+      "post": {
+        "tags": [
+          "verify-agent-login"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/verify-apartment/send-verification-code": {
+      "post": {
+        "tags": [
+          "verify-apartment"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/verify-apartment/verify-apartment-creation": {
+      "post": {
+        "tags": [
+          "verify-apartment"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
           }
         }
       }

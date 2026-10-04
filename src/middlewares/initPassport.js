@@ -50,7 +50,6 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
       },
       google,
       async (accessToken, refreshToken, profile, done) => {
-        console.log(profile);
         //done(err, user) will return the user we got from fb
         done(null, profile);
       }

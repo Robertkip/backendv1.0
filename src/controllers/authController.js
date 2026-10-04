@@ -22,7 +22,8 @@ import UserProfile from "../models/userProfileModel.js";
 dotenv.config();
 
 // The only roles a user can choose at signup; staff roles are granted separately.
-const DEFAULT_ROLE_NAMES = ["USER", "LANDLORD", "AGENT"];
+// In id order (1, 2, 3), matching migrations/20261004000200-seed-roles.cjs.
+const DEFAULT_ROLE_NAMES = ["USER", "AGENT", "LANDLORD"];
 
 // Bcrypt hashes start with $2a$, $2b$ or $2y$ followed by the cost.
 const isBcryptHash = (value) => /^\$2[aby]\$\d{2}\$/.test(value);
@@ -81,57 +82,59 @@ export const Signup = async (req, res) => {
     // 4. Hash password
     const hashedPassword = bcryptjs.hashSync(password, 8);
 
-    // 5. Create new user
-    const newUser = await User.create({
-      email,
-      username,
-      password: hashedPassword,
-      active: false,
-      verified: false,
-      roleId: resolvedRoleId,
-      settings: {
-        notification: { push: true, email: true },
-      },
-    });
+    // 5-9. Create the user, profile and OTP, and queue the OTP email, as one
+    // unit: if the email job cannot be queued (RabbitMQ down) nothing is
+    // saved, so the person can simply sign up again later.
+    const newUser = await sequelize.transaction(async (transaction) => {
+      const user = await User.create({
+        email,
+        username,
+        password: hashedPassword,
+        active: false,
+        verified: false,
+        roleId: resolvedRoleId,
+        settings: {
+          notification: { push: true, email: true },
+        },
+      }, { transaction });
 
-    // 6. Create user profile
-    await UserProfile.create({
-      userId: newUser.id,
-      user_fname: username,
-      user_lname: '',
-      user_location: '',
-      user_phonenumber: null,
-      followers: [],
-      following: [],
-      user_avatar: '',
-      type: '',
-    });
+      await UserProfile.create({
+        userId: user.id,
+        user_fname: username,
+        user_lname: '',
+        user_location: '',
+        user_phonenumber: null,
+        followers: [],
+        following: [],
+        user_avatar: '',
+        type: '',
+      }, { transaction });
 
-    // 7. Generate and save OTP
-    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
-    await Otp.create({
-      email: newUser.email,
-      code: otpCode,
-      createdAt: new Date(),
-      expireIn: expiresAt,
-      purpose: "account_verification",
-    });
+      const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+      const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+      await Otp.create({
+        email: user.email,
+        code: otpCode,
+        createdAt: new Date(),
+        expireIn: expiresAt,
+        purpose: "account_verification",
+      }, { transaction });
 
-    // 8. Render OTP template (if using your existing welcome.ejs)
-    const templatePath = path.join(__dirname, '../templates/layouts/registration-otp.ejs');
-    const html = await ejs.renderFile(templatePath, {
-      name: newUser.username || 'User',
-      otp: otpCode,
-      expiryMinutes: 5,
-    });
+      const templatePath = path.join(__dirname, '../templates/layouts/registration-otp.ejs');
+      const html = await ejs.renderFile(templatePath, {
+        name: user.username || 'User',
+        otp: otpCode,
+        expiryMinutes: 5,
+      });
 
-    // 9. Publish email job with pre‑rendered HTML
-    await publishEmailJob({
-      to: newUser.email,
-      subject: 'Verify Your Waridi Account',
-      html,        // 👈 rendered HTML
-      text: `Your OTP is ${otpCode}. Please verify your email within 5 minutes.`,
+      await publishEmailJob({
+        to: user.email,
+        subject: 'Verify Your Waridi Account',
+        html,
+        text: `Your OTP is ${otpCode}. Please verify your email within 5 minutes.`,
+      });
+
+      return user;
     });
 
     // 10. Respond
@@ -174,7 +177,6 @@ export const Signin = async (req, res) => {
     }
 
     if (!matched) {
-      console.log("Password Does Not Match", { email: emailInput, matched: false });
       return res.status(401).json({
         msg: "Invalid email or password",
         message: "Invalid email or password",
@@ -263,9 +265,6 @@ export const Signin = async (req, res) => {
 
     const dataUser = tokenPayload(user);
 
-    console.log("Role ID Data User is", dataUser.roleId);
-    console.log("Role By ID IS", role);
-
     const token = Helper.GenerateToken(dataUser);
     const refreshToken = Helper.GenerateRefreshToken(dataUser);
 
@@ -333,9 +332,13 @@ export const sendOtpVerification = async (user) => {
 export const verifyOtpCode = async (req, res) => {
   const { email, code } = req.body;
 
+  if (!email || !code) {
+    return res.status(400).json({ message: "email and code are required" });
+  }
+
   try {
     const otpRecord = await Otp.findOne({
-      where: { email, code, purpose: "account_verification" },
+      where: { email, code: String(code), purpose: "account_verification" },
     });
 
     if (!otpRecord) {
@@ -364,9 +367,13 @@ export const verifyOtpCode = async (req, res) => {
 export const verifyAgentLoginOtp = async (req, res) => {
   const { email, code } = req.body;
 
+  if (!email || !code) {
+    return res.status(400).json({ message: "email and code are required" });
+  }
+
   try {
     const otpRecord = await Otp.findOne({
-      where: { email, code, purpose: "agent_login" },
+      where: { email, code: String(code), purpose: "agent_login" },
     });
 
     if (!otpRecord) {
@@ -471,7 +478,7 @@ const imageUrl = (file) =>
     `http://localhost:${process.env.PORT || 8084}/images/`) + file.filename;
 
 export const updateUserProfile = async (req, res) => {
-  const userId = req.query.id;
+  const userId = req.query.id ?? req.user.id;
   if (!canModify(req.user, userId)) {
     return sendForbidden(res);
   }
@@ -594,7 +601,6 @@ export const allSocialUsers = async (req, res) => {
         },
       },
     }).then(user => { 
-      console.log("All Social Users Are", user);
        res.status(200).json(user);
     });
 
@@ -685,10 +691,6 @@ export const receivedConnectionRequest = async (req, res) => {
       return;
     }
 
-    console.log('Initial state:');
-    console.log('Sender connections:', sender.connections);
-    console.log('Recepient connections:', recepient.connections);
-
 
     await Connection.create({userId: senderId, connectionId: recepientId})
     await Connection.create({userId: recepientId, connectionId: senderId})
@@ -704,9 +706,6 @@ export const receivedConnectionRequest = async (req, res) => {
     // Filter and update friend requests arrays
     recepient.connectionsRequest = recepient.connectionsRequest.filter(request => request !== senderId);
     sender.connectionRequestSent = sender.connectionRequestSent.filter(request => request !== recepientId);
-
-    console.log('Sender connections:', sender.connections);
-    console.log('Recepient connections:', recepient.connections);
 
     // Update connections field
     // if (!sender.connections.includes(recepientId)) {
