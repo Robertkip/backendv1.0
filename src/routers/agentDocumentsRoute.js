@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.post("/agent-documents", Authenticated, agentDocumentsController.upload, agentDocumentsController.createAgentDocument);
 router.get("/agent-documents/:id", Authenticated, agentDocumentsController.getAgentDocuments);
-router.get("/agent-documents", Authenticated, agentDocumentsController.getSingleAgentDocument);
+router.get("/agent-documents", Authenticated, agentDocumentsController.getMyAgentDocuments);
 router.delete("/agent-documents/:id", Authenticated, agentDocumentsController.deleteAgentDocument);
 
 export default router;

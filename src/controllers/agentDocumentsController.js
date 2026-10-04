@@ -95,50 +95,33 @@ export const createAgentDocument = async (req, res) => {
   }
 }
 
+// Agent documents are identity papers: only the agent and admins may read them.
+
+// GET /agent-documents/:id lists the documents of agent profile :id.
 export const getAgentDocuments = async (req, res) => {
-  try {
-    const { agent_id } = req.params;
-
-    const documents = await AgentDocuments.findAll({
-      where: { agent_id: agent_id },
-      include: [
-        {
-          model: UserProfile,
-          as: "user",
-          attributes: ["id", "user_fname", "user_lname", "user_avatar"]
-        }
-      ]
-    });
-
-    res.status(200).json(documents);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  const agentProfileId = Number(req.params.id);
+  if (!Number.isInteger(agentProfileId)) {
+    return res.status(400).json({ message: "id must be a number" });
   }
-}
-
-export const getSingleAgentDocument = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const document = await AgentDocuments.findByPk(id, {
-      include: [
-        {
-          model: UserProfile,
-          as: "user",
-          attributes: ["id", "user_fname", "user_lname", "user_avatar"]
-        }
-      ]
-    });
-
-    if (!document) {
-      return res.status(404).json({ message: "Document not found" });
-    }
-
-    res.status(200).json(document);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  if (!(await AgentProfile.findByPk(agentProfileId))) {
+    return res.status(404).json({ message: "Agent profile not found" });
   }
-}
+  if (!(await canModifyAgentRecord(req.user, agentProfileId))) {
+    return sendForbidden(res);
+  }
+  const documents = await AgentDocuments.findAll({ where: { agent_profile_id: agentProfileId } });
+  return res.status(200).json(documents);
+};
+
+// GET /agent-documents lists the logged-in agent's own documents.
+export const getMyAgentDocuments = async (req, res) => {
+  const agent = await AgentProfile.findOne({ where: { user_id: req.user.id } });
+  if (!agent) {
+    return res.status(404).json({ message: "Agent profile not found" });
+  }
+  const documents = await AgentDocuments.findAll({ where: { agent_profile_id: agent.id } });
+  return res.status(200).json(documents);
+};
 
 export const deleteAgentDocument = async (req, res) => {
   try {
@@ -168,6 +151,7 @@ export const deleteAgentDocument = async (req, res) => {
 
     res.status(200).json({ message: "Document deleted successfully" });
   } catch (error) {
+    console.error("agentDocumentsController.js failed on " + req.method + " " + req.originalUrl + ":", error);
     res.status(500).json({ message: error.message });
   }
 }   

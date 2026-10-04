@@ -4,82 +4,59 @@ import path from "path";
 import { Op } from "sequelize";
 import UserProfile from "../models/userProfileModel.js";
 import User from "../models/authModel.js";
+import { isAdmin } from "../helpers/ownership.js";
 
 dotenv.config();
-export const createUserProfile = async (req, res, next) => {
-
-  const PRODUCTION_IMAGE_ADDRESS = process.env.PRODUCTION_IMAGE_URL
-
-
-  const userId = req.body.userId;
-  const user_fname = req.body.user_fname;
-  const user_lname = req.body.user_lname;
-  const user_phonenumber = req.body.user_phonenumber;
-  const user_location = req.body.user_location;
-  const followers = req.body.followers;
-  const following = req.body.following;
-  const user_avatar = PRODUCTION_IMAGE_ADDRESS + req.file.filename;
-
-  const userprofile = await UserProfile.findOne({
-    where: { user_phonenumber },
-  });
-
+export const createUserProfile = async (req, res) => {
+  const { user_fname, user_lname, user_phonenumber, user_location, followers, following } = req.body;
   if (!user_fname || !user_lname || !user_phonenumber) {
-    res.status(400).json({ msg: "Please Provide All Fields" });
-  } else if (userprofile) {
-    res.status(400).json({ msg: "Landlord with that name does not exist" });
-  } else {
-    UserProfile.create({
-      userId,
-      user_fname,
-      user_lname,
-      user_phonenumber,
-      user_location,
-      followers,
-      following,
-      user_avatar,
-      type: req.file.mimetype,
-    }).then((data) => {
-      res.status(201).send(data);
-    });
+    return res.status(400).json({ msg: "Please Provide All Fields" });
   }
+  if (await UserProfile.findOne({ where: { user_phonenumber } })) {
+    return res.status(400).json({ msg: "A profile with that phone number already exists" });
+  }
+
+  const profile = await UserProfile.create({
+    userId: isAdmin(req.user) && req.body.userId ? req.body.userId : req.user.id,
+    user_fname,
+    user_lname,
+    user_phonenumber,
+    user_location,
+    followers,
+    following,
+    user_avatar: req.file ? (process.env.PRODUCTION_IMAGE_URL || "") + req.file.filename : null,
+    type: req.file?.mimetype,
+  });
+  return res.status(201).send(profile);
 };
 
-export const getUserProfile = async (req, res, next) => {
-  await UserProfile.findAll()
-    .then((data) => {
-      res.status(200).json(data);
-      next();
-    })
-    .catch((err) => next(err));
+export const getUserProfile = async (req, res) => {
+  const profiles = await UserProfile.findAll();
+  return res.status(200).json(profiles);
 };
 
-export const getUserById = async (req, res, next) => {
-  const a_id = req.params.id;
-  UserProfile.findByPk(a_id)
-    .then((user) => {
-      if (!user) {
-        res.status(404).json({ message: "User Not Found" });
-        next();
-      } else {
-        res.json(user);
-      }
-    })
-    .catch();
+export const getUserById = async (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id)) {
+    return res.status(400).json({ message: "id must be a number" });
+  }
+  const user = await UserProfile.findByPk(id);
+  if (!user) {
+    return res.status(404).json({ message: "User Not Found" });
+  }
+  return res.json(user);
 };
 
 export const getSingleUser = async (req, res) => {
-  try {
-    const { userId } = req.params;
-    const user = await UserProfile.findOne({
-      where: { userId: userId },
-    });
-    if (user) {
-      return res.status(200).json({ user });
-    }
-  } catch (error) {
-    return res.status(500).send(error.message);
+  const userId = Number(req.params.userId);
+  if (!Number.isInteger(userId)) {
+    return res.status(400).json({ message: "userId must be a number" });
   }
+  const user = await UserProfile.findOne({ where: { userId } });
+  if (!user) {
+    return res.status(404).json({ message: "User Not Found" });
+  }
+  return res.status(200).json({ user });
 };
 
 export const searchUserQuery = async (req, res, next) => {
@@ -91,6 +68,7 @@ export const searchUserQuery = async (req, res, next) => {
       res.send(data);
     })
     .catch((err) => {
+      console.error("userController.js failed on " + req.method + " " + req.originalUrl + ":", err);
       res.status(500).send({
         message:
           err.message || "Some error occurred while retrieving Apartments.",
@@ -111,7 +89,7 @@ export const upload = multer({
   storage: storage,
   limits: { fileSize: "1000000" },
   fileFilter: (req, file, cb) => {
-    const fileTypes = /jpeg||jpg||png||gif/;
+    const fileTypes = /jpeg|jpg|png|gif/;
     const mimeTypes = fileTypes.test(file.mimetype);
     const extname = fileTypes.test(path.extname(file.originalname));
 

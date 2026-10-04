@@ -1,5 +1,10 @@
 import { Op } from "sequelize";
 import Location from "../models/locationModel.js";
+import { apartmentParent, detailRecordController } from "../helpers/detailRecordController.js";
+
+// apartment_locations has no property_id or active column: property locations
+// live in their own table (/api/v1/property-locations).
+class InvalidQueryError extends Error {}
 
 const normalizeLocationFilter = (value) => (typeof value === "string" ? value.trim() : "");
 
@@ -11,23 +16,19 @@ const buildLocationWhere = (query = {}) => {
 
     if (searchTerm) {
         where[Op.or] = [
-            { city_town: { [Op.like]: `%${searchTerm}%` } },
-            { county: { [Op.like]: `%${searchTerm}%` } },
-            { country: { [Op.like]: `%${searchTerm}%` } },
-            { address: { [Op.like]: `%${searchTerm}%` } },
+            { city_town: { [Op.iLike]: `%${searchTerm}%` } },
+            { county: { [Op.iLike]: `%${searchTerm}%` } },
+            { country: { [Op.iLike]: `%${searchTerm}%` } },
+            { address: { [Op.iLike]: `%${searchTerm}%` } },
         ];
     }
 
-    if (query.apartment_id) {
-        where.apartment_id = query.apartment_id;
-    }
-
-    if (query.property_id) {
-        where.property_id = query.property_id;
-    }
-
-    if (query.active !== undefined) {
-        where.active = query.active === "true" || query.active === true;
+    if (query.apartment_id !== undefined) {
+        const apartmentId = Number(query.apartment_id);
+        if (!Number.isInteger(apartmentId)) {
+            throw new InvalidQueryError("apartment_id must be a number");
+        }
+        where.apartment_id = apartmentId;
     }
 
     return where;
@@ -64,7 +65,13 @@ const groupLocationsByName = (records = []) => {
 
 export const GetLocations = async (req, res) => {
     try {
-        const where = buildLocationWhere(req.query);
+        let where;
+        try {
+            where = buildLocationWhere(req.query);
+        } catch (error) {
+            if (!(error instanceof InvalidQueryError)) throw error;
+            return res.status(400).send({ status: 400, message: error.message, data: [] });
+        }
         const locations = await Location.findAll({
             where,
             order: [["city_town", "ASC"], ["county", "ASC"], ["address", "ASC"]],
@@ -79,10 +86,10 @@ export const GetLocations = async (req, res) => {
             total: locations.length,
         });
     } catch (error) {
+        console.error("Location query failed:", error);
         return res.status(500).send({
             status: 500,
             message: "Internal server error",
-            error: error.message,
         });
     }
 };
@@ -111,10 +118,10 @@ export const SearchLocations = async (req, res) => {
             total: locations.length,
         });
     } catch (error) {
+        console.error("Location query failed:", error);
         return res.status(500).send({
             status: 500,
             message: "Internal server error",
-            error: error.message,
         });
     }
 };
@@ -143,113 +150,23 @@ export const GetLocationsByName = async (req, res) => {
             total: locations.length,
         });
     } catch (error) {
+        console.error("Location query failed:", error);
         return res.status(500).send({
             status: 500,
             message: "Internal server error",
-            error: error.message,
         });
     }
 };
 
-export const CreateLocation = async (req, res) => {
-    try {
-        const { country, apartment_id, county, city_town, latitude, longitude, address, location_description } = req.body;
+const writer = detailRecordController({
+    model: Location,
+    parent: apartmentParent,
+    fields: ["country", "county", "city_town", "latitude", "longitude", "address", "location_description"],
+});
 
-        const create = await Location.create({
-           country,
-           apartment_id,
-           county,
-           city_town,
-           latitude,
-           longitude,
-           address,
-           location_description,
-           createdAt: Date.now(),
-           updatedAt: Date.now()
-        });
-
-        return res.status(201).send({
-            status: 201,
-            message: "Created",
-            data: create
-        });
-    } catch (error) {
-        return res.status(500).send({
-            status: 500,
-            message: "Internal server error",
-            error: error.message,
-        });
-    }
-};
-
-export const UpdateLocation = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { country, county, city_town, latitude, longitude, address, location_description } = req.body;
-
-        const apartmentLocation = await Location.findByPk(id);
-
-        if (!apartmentLocation) {
-            return res.status(404).send({
-                status: 404,
-                message: "Data Not Found",
-                data: null
-            });
-        }
-
-        apartmentLocation.country = country;
-        apartmentLocation.county = county;
-        apartmentLocation.city_town = city_town;
-        apartmentLocation.latitude = latitude;
-        apartmentLocation.longitude = longitude;
-        apartmentLocation.address = address;
-        apartmentLocation.location_description = location_description;
-
-        await apartmentLocation.save();
-
-        return res.status(200).send({
-            status: 200,
-            message: "OK",
-            data: apartmentLocation
-        });
-    } catch (error) {
-        return res.status(500).send({
-            status: 500,
-            message: "Internal server error",
-            error: error.message,
-        });
-    }
-};
-
-export const DeleteLocation = async (req, res) => {
-    try {
-        const { id } = req.params;
-
-        const apartmentLocation = await Location.findByPk(id);
-
-        if (!apartmentLocation) {
-            return res.status(404).send({
-                status: 404,
-                message: "Data Not Found",
-                data: null
-            });
-        }
-
-        await apartmentLocation.destroy();
-
-        return res.status(200).send({
-            status: 200,
-            message: "Deleted",
-            data: null
-        });
-    } catch (error) {
-        return res.status(500).send({
-            status: 500,
-            message: "Internal server error",
-            error: error.message,
-        });
-    }
-};
+export const CreateLocation = writer.create;
+export const UpdateLocation = writer.update;
+export const DeleteLocation = writer.remove;
 
 export const GetLocationById = async (req, res) => {
     try {
@@ -271,10 +188,10 @@ export const GetLocationById = async (req, res) => {
             data: apartmentLocation
         });
     } catch (error) {
+        console.error("Location query failed:", error);
         return res.status(500).send({
             status: 500,
             message: "Internal server error",
-            error: error.message,
         });
     }
 };

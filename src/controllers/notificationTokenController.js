@@ -26,6 +26,7 @@ export const notificationDeviceToken = async (req, res) => {
       return res.status(200).send(responseToken);
     }
   } catch (err) {
+    console.error("notificationTokenController.js failed on " + req.method + " " + req.originalUrl + ":", err);
     res.status(500).send({ message: err.message });
   }
 };
@@ -45,6 +46,7 @@ export const searchReceiverToken = async (req, res, next) => {
       res.send(data);
     })
     .catch((err) => {
+      console.error("notificationTokenController.js failed on " + req.method + " " + req.originalUrl + ":", err);
       res.status(500).send({
         message:
           err.message || "Some error occurred while retrieving Apartments.",

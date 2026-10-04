@@ -1,141 +1,15 @@
 import Facility from "../models/facilitiesModel.js";
+import { apartmentParent, detailRecordController } from "../helpers/detailRecordController.js";
 
-export const ApartmentFacility = async(req, res) => {
-    try {
-        const apartmentProperties = await Facility.findAll({
-            where: {
-                active: true
-            }
-        });
-        return res.status(200).send({
-            status: 200,
-            message: 'OK',
-            data: apartmentProperties
-        })
-    } catch (error) {
-        return res.status(500).send({
-            status: 500,
-            message: "Internal server error",
-        });
-    }
-}
+// Facilities (water, security, ...) of an apartment.
+const controller = detailRecordController({
+  model: Facility,
+  parent: apartmentParent,
+  fields: ["facility_name", "service_provider", "provider_contact"],
+});
 
-export const CreateApartmentFacility = async(req, res) => {
-    try {
-
-        const { facility_name, service_provider, provider_contact, apartment_id } = req.body;
-
-        const newFacility = await Facility.create({
-            facility_name,
-            service_provider,
-            provider_contact,
-            apartment_id
-        });
-
-        return res.status(201).send({
-            status: 201,
-            message: "Created",
-            data: newFacility
-        });
-    } catch (error) {
-        return res.status(500).send({
-            status: 500,
-            message: "Internal server error",
-        });
-    }
-}
-
-
-export const UpdateApartmentFacility = async(req, res) => {
-    try {
-        const { id } = req.params;
-
-        const { facility_name, service_provider, provider_contact, apartment_id } = req.body;
-
-        const propertyFacitilities = await Facility.findByPk(id);
-
-        if (!propertyFacitilities) {
-            return res.status(404).send({
-                status: 404,
-                message: "Data Not Found",
-                data: null
-            });
-        }
-
-        propertyFacitilities.facility_name = facility_name;
-        propertyFacitilities.service_provider = service_provider;
-        propertyFacitilities.provider_contact = provider_contact;
-        propertyFacitilities.apartment_id = apartment_id;
-
-        await propertyFacitilities.save();
-
-        return res.status(200).send({
-            status: 200,
-            message: "OK",
-            data: propertyFacitilities
-        });
-    } catch (error) {
-        return res.status(500).send({
-            status: 500,
-            message: "Internal server error",
-        });
-    }
-};
-
-export const DeleteApartmentFacility = async(req, res) => {
-    try {
-        const { id } = req.params;
-
-        const propertyFacitilities = await Facility.findByPk(id);
-
-        if (!role) {
-            return res.status(404).send({
-                status: 404,
-                message: "Data Not Found",
-                data: null
-            });
-        }
-
-        await propertyFacitilities.destroy();
-
-        return res.status(200).send({
-            status: 200,
-            message: "Deleted",
-            data: null
-        });
-    } catch (error) {
-        return res.status(500).send({
-            status: 500,
-            message: "Internal server error",
-        });
-    }
-}
-
-export const GetApartmentFacilityById = async(req, res) => {
-    try {
-        const { id } = req.params;
-
-        const propertyFacitilities = await Facility.findByPk(id);
-
-        if (!propertyFacitilities) {
-            return res.status(404).send({
-                status: 404,
-                message: "Data Not Found",
-                data: null
-            });
-        }
-
-        return res.status(200).send({
-            status: 200,
-            message: "OK",
-            data: propertyFacitilities
-        });
-    } catch (error) {
-
-        return res.status(500).send({
-            status: 500,
-            message: "Internal server error",
-
-        });
-    }
-}
+export const ApartmentFacility = controller.list;
+export const GetApartmentFacilityById = controller.get;
+export const CreateApartmentFacility = controller.create;
+export const UpdateApartmentFacility = controller.update;
+export const DeleteApartmentFacility = controller.remove;

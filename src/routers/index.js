@@ -1,3 +1,4 @@
+import { wrapRouterHandlers } from "../middlewares/errorHandler.js";
 import apartmentRouter from "./apartmentRoute.js";
 import authRouter from "./authRoute.js";
 import roleRouter from "./roleRoute.js";
@@ -31,7 +32,8 @@ import apartmentPaymentPlanRouter from "./apartmentPaymentRoute.js";
 import agentProfileRouter from "./agentProfileRoute.js";
 
 // Every REST router and the path it is mounted on, in mount order.
-// Order matters: when two routers define the same path, the first one wins.
+// Every router has its own paths: tests/routeTable.test.js fails when two
+// routes share a method and path, because only the first would ever run.
 export const apiRoutes = [
   ["/api/v1", apartmentRouter],
   ["/api/v1", authRouter],
@@ -41,13 +43,13 @@ export const apiRoutes = [
   ["/api/v1", marketRouter],
   ["/api/v1/posts", postMediaRouter],
   ["/api/v1/apartment", apartmentFilesRouter],
-  ["/api/v1", apartmentPropertiesRouter],
-  ["/api/v1", facilitiesRouter],
-  ["/api/v1", propertyFacilitiesRouter],
+  ["/api/v1/apartment-properties", apartmentPropertiesRouter],
+  ["/api/v1/apartment-facilities", facilitiesRouter],
+  ["/api/v1/property-facilities", propertyFacilitiesRouter],
   ["/api/v1/property", propertyFilesRouter],
-  ["/api/v1", propertyLocationRouter],
+  ["/api/v1/property-locations", propertyLocationRouter],
   ["/api/v1/location", apartmentLocationRouter],
-  ["/api/v1", propertyPropertiesRouter],
+  ["/api/v1/property-properties", propertyPropertiesRouter],
   ["/api/v1", cartRouter],
   ["/api/v1/user", userProfileRouter],
   ["/api/v1", friendRequestRouter],
@@ -68,6 +70,6 @@ export const apiRoutes = [
 
 export const mountApiRoutes = (app) => {
   for (const [path, router] of apiRoutes) {
-    app.use(path, router);
+    app.use(path, wrapRouterHandlers(router));
   }
 };

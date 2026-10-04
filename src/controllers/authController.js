@@ -1,18 +1,14 @@
 import dotenv from "dotenv";
 import bcryptjs from "bcryptjs";
 import { Op, where } from "sequelize";
-import nodemailer from "nodemailer";
-import { google } from "googleapis";
 import multer from "multer";
 import path from "path";
-import otpGenerator from 'otp-generator';
 import { sequelize } from "../config/connectDb.js";
 import User from "../models/authModel.js";
 import * as PasswordHelper from "../helpers/passwordHelper.js";
 import * as Helper from "../helpers/helper.js";
 import { canModify, sendForbidden } from "../helpers/ownership.js";
 import Otp from "../models/otpModel.js";
-import { Authenticated } from "../middlewares/authorizationPermission.js";
 import Connection from "../models/connectionsModel.js";
 import Role from "../models/role.js";
 import ejs from 'ejs';
@@ -52,25 +48,6 @@ const ensureDefaultRoles = async () => {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// const {
-//   GOOGLE_CLIENT_ID,
-//   GOOGLE_CLIENT_SECRET,
-//   MAILING_SERVICE_REFRESH_TOKEN,
-//   SENDER_EMAIL_ADDRESS,
-//   SENDER_PASSWORD,
-// } = process.env;
-
-
-
-// const { OAuth2 } = google.auth;
-// const OAUTH_PLAYGROUND = "https://developers.google.com/oauthplayground";
-
-// const oauth2Client = new OAuth2(
-//   GOOGLE_CLIENT_ID,
-//   GOOGLE_CLIENT_SECRET,
-//   MAILING_SERVICE_REFRESH_TOKEN,
-//   OAUTH_PLAYGROUND
-// );
 export const Signup = async (req, res) => {
   try {
     await ensureDefaultRoles();
@@ -325,63 +302,32 @@ export const Signin = async (req, res) => {
 };
 
 
-// oauth2Client.setCredentials({
-//   refresh_token: MAILING_SERVICE_REFRESH_TOKEN,
-// });
+const PASSWORD_RESET_MINUTES = 10;
 
-// const accessToken = oauth2Client.getAccessToken();
-
-// const transporter = nodemailer.createTransport({
-//   service: "gmail",
-//   auth: {
-//     type: "OAuth2",
-//     user: SENDER_EMAIL_ADDRESS,
-//     pass: SENDER_PASSWORD,
-//     clientId: GOOGLE_CLIENT_ID,
-//     clientSecret: GOOGLE_CLIENT_SECRET,
-//     refreshToken: MAILING_SERVICE_REFRESH_TOKEN,
-//     accessToken,
-//   },
-// });
-
-// //Testing Success
-// transporter.verify((error, success) => {
-//   if (error) {
-//     console.log(error);
-//   } else {
-//     console.log("Ready for Messages");
-//     console.log(success);
-//   }
-// });
-
-
-export const sendOtpVerification = async (email) => {
-  const otp = `${Math.floor(1000 + Math.random() * 9000)}`;
-
-
-  console.log("Sender Email Address Is", email);
-
-  //Mail Options
-  const mailOptions = {
-    from: SENDER_EMAIL_ADDRESS,
-    to: email,
-    subject: "Verify Your Email",
-    html: `<p>Enter <b> ${otp} </> To verify Account. </p>`,
-  };
-
- 
-  const newOTPVerification = await new Otp({
-    email: email,
-    code: otp,
-    createdAt: Date.now(),
-    expireIn: Date.now() + 360000,
+// Emails a one-time code that POST /resetpassword accepts in place of the
+// old password.
+export const sendOtpVerification = async (user) => {
+  const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+  await Otp.destroy({ where: { email: user.email, purpose: "password_reset" } });
+  await Otp.create({
+    email: user.email,
+    code: otpCode,
+    createdAt: new Date(),
+    expireIn: new Date(Date.now() + PASSWORD_RESET_MINUTES * 60 * 1000),
+    purpose: "password_reset",
   });
 
-  await newOTPVerification.save();
-  await transporter.sendMail(mailOptions).then((res) => {
-    console.log("Email Response is", res);
+  const html = await ejs.renderFile(path.join(__dirname, "../templates/layouts/password-reset-otp.ejs"), {
+    name: user.username || "User",
+    otp: otpCode,
+    expiryMinutes: PASSWORD_RESET_MINUTES,
   });
-
+  await publishEmailJob({
+    to: user.email,
+    subject: "Reset Your Waridi Password",
+    html,
+    text: `Your password reset code is ${otpCode}. It expires in ${PASSWORD_RESET_MINUTES} minutes.`,
+  });
 };
 
 export const verifyOtpCode = async (req, res) => {
@@ -478,61 +424,74 @@ export const verifyAgentLoginOtp = async (req, res) => {
   }
 };
 
+// Same answer whether or not the email is registered, so this endpoint
+// cannot be used to find out who has an account.
+const FORGOT_PASSWORD_REPLY = "If that email is registered, a reset code has been sent.";
+
 export const forgotPassword = async (req, res) => {
-  
-  const email = req.body.email;
-
-  const user = await User.findOne({
-    where: { email: email }
-  });
-
-  try {
-
-  if(!user){
-    return res.status(401).send({message: "Email Not Found"})
-  } else {
-    await sendOtpVerification(req.body.email).then(res => {
-      console.log("Sender Response Is", res);
-    });
-
-    return res.status(200).send({message: "Email Sent"});
+  const email = typeof req.body.email === "string" ? req.body.email.trim().toLowerCase() : "";
+  if (!email) {
+    return res.status(400).send({ message: "email is required" });
   }
-} catch (err){
-  res.status(500).send({message: err.message})
-}
-}
 
+  const user = await User.findOne({ where: { email } });
+  if (user) {
+    await sendOtpVerification(user);
+  }
+  return res.status(200).send({ message: FORGOT_PASSWORD_REPLY });
+};
+
+export const resetPassword = async (req, res) => {
+  const email = typeof req.body.email === "string" ? req.body.email.trim().toLowerCase() : "";
+  const { code, password, confirm_password } = req.body;
+  if (!email || !code || !password || !confirm_password) {
+    return res.status(400).send({ message: "email, code, password and confirm_password are required" });
+  }
+  if (password !== confirm_password) {
+    return res.status(400).send({ message: "Passwords do not match" });
+  }
+
+  const otpRecord = await Otp.findOne({ where: { email, code: String(code), purpose: "password_reset" } });
+  if (!otpRecord || otpRecord.expired || (otpRecord.expireIn && new Date() > otpRecord.expireIn)) {
+    return res.status(400).send({ message: "Invalid or expired code" });
+  }
+
+  const user = await User.findOne({ where: { email } });
+  if (!user) {
+    return res.status(400).send({ message: "Invalid or expired code" });
+  }
+  await User.update({ password: await PasswordHelper.PasswordHashing(password) }, { where: { id: user.id } });
+  await otpRecord.destroy();
+  return res.status(200).send({ message: "Password reset successfully" });
+};
+
+// Public URL of an uploaded image (files are served from /images).
+const imageUrl = (file) =>
+  ((process.env.NODE_ENV === "production" ? process.env.PRODUCTION_IMAGE_URL : process.env.DEVELOPMENT_IMAGE_URL) ||
+    `http://localhost:${process.env.PORT || 8084}/images/`) + file.filename;
 
 export const updateUserProfile = async (req, res) => {
-   const userId = req.query.id;
-   if (!canModify(req.user, userId)) {
-     return sendForbidden(res);
-   }
+  const userId = req.query.id;
+  if (!canModify(req.user, userId)) {
+    return sendForbidden(res);
+  }
 
-   console.log("Updating user profile Id Is", userId)
-   const username = req.body.username;
-   const user_avatar = PRODUCTION_IMAGE_ADDRESS + req.file.filename;
-   const description = req.body.description;
-   
-   const user = await User.findOne({
-     where: { id: userId },
-   });
+  const user = await User.findOne({ where: { id: userId } });
+  if (!user) {
+    return res.status(404).send({ msg: "User not found" });
+  }
+  if (user.verified == false) {
+    return res.status(401).send({ msg: "Please Verify Your Account" });
+  }
 
-   if (!user) {
-     return res.status(401).send({ msg: "Unauthorized" });
-   } else if(user.verified == false) {
-       
-     return res.status(401).send({ msg: "Please Verify Your Account" });
-
-
-   } else {
-   await User.update({username: username, user_avatar: user_avatar, description: description, 
-    type: req.file.mimetype}, {where: {id: userId}}).then((data) => {
-    res.status(201).send(data);
-    
-  });
-}
-}
+  const changes = { username: req.body.username, description: req.body.description };
+  if (req.file) {
+    changes.user_avatar = imageUrl(req.file);
+    changes.type = req.file.mimetype;
+  }
+  await user.update(changes);
+  return res.status(201).send(user);
+};
 
 
 export const getAllUsers = async (req, res) => {
@@ -540,41 +499,10 @@ export const getAllUsers = async (req, res) => {
     const users = await User.findAll();
     res.status(200).send(users);
   } catch (err) {
+    console.error("authController.js failed on " + req.method + " " + req.originalUrl + ":", err);
     res.status(500).send({ message: err.message });
   }
 };
-
-export const resetPassword = async (req, res) => {
-  try {
-    await User.findOne({
-      resetPasswordToken: req.body.token,
-      resetPasswordExpires: {
-        $gt: Date.now(),
-      },
-    });
-  } catch (error) {}
-};
-
-export const emailSend = async () => {
-  let data = await User.findOne({ email: req.body.email });
-  const responseType = {};
-  if (data) {
-    let otpcode = Math.floor(Math.random() * 10000 + 1);
-    let otpData = new Otp({
-      email: req.body.email,
-      code: otpcode,
-      expireIn: new Date().getTime() + 300 * 1000,
-    });
-    let otpResponse = await otpData.save();
-    responseType.statusText = "Success";
-    responseType.message = "Please check Your Email Id";
-  } else {
-    responseType.statusText = "Error";
-    responseType.statusText = "Email Id Not Exist";
-  }
-  res.status(200).json("Ok");
-};
-
 
 export const changePassword = async (req, res) => {
   try {
@@ -614,32 +542,24 @@ export const changePassword = async (req, res) => {
 
 
 
-export const generateOtp = async () => {
-  const Otp = otpGenerator.generate(6, { digits: true, specialChars: false })
-}
-
 export const changeImage = async (req, res) => {
   const id = req.params.id;
   if (!canModify(req.user, id)) {
     return sendForbidden(res);
   }
-  const user_avatar = PRODUCTION_IMAGE_ADDRESS + req.file.filename;
 
-  await User.findOne({ where: { id: id } }).then((updateImage) => {
-    updateImage
-      .update({
-        description: req.body.description,
-        dateofbirth: req.body.dateofbirth,
-        user_avatar: user_avatar,
-        type: req.file.mimetype,
-      })
-      .then(() => {
-        res.status(200).send({ updateImage });
-      })
-      .catch((error) => {
-        res.status(500).send({ msg: "Error Occurrs" });
-      });
-  });
+  const user = await User.findOne({ where: { id } });
+  if (!user) {
+    return res.status(404).send({ msg: "User not found" });
+  }
+
+  const changes = { description: req.body.description, dateofbirth: req.body.dateofbirth };
+  if (req.file) {
+    changes.user_avatar = imageUrl(req.file);
+    changes.type = req.file.mimetype;
+  }
+  await user.update(changes);
+  return res.status(200).send({ updateImage: user });
 };
 
 export const getSingleUser = async (req, res, next) => {
@@ -656,6 +576,7 @@ export const getSingleUser = async (req, res, next) => {
       res.send(data);
     })
     .catch((err) => {
+      console.error("authController.js failed on " + req.method + " " + req.originalUrl + ":", err);
       res.status(500).send({
         message: err.message || "Some error occurred while retrieving Users.",
       });
@@ -743,6 +664,7 @@ export const unfollowUser = async (req, res) => {
         res.status(403).json("User is not followed by you");
       }
     } catch (error) {
+      console.error("authController.js failed on " + req.method + " " + req.originalUrl + ":", error);
       res.status(500).json(error);
     }
   }
@@ -806,36 +728,25 @@ export const receivedConnectionRequest = async (req, res) => {
   }
 };
 
+const findConnections = (userId) =>
+  sequelize.query(
+    `
+    SELECT c."connectionId", u.id, u.username, u.email, u.user_avatar
+    FROM connections c
+    LEFT JOIN users u ON c."connectionId" = u.id
+    WHERE c."userId" = :userId
+    `,
+    { replacements: { userId }, type: sequelize.QueryTypes.SELECT }
+  );
+
+// Connections of ?id=, or of the logged-in user when no id is given.
 export const getConnections = async (req, res) => {
-  const userId = req.query.id;
-
-  try {
-    const connections = await sequelize.query(
-      `
-      SELECT
-          c."connectionId",
-          u.id,
-          u.username,
-          u.email,
-          u.user_avatar
-      FROM
-          "Connections" c
-      LEFT JOIN
-          "Users" u ON c."connectionId" = u.id
-      WHERE
-          c."userId" = :userId
-      `,
-      {
-        replacements: { userId },
-        type: sequelize.QueryTypes.SELECT,
-      }
-    );
-
-    res.status(200).json({ connections });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Internal Server Error' });
+  const userId = req.query.id === undefined ? req.user.id : Number(req.query.id);
+  if (!Number.isInteger(userId)) {
+    return res.status(400).json({ message: "id must be a number" });
   }
+  const connections = await findConnections(userId);
+  return res.status(200).json({ connections });
 };
 
 
@@ -892,27 +803,16 @@ export const getConnections = async (req, res) => {
 
 
 export const userConnections = async (req, res) => {
-  try {
-    const { userId } = req.params;
-
-    // Find the user by their primary key
-    const user = await User.findByPk(userId);
-
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
-
-    const acceptedFriends = user.connections; // Assuming 'friends' is a field in your User model
-
-    res.json(acceptedFriends);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
+  const userId = Number(req.params.id);
+  if (!Number.isInteger(userId)) {
+    return res.status(400).json({ error: "id must be a number" });
   }
-}
-
-
-
+  const user = await User.findByPk(userId);
+  if (!user) {
+    return res.status(404).json({ error: "User not found" });
+  }
+  return res.json(await findConnections(userId));
+};
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -927,7 +827,7 @@ export const upload = multer({
   storage: storage,
   limits: { fileSize: "1000000" },
   fileFilter: (req, file, cb) => {
-    const fileTypes = /jpeg||jpg||png||gif/;
+    const fileTypes = /jpeg|jpg|png|gif/;
     const mimeTypes = fileTypes.test(file.mimetype);
     const extname = fileTypes.test(path.extname(file.originalname));
 

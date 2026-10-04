@@ -15,20 +15,11 @@ router.get("/userapartment", Authorization.Authenticated, apartmentController.ge
 router.get("/user-apartments", Authorization.Authenticated, apartmentController.getApartmentByUser);
 router.get("/apartments", apartmentController.getAllRentals);
 router.get("/rentals", apartmentController.getAllRentals);
-router.get("/allapartment/", apartmentController.getAllApartments);
 router.get("/allapartment", apartmentController.getAllApartments);
 
 router.get("/apartment/:id", apartmentController.getApartmentById);
 
-router.get(
-  "/apartmentaccount/:logent_id",
-  apartmentController.getLandlordApartments
-);
-
-router.get(
-  "/apartmentaccount/:logent_id",
-  apartmentController.getAgentApartments
-);
+router.get("/apartmentaccount/:logent_id", apartmentController.getUserApartments);
 
 router.put(
   "/apartment/update/:id",
@@ -36,13 +27,14 @@ router.put(
   Authorization.AdminRole,
   apartmentController.updateApartment
 );
-router.delete("/apartment/delete/:id", Authorization.Authenticated, apartmentController.deleteApartment);
+// Declared before /delete/:id, which would otherwise treat "all" as an id.
 router.delete(
   "/apartment/delete/all",
   Authorization.Authenticated,
   Authorization.AdminRole,
   apartmentController.deleteAllApartments
 );
+router.delete("/apartment/delete/:id", Authorization.Authenticated, apartmentController.deleteApartment);
 router.get("/single-apartment", apartmentController.searchApartmentQuery);
 
 router.get("/search-apartment", apartmentController.searchApartmentInPlace);

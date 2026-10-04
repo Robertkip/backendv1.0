@@ -3,7 +3,11 @@ import { canModify, sendForbidden } from "../helpers/ownership.js";
 
 export const createApartmentComment = async (req, res) => {
   try {
-    const { apartmentId, content } = req.body;
+    const { content } = req.body;
+    const apartmentId = Number(req.body.apartmentId ?? req.body.apartment_id);
+    if (!content || !Number.isInteger(apartmentId)) {
+      return res.status(400).json({ message: "content and apartmentId are required" });
+    }
 
     const userId = req.user.id;
 
@@ -22,7 +26,11 @@ export const createApartmentComment = async (req, res) => {
 
 export const getApartmentComments = async (req, res) => {
   try {
-    const { apartmentId } = req.params;
+    // The route is /apartment-comment/:id, where id is the apartment's id.
+    const apartmentId = Number(req.params.id);
+    if (!Number.isInteger(apartmentId)) {
+      return res.status(400).json({ message: "id must be a number" });
+    }
 
     const comments = await ApartmentComment.findAll({
       where: { apartment_id: apartmentId }

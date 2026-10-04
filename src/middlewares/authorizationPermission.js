@@ -60,6 +60,7 @@ export const SuperUser = (req, res, next) => {
 
     next();
   } catch (err) {
+    console.error("authorizationPermission.js failed on " + req.method + " " + req.originalUrl + ":", err);
     return res.status(500).send({ msg: "Error" });
   }
 };
@@ -136,6 +137,7 @@ export const BasicUser = (req, res, next) => {
 
     next();
   } catch (err) {
+    console.error("authorizationPermission.js failed on " + req.method + " " + req.originalUrl + ":", err);
     return res.status(500).send({ msg: "Error" });
   }
 };

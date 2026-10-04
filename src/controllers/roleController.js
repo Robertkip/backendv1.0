@@ -13,6 +13,7 @@ export const GetRole = async (req, res) => {
            data: roles 
         })
     } catch (error) {
+        console.error("roleController.js failed on " + req.method + " " + req.originalUrl + ":", error);
         return res.status(500).send({
 			status: 500,
 			message: "Internal server error",
@@ -35,6 +36,7 @@ export const CreateRole = async (req, res) => {
 			data: create
 		});
 	} catch (error) {
+		console.error("roleController.js failed on " + req.method + " " + req.originalUrl + ":", error);
 		return res.status(500).send({
 			status: 500,
 			message: "Internal server error",
@@ -68,6 +70,7 @@ export const UpdateRole = async (req, res) => {
 			data: role
 		});
 	} catch (error) {
+		console.error("roleController.js failed on " + req.method + " " + req.originalUrl + ":", error);
 		return res.status(500).send({
 			status: 500,
 			message: "Internal server error",
@@ -97,6 +100,7 @@ export const DeleteRole = async (req, res) => {
 			data: null
 		});
 	} catch (error) {
+		console.error("roleController.js failed on " + req.method + " " + req.originalUrl + ":", error);
 		return res.status(500).send({
 			status: 500,
 			message: "Internal server error",
@@ -124,6 +128,7 @@ export const GetRoleById = async (req, res) => {
 			data: role
 		});
 	} catch (error) {
+		console.error("roleController.js failed on " + req.method + " " + req.originalUrl + ":", error);
 
 		return res.status(500).send({
 			status: 500,
