@@ -7,55 +7,38 @@ import { canModify, sendForbidden } from "../helpers/ownership.js";
 dotenv.config();
 
 export const createMarket = async (req, res) => {
-  
-  const PRODUCTION_IMAGE_ADDRESS = process.env.PRODUCTION_IMAGE_URL
-
-  const sellerId = req.body.sellerId;
-  const product_name = req.body.product_name;
-  const product_description = req.body.product_description;
-  const product_quantity = req.body.product_quantity;
-  const product_price = req.body.product_price;
-  const product_image = PRODUCTION_IMAGE_ADDRESS + req.file.filename;
-
-  const market = await Market.findOne({ where: { product_name } });
-
+  const { product_name, product_description, product_quantity, product_price } = req.body;
   if (!product_name || !product_price) {
-    res.status(400).json({ msg: "Please Provide All Fields" });
-  } else if (market) {
-    res.status(400).json({ msg: "Product with that name does not exist" });
-  } else {
-    Market.create({
-      sellerId,
-      product_name,
-      product_description,
-      product_price,
-      product_image,
-      product_quantity,
-    }).then((data) => {
-      res.status(201).send(data);
-    });
+    return res.status(400).json({ msg: "Please Provide All Fields" });
   }
+  if (await Market.findOne({ where: { product_name } })) {
+    return res.status(400).json({ msg: "A product with that name already exists" });
+  }
+
+  const product = await Market.create({
+    // The seller is whoever is logged in; ownership checks rely on it.
+    sellerId: req.user.id,
+    product_name,
+    product_description,
+    product_price,
+    product_image: req.file ? process.env.PRODUCTION_IMAGE_URL + req.file.filename : null,
+    product_quantity,
+  });
+  return res.status(201).send(product);
 };
 
 export const getMarket = async (req, res) => {
-  await Market.findAll().then((data) => {
-    return res.status(200).send(data);
-  });
+  const products = await Market.findAll();
+  return res.status(200).send(products);
 };
 
-export const getMarketBySellerId = async () => {
-  try {
-    const { sellerId } = req.params;
-
-    const market = Market.findOne({
-      where: { sellerId: sellerId },
-    });
-    if (market) {
-      return res.status(200).json({ market });
-    }
-  } catch (error) {
-    return res.status(500).send(error.message);
+export const getMarketBySellerId = async (req, res) => {
+  const sellerId = Number(req.params.sellerId);
+  if (!Number.isInteger(sellerId)) {
+    return res.status(400).json({ message: "sellerId must be a number" });
   }
+  const market = await Market.findAll({ where: { sellerId } });
+  return res.status(200).json({ market });
 };
 
 export const deleteMarket = async (req, res, next) => {
@@ -95,7 +78,7 @@ export const upload = multer({
   storage: storage,
   limits: { fileSize: "1000000" },
   fileFilter: (req, file, cb) => {
-    const fileTypes = /jpeg||jpg||png||gif/;
+    const fileTypes = /jpeg|jpg|png|gif/;
     const mimeTypes = fileTypes.test(file.mimetype);
     const extname = fileTypes.test(path.extname(file.originalname));
 

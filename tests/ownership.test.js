@@ -39,8 +39,7 @@ let counter = 0;
 const createUser = async (role = "USER") => {
   const n = ++counter;
   const user = await User.create({ email: `owner${n}@example.com`, username: `owner${n}`, roleId: roleId(role), verified: true });
-  // Comments reference userprofiles.id with the user's id.
-  await UserProfile.create({ id: user.id, userId: user.id });
+  await UserProfile.create({ userId: user.id });
   return user;
 };
 

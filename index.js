@@ -30,6 +30,8 @@ import connectSocket from "./src/socket/ConnectSocket.js";
 import { Authenticated } from "./src/middlewares/authorizationPermission.js";
 import connectDB from "./src/config/connectMongo.js";
 import { runMigrations } from "./src/config/connectDb.js";
+import { checkEnv } from "./src/config/checkEnv.js";
+import { errorHandler } from "./src/middlewares/errorHandler.js";
 const options = JSON.parse(fs.readFileSync(new URL("./swagger-output.json", import.meta.url), "utf8"));
 
 const __filename = fileURLToPath(import.meta.url);
@@ -40,14 +42,28 @@ const uploadDir = path.join(projectRoot, "Images");
 const PROTO_PATH = path.join(__dirname, "./proto/post.proto");
 
 dotenv.config();
+checkEnv();
+
+// A rejected promise nobody awaited must not take the whole API down.
+process.on("unhandledRejection", (reason) => {
+  console.error("Unhandled promise rejection:", reason);
+});
 
 const app = express();
+
+// Number of reverse proxies in front of the app (for example 1 behind nginx),
+// so req.ip and the login rate limits see the real client address.
+app.set("trust proxy", Number(process.env.TRUST_PROXY) || 0);
 
 
 connectDB();
 
+// File uploads use multipart (multer) and are not limited here.
+const BODY_LIMIT = process.env.BODY_LIMIT || "10mb";
+
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: BODY_LIMIT }));
+app.use(express.urlencoded({ limit: BODY_LIMIT, extended: true }));
 
 const server = new ApolloServer({
   typeDefs,
@@ -62,7 +78,6 @@ const server = new ApolloServer({
 
 
 global.__basedir = __dirname;
-console.log(__basedir);
 
 const specs = {
   customCss: fs.readFileSync("./swagger.css", "utf-8"),
@@ -88,6 +103,7 @@ const redisStore = new RedisStore({
   prefix: "waridi:",
 });
 
+// checkEnv() makes production set this; the fallback is for local development.
 const REDIS_SESSION_SECRET = process.env.REDIS_SESSION_SECRET || 'your-secret-here';
 
 const packageDefinition = protoLoader.loadSync(PROTO_PATH);
@@ -123,14 +139,12 @@ grpcserver.bindAsync(
 app.use(
   cookieSession({
     name: "session",
-    keys: ["waridi"],
-    maxAge: 24 * 60 * 60 * 100,
+    keys: [REDIS_SESSION_SECRET],
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
   })
 );
 
 app.use(detectDevice);
-app.use(express.json({ limit: '800mb' }));
-app.use(express.urlencoded({ limit: '800mb', extended: true }));
 app.use(helmet());
 app.use(logger("common"));
 
@@ -173,7 +187,6 @@ app.use('/graphql', Authenticated);
 
 app.post('/locations', (req, res) => {
   const payload = req.body;
-  console.log('Received location', payload);
   io.emit('location:update', payload);
   res.json({ ok: true });
 });
@@ -183,6 +196,9 @@ app.use(graphqlUploadExpress());
 // Start Apollo
 await server.start();
 server.applyMiddleware({ app });
+
+// Last: answers any error a route passed on, after logging it.
+app.use(errorHandler);
 
 const httpServer = http.createServer(app);
 

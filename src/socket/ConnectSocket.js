@@ -32,7 +32,8 @@ io.use(async (socket, next) => {
     }
 
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      // Same secret the REST login signs tokens with (helpers/helper.js).
+      const decoded = jwt.verify(token, process.env.JWT_TOKEN);
       
       const profile = await UserProfile.findOne({
         where: { userId: decoded.id },

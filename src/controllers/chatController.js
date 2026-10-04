@@ -7,6 +7,7 @@ export const getUsers = async (req, res, next) => {
      await User.findAll().then(data => {
         res.status(200).send(data);
      }).catch(err => {
+        console.error("chatController.js failed on " + req.method + " " + req.originalUrl + ":", err);
         res.status(500).send(err);
      })
 }

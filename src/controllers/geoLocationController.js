@@ -1,63 +1,32 @@
-import redis from 'redis';
-import util from 'util';
+import { getRedis } from "../config/redisClient.js";
 
-// Promisify Redis functions
-const client = redis.createClient({
-    legacyMode: true,
-    host: "localhost",
-    port: 6379,
-});
+const coordinatesKey = (userId) => `user_coordinates:${userId}`;
 
-const setAsync = util.promisify(client.set).bind(client);
-const getAsync = util.promisify(client.get).bind(client);
-
+// Saves the logged-in user's latest position.
 export const userGeolocation = async (req, res) => {
-    const { id, latitude, longitude, timestamp } = req.body;
-
-    try {
-        // Connect to Redis
-        await client.connect();
-        console.log("Connected to Redis");
-
-        if (!id || !latitude || !longitude || !timestamp) {
-            throw new Error('Latitude and longitude are required.');
-        }
-
-        await setAsync('user_coordinates', JSON.stringify({ id, latitude, longitude, timestamp }));
-        console.log('Coordinates saved successfully.');
-
-        res.status(200).json({ id, latitude, longitude, timestamp});
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    } finally {
-        // Disconnect from Redis
-        await client.quit();
+    const { latitude, longitude, timestamp } = req.body;
+    if (latitude == null || longitude == null || !Number.isFinite(Number(latitude)) || !Number.isFinite(Number(longitude))) {
+        return res.status(400).json({ error: "latitude and longitude are required" });
     }
+
+    const coordinates = { id: req.user.id, latitude, longitude, timestamp: timestamp ?? Date.now() };
+    const redis = await getRedis();
+    await redis.set(coordinatesKey(req.user.id), JSON.stringify(coordinates));
+    return res.status(200).json(coordinates);
 };
 
-export const getUserCoordinates =async (req, res) => {
+// Latest position of ?id=, or of the logged-in user when no id is given.
+export const getUserCoordinates = async (req, res) => {
+    const userId = req.query.id === undefined ? req.user.id : Number(req.query.id);
+    if (!Number.isInteger(userId)) {
+        return res.status(400).json({ error: "id must be a number" });
+    }
 
-    const client = redis.createClient({
-        legacyMode: true,
-        host: "localhost",
-        port: 6379,
-    });
-
-    await client.connect();
-
-    // Retrieve coordinates from Redis
-   await client.get('user_coordinates', (err, reply) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ error: 'Internal Server Error' });
-        }
-
-        if (!reply) {
-            return res.status(404).json({ error: 'User coordinates not found.' });
-        }
-
-        const { id, latitude, longitude } = JSON.parse(reply);
-        res.status(200).json({ id, latitude, longitude });
-    });
+    const redis = await getRedis();
+    const saved = await redis.get(coordinatesKey(userId));
+    if (!saved) {
+        return res.status(404).json({ error: "User coordinates not found." });
+    }
+    const { id, latitude, longitude } = JSON.parse(saved);
+    return res.status(200).json({ id, latitude, longitude });
 };

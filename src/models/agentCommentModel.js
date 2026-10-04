@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../config/connectDb.js";
 import AgentProfile from "./agentProfileModel.js";
-import UserProfile from "./userProfileModel.js";
+import User from "./authModel.js";
 
 
 const AgentComment = sequelize.define('agent_comments', {
@@ -10,11 +10,12 @@ const AgentComment = sequelize.define('agent_comments', {
     defaultValue: DataTypes.UUIDV4,
     primaryKey: true,
   },
+  // The commenter's users.id (what the controllers store).
   user_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: 'userprofiles',
+      model: 'users',
       key: 'id',
     },
   },
@@ -40,18 +41,15 @@ const AgentComment = sequelize.define('agent_comments', {
   },
 });
 
+AgentComment.belongsTo(AgentProfile, {
+  foreignKey: "agent_id",
+  as: "agent_profile",
+});
+
+AgentComment.belongsTo(User, {
+  foreignKey: "user_id",
+  as: "user",
+});
+
 export default AgentComment;
-
-
-AgentComment.associate = (models) => {
-  AgentComment.belongsTo(AgentProfile, {
-    foreignKey: "agent_id",
-    as: "agent_profile",
-  });
-
-  AgentComment.belongsTo(UserProfile, {
-    foreignKey: "user_id",
-    as: "user",
-  });
-};
 

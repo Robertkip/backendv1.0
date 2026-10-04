@@ -2,13 +2,13 @@ import express from 'express';
 import * as apartmentPropertiesController from '../controllers/apartmentPropertiesController.js';
 import { Authenticated } from '../middlewares/authorizationPermission.js';
 
+// Mounted on /api/v1/apartment-properties.
 const router = express.Router();
 
-router.post('/addproperties', Authenticated, apartmentPropertiesController.CreateApartementProperties);
-router.get('/allproperties', apartmentPropertiesController.GetApartementProperties);
-router.get('/properties/:id', apartmentPropertiesController.GetApartementPropertiesById);
-router.get('/update/:id', Authenticated, apartmentPropertiesController.UpdateApartementProperties);
-router.get('/deleteproperty/:userId', Authenticated, apartmentPropertiesController.DeleteApartementProperties);
-
+router.get('/', apartmentPropertiesController.GetApartementProperties);
+router.get('/:id', apartmentPropertiesController.GetApartementPropertiesById);
+router.post('/', Authenticated, apartmentPropertiesController.CreateApartementProperties);
+router.put('/:id', Authenticated, apartmentPropertiesController.UpdateApartementProperties);
+router.delete('/:id', Authenticated, apartmentPropertiesController.DeleteApartementProperties);
 
 export default router;

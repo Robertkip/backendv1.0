@@ -43,12 +43,13 @@ export const connectRabbitMQ = async (retries = 5) => {
   }
 }
 
+// Called while a request waits (signup, login OTP), so give up after one
+// retry instead of the five used at startup.
 export const publishEmailJob = async (emailData) => {
-  if (!channel) await connectRabbitMQ();
+  if (!channel) await connectRabbitMQ(1);
   const message = Buffer.from(JSON.stringify(emailData));
   channel.sendToQueue(process.env.EMAIL_QUEUE, message, {
     persistent: true,
     contentType: 'application/json',
   });
-  console.log(`📨 Email job published for ${emailData.to}`);
 }

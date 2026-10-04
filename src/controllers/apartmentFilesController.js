@@ -52,11 +52,7 @@ export const uploadApartment = async (req, res) => {
   try {
     const { apartment_id } = req.body;
 
-    console.log("Apartment ID:", apartment_id);
-
     const uploaded_by = req.user.id;
-
-    console.log("Uploaded by:", uploaded_by);
     
     const files = req.files;
 

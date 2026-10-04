@@ -2,12 +2,12 @@ import dotenv from "dotenv";
 import multer from "multer";
 import path from "path";
 import { Op } from "sequelize";
-import axios from "axios";
 import slugify from "slugify";
-import NodeGeocoder from "node-geocoder";
 
 import { sequelize } from "../config/connectDb.js";
 import Apartment from "../models/apartmentModel.js";
+import Landlord from "../models/landlordModel.js";
+import { getPlaceCoordinates, PlacesNotConfiguredError, SEARCH_RADIUS_DEGREES } from "../services/places.js";
 import { canModifyApartment, sendForbidden } from "../helpers/ownership.js";
 
 dotenv.config();
@@ -35,16 +35,12 @@ export const uploadApartment = async (req, res) => {
         address: req.body.address,
         agent_id: req.user.id
       });
-      try {
-        await newApartment.save();
-      } catch (error) {
-        console.log(error);
-      }
-     
-    return res.status(201).send("Apartment Created Successfully");
+      await newApartment.save();
+      return res.status(201).send("Apartment Created Successfully");
   }
   catch (error) {
-    return res.status(500).send({ message: "Internal Server Error", error });
+    console.error("Error saving apartment:", error);
+    return res.status(500).send({ message: "Internal Server Error" });
 }
 };
 
@@ -128,56 +124,40 @@ export const getAllRentals = async (req, res) => {
 // };
 
 
-export const getLandlordApartments = async (req, res) => {
-  try {
-    const { landlord_id } = req.params;
-    const apartments = await Apartment.findAll({
-      where: { landlord_id: landlord_id },
-    });
-    if (apartments) {
-      return res.status(200).json({ apartments });
-    }
-  } catch (error) {
-    return res.status(500).send(error.message);
+// Apartments that belong to a user: listed by them (agent_id) or attached to
+// their landlord record (landlord_id points at the landlords table).
+export const getUserApartments = async (req, res) => {
+  const userId = Number(req.params.logent_id);
+  if (!Number.isInteger(userId)) {
+    return res.status(400).json({ message: "logent_id must be a number" });
   }
-};
-export const getAgentApartments = async (req, res) => {
-  try {
-    const { agent_id } = req.params;
-    const apartments = await Apartment.findAll({
-      where: { agent_id: agent_id },
-    });
-    if (apartments) {
-      return res.status(200).json({ apartments });
-    }
-  } catch (error) {
-    return res.status(500).send(error.message);
-  }
+  const landlords = await Landlord.findAll({ where: { userId }, attributes: ["id"] });
+  const apartments = await Apartment.findAll({
+    where: {
+      [Op.or]: [
+        { agent_id: userId },
+        { landlord_id: landlords.map((landlord) => landlord.id) },
+      ],
+    },
+  });
+  return res.status(200).json({ apartments });
 };
 
-export const getApartmentByUser = (req, res) => {
-  const userId = req.user.id;
-  Apartment.findAll({ where: { agent_id: userId } })
-    .then((apartments) => {
-      res.status(200).json(apartments);
-    })
-    .catch((error) => {
-      res.status(500).json({ message: "Error retrieving apartments", error });
-    });
+export const getApartmentByUser = async (req, res) => {
+  const apartments = await Apartment.findAll({ where: { agent_id: req.user.id } });
+  return res.status(200).json(apartments);
 };
 
-export const getApartmentById = async (req, res, next) => {
-  const p_id = req.params.id;
-  Apartment.findByPk(p_id)
-    .then((apartment) => {
-      if (!apartment) {
-        res.status(404).json({ message: "Apartment not found" });
-        next();
-      } else {
-        return res.json(apartment);
-      }
-    })
-    .catch((error) => next(error));
+export const getApartmentById = async (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id)) {
+    return res.status(400).json({ message: "id must be a number" });
+  }
+  const apartment = await Apartment.findByPk(id);
+  if (!apartment) {
+    return res.status(404).json({ message: "Apartment not found" });
+  }
+  return res.json(apartment);
 };
 
 export const updateApartment = async (req, res, next) => {
@@ -224,56 +204,34 @@ export const deleteAllApartments = async (req, res, next) => {
     .catch((error) => next(error));
 };
 
+// Joins each apartment with its location, so searches can match on place.
+const APARTMENT_WITH_LOCATION = `
+  SELECT a.*, l.country, l.county, l.city_town, l.latitude, l.longitude, l.address
+  FROM rental_apartments a
+  LEFT JOIN apartment_locations l ON a.id = l.apartment_id
+`;
+
 export const searchApartmentQuery = async (req, res) => {
-  try {
-    const { search } = req.query; 
-
-    if (!search) {
-      return res.status(400).json({ message: "Search query is required" });
-    }
-
-    const apartments = await Apartment.findAll({
-      where: {
-        [Op.or]: [
-          { apartment_name: { [Op.like]: `%${search}%` } },
-          { apartment_location: { [Op.like]: `%${search}%` } },
-          { address: { [Op.like]: `%${search}%` } },
-        ],
-      },
-    });
-
-    if (apartments.length === 0) {
-      return res.status(404).json({ message: "No apartments found" });
-    }
-
-    res.status(200).json(apartments);
-  } catch (error) {
-    console.error("Error searching apartments:", error);
-    res.status(500).json({ message: "Internal server error" });
+  const { search } = req.query;
+  if (!search) {
+    return res.status(400).json({ message: "Search query is required" });
   }
+
+  const apartments = await sequelize.query(
+    `${APARTMENT_WITH_LOCATION}
+     WHERE a.apartment_name ILIKE :term
+        OR l.city_town ILIKE :term
+        OR l.county ILIKE :term
+        OR l.address ILIKE :term
+     ORDER BY a.id DESC`,
+    { replacements: { term: `%${search}%` }, type: sequelize.QueryTypes.SELECT }
+  );
+
+  if (apartments.length === 0) {
+    return res.status(404).json({ message: "No apartments found" });
+  }
+  return res.status(200).json(apartments);
 };
-
-async function getPlaceCoordinates(place) {
-  const params = {
-    input: place,
-    inputtype: "textquery",
-    fields: "geometry",
-    key: API_KEY,
-  };
-
-  const response = await axios.get(PLACES_API_ENDPOINT, { params });
-
-  console.log("Response is", response);
-
-  // Parse the response to retrieve the latitude and longitude coordinates
-  if (response.status === 200) {
-    const result = response.data.candidates[0];
-    const { lat, lng } = result.geometry.location;
-    return { latitude: lat, longitude: lng };
-  } else {
-    return null;
-  }
-}
 
 const generateUniqueSlug = async (baseName) => {
   let slug = slugify(baseName, { lower: true, strict: true });
@@ -287,56 +245,44 @@ const generateUniqueSlug = async (baseName) => {
   return uniqueSlug;
 };
 
-export async function searchApartmentInPlace(req, res, next) {
+// Apartments whose location lies within about 1 km of a named place.
+export const searchApartmentInPlace = async (req, res) => {
   const { place } = req.query;
-
-  // Get the geographic coordinates of the selected place
-  const coordinates = await getPlaceCoordinates(place);
-  console.log("Place Coordinates are", coordinates);
-
-  // Query your model for houses that are within a certain radius of the selected place
-  const radius = 500; // in meters
-  const houses = await Apartment.findAll({
-    latitude: {
-      [Op.gte]: coordinates.latitude - 0.01,
-      [Op.lte]: coordinates.latitude + 0.01,
-    },
-    longitude: {
-      [Op.gte]: coordinates.longitude - 0.01,
-      [Op.lte]: coordinates.longitude + 0.01,
-    },
-  });
-
-  // Make a request to the Google Places API to search for houses in the selected place
-  const params = {
-    location: `${coordinates.latitude},${coordinates.longitude}`,
-    radius,
-    type: "house",
-    key: API_KEY,
-  };
-  const response = await axios.get(PLACES_SEARCH_API_ENDPOINT, { params });
-
-  console.log("Response is", response);
-  // Parse the response to retrieve the list of house results
-  if (response.status === 200) {
-    const results = response.data.results;
-    console.log("Results is", results);
-    const houseIds = results.map((result) => result.vicinity);
-    console.log("House Ids Is", houseIds);
-    await Apartment.findAll({
-      where: { address: houseIds },
-    }).then((data) => {
-      return res.status(200).send(data);
-    });
-  } else {
-    return res.status(500).send({ message: "No Data Founde" });
+  if (!place) {
+    return res.status(400).json({ message: "place is required" });
   }
-}
 
-// console.log(rows[0]);
-// console.log(rows[0].length);
-// console.log(rows[0][0].apartment_name);
-// console.log(rows[0][0].apartment_location);
+  let coordinates;
+  try {
+    coordinates = await getPlaceCoordinates(place);
+  } catch (error) {
+    if (error instanceof PlacesNotConfiguredError) {
+      return res.status(503).json({ message: error.message });
+    }
+    throw error;
+  }
+  if (!coordinates) {
+    return res.status(404).json({ message: "Place not found" });
+  }
+
+  const apartments = await sequelize.query(
+    `${APARTMENT_WITH_LOCATION}
+     WHERE l.latitude ~ '^-?[0-9.]+$' AND l.longitude ~ '^-?[0-9.]+$'
+       AND l.latitude::float BETWEEN :minLat AND :maxLat
+       AND l.longitude::float BETWEEN :minLng AND :maxLng
+     ORDER BY a.id DESC`,
+    {
+      replacements: {
+        minLat: coordinates.latitude - SEARCH_RADIUS_DEGREES,
+        maxLat: coordinates.latitude + SEARCH_RADIUS_DEGREES,
+        minLng: coordinates.longitude - SEARCH_RADIUS_DEGREES,
+        maxLng: coordinates.longitude + SEARCH_RADIUS_DEGREES,
+      },
+      type: sequelize.QueryTypes.SELECT,
+    }
+  );
+  return res.status(200).json(apartments);
+};
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
