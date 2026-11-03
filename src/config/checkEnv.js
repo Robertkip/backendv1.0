@@ -1,3 +1,5 @@
+import { logger } from "./logger.js";
+
 // Settings the server cannot run without. Login breaks without the JWT secrets.
 const REQUIRED = ["JWT_TOKEN", "JWT_REFRESH_TOKEN"];
 
@@ -14,9 +16,9 @@ export const missingEnv = (env = process.env) => {
 export const checkEnv = (env = process.env) => {
   const missing = missingEnv(env);
   if (missing.length > 0) {
-    console.error(
-      `Missing required environment variables: ${missing.join(", ")}. ` +
-        "Set them in .env (see env.example) and restart."
+    logger.fatal(
+      { missing },
+      `Missing required environment variables: ${missing.join(", ")}. Set them in .env (see env.example) and restart.`
     );
     process.exit(1);
   }

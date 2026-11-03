@@ -24,7 +24,33 @@
         "tags": [
           "agent-comment"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "content": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 5000
+                },
+                "agent_id": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "content",
+                "agent_id"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -33,6 +59,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -77,6 +106,25 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "content": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 5000
+                }
+              },
+              "required": [
+                "content"
+              ],
+              "additionalProperties": false
+            }
           }
         ],
         "security": [
@@ -87,6 +135,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -152,6 +203,9 @@
       "post": {
         "tags": [
           "agent-documents"
+        ],
+        "consumes": [
+          "multipart/form-data"
         ],
         "parameters": [],
         "security": [
@@ -247,7 +301,47 @@
         "tags": [
           "agent-location"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "agent_county": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "agent_subcounty": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "agent_town": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "agent_street": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "agent_location_description": {
+                  "type": "string",
+                  "maxLength": 255
+                }
+              },
+              "required": [
+                "agent_county",
+                "agent_subcounty",
+                "agent_street"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -256,6 +350,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -319,6 +416,40 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "agent_county": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "agent_subcounty": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "agent_town": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "agent_street": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "agent_location_description": {
+                  "type": "string",
+                  "maxLength": 255
+                }
+              },
+              "additionalProperties": false
+            }
           }
         ],
         "security": [
@@ -329,6 +460,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -367,7 +501,47 @@
         "tags": [
           "agent-payment"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "apartment_id": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
+                },
+                "unit_type": {
+                  "type": "integer"
+                },
+                "plan_description": {
+                  "type": "string",
+                  "maxLength": 5000
+                },
+                "pricing_amount": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "plan_duration": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "currency_type": {
+                  "type": "string",
+                  "maxLength": 10
+                }
+              },
+              "required": [
+                "apartment_id",
+                "unit_type"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -376,6 +550,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -439,6 +616,36 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "unit_type": {
+                  "type": "integer"
+                },
+                "plan_description": {
+                  "type": "string",
+                  "maxLength": 5000
+                },
+                "pricing_amount": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "plan_duration": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "currency_type": {
+                  "type": "string",
+                  "maxLength": 10
+                }
+              },
+              "additionalProperties": false
+            }
           }
         ],
         "security": [
@@ -449,6 +656,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -487,7 +697,56 @@
         "tags": [
           "agent-profile"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "agent_fname": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                },
+                "agent_lname": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                },
+                "agent_mname": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "agent_phonenumber": {
+                  "type": "string",
+                  "pattern": "^\\+?[0-9 ()-]{7,20}$"
+                },
+                "agent_gender": {
+                  "type": "string",
+                  "maxLength": 20
+                },
+                "agent_description": {
+                  "type": "string",
+                  "maxLength": 5000
+                },
+                "agent_idno": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "agent_fname",
+                "agent_lname",
+                "agent_phonenumber",
+                "agent_idno"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -496,6 +755,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -559,6 +821,43 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "agent_fname": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                },
+                "agent_lname": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                },
+                "agent_mname": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "agent_phonenumber": {
+                  "type": "string",
+                  "pattern": "^\\+?[0-9 ()-]{7,20}$"
+                },
+                "agent_gender": {
+                  "type": "string",
+                  "maxLength": 20
+                },
+                "agent_description": {
+                  "type": "string",
+                  "maxLength": 5000
+                }
+              },
+              "additionalProperties": false
+            }
           }
         ],
         "security": [
@@ -569,6 +868,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -738,7 +1040,35 @@
         "tags": [
           "apartment"
         ],
-        "parameters": [],
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "apartment_name",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "apartment_location",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "apartment_description",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "address",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          }
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -747,6 +1077,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -759,7 +1092,37 @@
         "tags": [
           "apartment-comment"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "content": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 5000
+                },
+                "apartmentId": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
+                },
+                "apartment_id": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "content"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -768,6 +1131,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -812,6 +1178,25 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "content": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 5000
+                }
+              },
+              "required": [
+                "content"
+              ],
+              "additionalProperties": false
+            }
           }
         ],
         "security": [
@@ -822,6 +1207,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -871,7 +1259,39 @@
         "tags": [
           "apartment-facilities"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "apartment_id": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
+                },
+                "facility_name": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "service_provider": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "provider_contact": {
+                  "type": "string",
+                  "maxLength": 255
+                }
+              },
+              "required": [
+                "apartment_id"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -880,6 +1300,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -916,6 +1339,34 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "apartment_id": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
+                },
+                "facility_name": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "service_provider": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "provider_contact": {
+                  "type": "string",
+                  "maxLength": 255
+                }
+              },
+              "additionalProperties": false
+            }
           }
         ],
         "security": [
@@ -926,6 +1377,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -975,7 +1429,47 @@
         "tags": [
           "apartment-properties"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "apartment_id": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
+                },
+                "number_of_units": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "number_of_one_bd": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "number_of_two_bd": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "number_of_three_bd": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "number_of_four_bd": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "apartment_id"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -984,6 +1478,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -1020,6 +1517,42 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "apartment_id": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
+                },
+                "number_of_units": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "number_of_one_bd": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "number_of_two_bd": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "number_of_three_bd": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "number_of_four_bd": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "additionalProperties": false
+            }
           }
         ],
         "security": [
@@ -1030,6 +1563,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -1088,7 +1624,17 @@
         "tags": [
           "apartment"
         ],
-        "parameters": [],
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "apartment_id",
+            "in": "formData",
+            "required": true,
+            "type": "integer"
+          }
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -1097,6 +1643,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -1164,6 +1713,43 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "apartment_name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "apartment_location": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "apartment_slug": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "rent_amount": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "apartment_description": {
+                  "type": "string",
+                  "maxLength": 5000
+                },
+                "agent_id": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
+                }
+              },
+              "additionalProperties": false
+            }
           }
         ],
         "security": [
@@ -1174,6 +1760,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -1225,6 +1814,27 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "action": {
+                  "type": "string",
+                  "enum": [
+                    "increment",
+                    "decrement"
+                  ]
+                }
+              },
+              "required": [
+                "action"
+              ],
+              "additionalProperties": false
+            }
           }
         ],
         "security": [
@@ -1235,6 +1845,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -1307,6 +1920,29 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "password": {
+                  "type": "string",
+                  "minLength": 8,
+                  "maxLength": 128
+                },
+                "confirmPassword": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "password",
+                "confirmPassword"
+              ],
+              "additionalProperties": false
+            }
           }
         ],
         "security": [
@@ -1317,6 +1953,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -1329,7 +1968,40 @@
         "tags": [
           "create-message"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "receiverId": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
+                },
+                "message": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 5000
+                },
+                "messageType": {
+                  "type": "string",
+                  "enum": [
+                    "text",
+                    "image"
+                  ]
+                }
+              },
+              "required": [
+                "receiverId",
+                "message"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -1338,6 +2010,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -1376,10 +2051,33 @@
         "tags": [
           "forgotpassword"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "format": "email",
+                  "maxLength": 254
+                }
+              },
+              "required": [
+                "email"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           }
         }
       }
@@ -1389,7 +2087,27 @@
         "tags": [
           "friend"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "receiverId": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "receiverId"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -1398,6 +2116,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -1562,7 +2283,47 @@
         "tags": [
           "landlord"
         ],
-        "parameters": [],
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "formData",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "landlord_fname",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "landlord_lname",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "landlord_phonenumber",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "landlord_idno",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "landlord_location",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          }
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -1571,6 +2332,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -1660,7 +2424,44 @@
         "tags": [
           "location"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "latitude": {
+                  "type": "number",
+                  "minimum": -90,
+                  "maximum": 90
+                },
+                "longitude": {
+                  "type": "number",
+                  "minimum": -180,
+                  "maximum": 180
+                },
+                "timestamp": {
+                  "anyOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "string",
+                      "maxLength": 50
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "latitude",
+                "longitude"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -1669,6 +2470,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -1681,7 +2485,57 @@
         "tags": [
           "location"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "apartment_id": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
+                },
+                "country": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "county": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "city_town": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "latitude": {
+                  "type": "number",
+                  "minimum": -90,
+                  "maximum": 90
+                },
+                "longitude": {
+                  "type": "number",
+                  "minimum": -180,
+                  "maximum": 180
+                },
+                "address": {
+                  "type": "string",
+                  "maxLength": 1000
+                },
+                "location_description": {
+                  "type": "string",
+                  "maxLength": 255
+                }
+              },
+              "required": [
+                "apartment_id"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -1690,6 +2544,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -1752,6 +2609,52 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "apartment_id": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
+                },
+                "country": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "county": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "city_town": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "latitude": {
+                  "type": "number",
+                  "minimum": -90,
+                  "maximum": 90
+                },
+                "longitude": {
+                  "type": "number",
+                  "minimum": -180,
+                  "maximum": 180
+                },
+                "address": {
+                  "type": "string",
+                  "maxLength": 1000
+                },
+                "location_description": {
+                  "type": "string",
+                  "maxLength": 255
+                }
+              },
+              "additionalProperties": false
+            }
           }
         ],
         "security": [
@@ -1762,6 +2665,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -1833,7 +2739,35 @@
         "tags": [
           "market"
         ],
-        "parameters": [],
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "product_name",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "product_description",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "product_quantity",
+            "in": "formData",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "product_price",
+            "in": "formData",
+            "required": true,
+            "type": "integer"
+          }
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -1842,6 +2776,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -1923,6 +2860,9 @@
         "tags": [
           "posts"
         ],
+        "consumes": [
+          "multipart/form-data"
+        ],
         "parameters": [],
         "security": [
           {
@@ -1965,7 +2905,41 @@
         "tags": [
           "property"
         ],
-        "parameters": [],
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "apartment_name",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "apartment_location",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "apartment_description",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "apartment_price",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "address",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          }
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -1974,6 +2948,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -1997,7 +2974,31 @@
         "tags": [
           "property-facilities"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "property_id": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
+                },
+                "facility_name": {
+                  "type": "string",
+                  "maxLength": 255
+                }
+              },
+              "required": [
+                "property_id"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -2006,6 +3007,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -2042,6 +3046,26 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "property_id": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
+                },
+                "facility_name": {
+                  "type": "string",
+                  "maxLength": 255
+                }
+              },
+              "additionalProperties": false
+            }
           }
         ],
         "security": [
@@ -2052,6 +3076,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -2101,7 +3128,57 @@
         "tags": [
           "property-locations"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "property_id": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
+                },
+                "country": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "county": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "city_town": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "latitude": {
+                  "type": "number",
+                  "minimum": -90,
+                  "maximum": 90
+                },
+                "longitude": {
+                  "type": "number",
+                  "minimum": -180,
+                  "maximum": 180
+                },
+                "address": {
+                  "type": "string",
+                  "maxLength": 1000
+                },
+                "location_description": {
+                  "type": "string",
+                  "maxLength": 255
+                }
+              },
+              "required": [
+                "property_id"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -2110,6 +3187,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -2146,6 +3226,52 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "property_id": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
+                },
+                "country": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "county": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "city_town": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "latitude": {
+                  "type": "number",
+                  "minimum": -90,
+                  "maximum": 90
+                },
+                "longitude": {
+                  "type": "number",
+                  "minimum": -180,
+                  "maximum": 180
+                },
+                "address": {
+                  "type": "string",
+                  "maxLength": 1000
+                },
+                "location_description": {
+                  "type": "string",
+                  "maxLength": 255
+                }
+              },
+              "additionalProperties": false
+            }
           }
         ],
         "security": [
@@ -2156,6 +3282,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -2205,7 +3334,39 @@
         "tags": [
           "property-properties"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "property_id": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
+                },
+                "bedrooms": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "bathrooms": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "kitchen": {
+                  "type": "string",
+                  "maxLength": 255
+                }
+              },
+              "required": [
+                "property_id"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -2214,6 +3375,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -2250,6 +3414,34 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "property_id": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
+                },
+                "bedrooms": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "bathrooms": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "kitchen": {
+                  "type": "string",
+                  "maxLength": 255
+                }
+              },
+              "additionalProperties": false
+            }
           }
         ],
         "security": [
@@ -2260,6 +3452,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -2326,7 +3521,23 @@
         "tags": [
           "property"
         ],
-        "parameters": [],
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "property_id",
+            "in": "formData",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "apartment_id",
+            "in": "formData",
+            "required": false,
+            "type": "integer"
+          }
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -2335,6 +3546,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -2430,6 +3644,34 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "apartment_name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "apartment_location": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "apartment_description": {
+                  "type": "string",
+                  "maxLength": 5000
+                },
+                "apartment_price": {
+                  "type": "string",
+                  "maxLength": 255
+                }
+              },
+              "additionalProperties": false
+            }
           }
         ],
         "security": [
@@ -2440,6 +3682,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -2480,7 +3725,32 @@
         "tags": [
           "rating"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "itemId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                },
+                "rating": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 5
+                }
+              },
+              "required": [
+                "rating"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -2489,6 +3759,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -2529,7 +3802,27 @@
         "tags": [
           "receive-connection-request"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "senderId": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "senderId"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -2538,6 +3831,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -2550,7 +3846,27 @@
         "tags": [
           "register"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 4096
+                }
+              },
+              "required": [
+                "token"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -2559,6 +3875,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -2584,10 +3903,48 @@
         "tags": [
           "resetpassword"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "format": "email",
+                  "maxLength": 254
+                },
+                "code": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 10
+                },
+                "password": {
+                  "type": "string",
+                  "minLength": 8,
+                  "maxLength": 128
+                },
+                "confirm_password": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "email",
+                "password",
+                "confirm_password"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           }
         }
       }
@@ -2597,7 +3954,41 @@
         "tags": [
           "role"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "roleName": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 50
+                },
+                "active": {
+                  "anyOf": [
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "true",
+                        "false"
+                      ]
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "roleName"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -2606,6 +3997,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -2683,7 +4077,27 @@
         "tags": [
           "send-connection-request"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "selectedUserId": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "selectedUserId"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -2692,6 +4106,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -2704,7 +4121,40 @@
         "tags": [
           "send-notification"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "body": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 1000
+                },
+                "imageUrl": {
+                  "type": "string",
+                  "format": "uri",
+                  "maxLength": 2000
+                },
+                "type": {
+                  "type": "string",
+                  "maxLength": 50
+                }
+              },
+              "required": [
+                "body"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -2713,6 +4163,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -2725,10 +4178,37 @@
         "tags": [
           "signin"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "maxLength": 254
+                },
+                "password": {
+                  "type": "string",
+                  "maxLength": 128
+                }
+              },
+              "required": [
+                "email",
+                "password"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           }
         }
       }
@@ -2738,10 +4218,54 @@
         "tags": [
           "signup"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "username": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 50
+                },
+                "email": {
+                  "type": "string",
+                  "format": "email",
+                  "maxLength": 254
+                },
+                "password": {
+                  "type": "string",
+                  "minLength": 8,
+                  "maxLength": 128
+                },
+                "confirm_password": {
+                  "type": "string"
+                },
+                "roleId": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "username",
+                "email",
+                "password",
+                "confirm_password"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           }
         }
       }
@@ -2806,7 +4330,47 @@
         "tags": [
           "tenant"
         ],
-        "parameters": [],
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "formData",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "tenant_fname",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "tenant_lname",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "tenant_idno",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "tenant_phonenumber",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "tenant_location",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          }
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -2815,6 +4379,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -2904,7 +4471,27 @@
         "tags": [
           "token"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "deviceToken": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 4096
+                }
+              },
+              "required": [
+                "deviceToken"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -2913,6 +4500,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -2925,7 +4515,23 @@
         "tags": [
           "updateprofile"
         ],
-        "parameters": [],
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          }
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -2934,6 +4540,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -3016,11 +4625,26 @@
         "tags": [
           "user"
         ],
+        "consumes": [
+          "multipart/form-data"
+        ],
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "dateofbirth",
+            "in": "formData",
+            "required": false,
             "type": "string"
           }
         ],
@@ -3032,6 +4656,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -3093,7 +4720,53 @@
         "tags": [
           "user"
         ],
-        "parameters": [],
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "formData",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "user_fname",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "user_lname",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "user_phonenumber",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "user_location",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "followers",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "following",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          }
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -3102,6 +4775,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"
@@ -3184,10 +4860,38 @@
         "tags": [
           "verify"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "format": "email",
+                  "maxLength": 254
+                },
+                "code": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 10
+                }
+              },
+              "required": [
+                "email"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           }
         }
       }
@@ -3197,10 +4901,38 @@
         "tags": [
           "verify-agent-login"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "format": "email",
+                  "maxLength": 254
+                },
+                "code": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 10
+                }
+              },
+              "required": [
+                "email"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           }
         }
       }
@@ -3231,7 +4963,24 @@
         "tags": [
           "verify-apartment"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 10
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -3240,6 +4989,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
             "description": "Login required"

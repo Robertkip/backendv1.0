@@ -1,10 +1,12 @@
 import express from 'express';
 import * as tenantController from '../controllers/tenantController.js';
 import { Authenticated } from '../middlewares/authorizationPermission.js';
+import { validateBody } from '../middlewares/validate.js';
+import * as schemas from '../validation/schemas.js';
 
 const router = express.Router();
 
-router.post('/tenant', Authenticated, tenantController.upload, tenantController.registerTenant);
+router.post('/tenant', Authenticated, tenantController.upload, validateBody(schemas.registerTenant), tenantController.registerTenant);
 router.get('/alltenant', Authenticated, tenantController.getAllTenant);
 router.get('/tenant/:id', Authenticated, tenantController.getTenantByPK);
 

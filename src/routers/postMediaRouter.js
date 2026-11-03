@@ -6,6 +6,7 @@ import { fileURLToPath } from "url";
 import { Authenticated } from '../middlewares/authorizationPermission.js';
 import UserProfile from '../models/userProfileModel.js';
 import Media from "../models/mediaModel.js";
+import { logger } from "../config/logger.js";
 
 const router = express.Router();
 
@@ -62,7 +63,7 @@ return res.json(mediaItem);
     });
 
   } catch (err) {
-    console.error(err);
+    logger.error({ err: err });
     res.status(500).json({ msg: 'Server error during file upload' });
   }
 });

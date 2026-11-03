@@ -3,6 +3,7 @@ import { Server } from "socket.io";
 import jwt from "jsonwebtoken";
 import UserProfile from "../models/userProfileModel.js";
 import MessageSchema from "../mongomodel/messageSchema.js";
+import { logger } from "../config/logger.js";
 
 const onlineUsers = new Map(); // socket.id -> { userId, username, userProfile }
 
@@ -27,7 +28,7 @@ io.use(async (socket, next) => {
       socket.handshake.query?.token;
 
     if (!token) {
-      console.log("No token provided");
+      logger.warn("Socket connection without a token");
       return next(new Error("Authentication required"));
     }
 
@@ -49,16 +50,16 @@ io.use(async (socket, next) => {
         avatar: profile.user_avatar,
       };
 
-      console.log(`Authenticated socket: ${socket.user.name} (${socket.user.id})`);
+      logger.info(`Authenticated socket: ${socket.user.name} (${socket.user.id})`);
       next();
     } catch (err) {
-      console.log("JWT Error:", err.message);
+      logger.warn({ error: err.message }, "Socket token rejected");
       return next(new Error("Invalid or expired token"));
     }
   });
 
   io.on("connection", (socket) => {
-    console.log(`User connected: ${socket.user.name} (ID: ${socket.user.id})`);
+    logger.info(`User connected: ${socket.user.name} (ID: ${socket.user.id})`);
 
     // Add to online users
     onlineUsers.set(socket.id, {
@@ -143,7 +144,7 @@ io.use(async (socket, next) => {
 
     // === DISCONNECT ===
     socket.on("disconnect", () => {
-      console.log(`User disconnected: ${socket.user.name}`);
+      logger.info(`User disconnected: ${socket.user.name}`);
       onlineUsers.delete(socket.id);
 
       // Notify friends they're offline (optional)

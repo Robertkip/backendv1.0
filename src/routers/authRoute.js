@@ -21,27 +21,29 @@ import {
 import * as authController from "../controllers/authController.js";
 import { Authenticated } from "../middlewares/authorizationPermission.js";
 import { createAuthRateLimit } from "../middlewares/rateLimit.js";
+import { validateBody } from "../middlewares/validate.js";
+import * as schemas from "../validation/schemas.js";
 
 const router = express.Router();
 
 const CLIENT_URL = "https://api.waridi.org/";
 
-router.post("/signup", createAuthRateLimit(), Signup);
-router.post("/signin", createAuthRateLimit(), Signin);
-router.put("/updateprofile/", Authenticated, authController.upload, updateUserProfile);
-router.post("/verify", createAuthRateLimit(), verifyOtpCode);
-router.post("/verify-agent-login", createAuthRateLimit(), verifyAgentLoginOtp);
-router.put("/changepassword/:id", Authenticated, changePassword);
-router.post("/forgotpassword", createAuthRateLimit(), forgotPassword);
-router.post("/resetpassword", createAuthRateLimit(), authController.resetPassword);
+router.post("/signup", createAuthRateLimit(), validateBody(schemas.signup), Signup);
+router.post("/signin", createAuthRateLimit(), validateBody(schemas.signin), Signin);
+router.put("/updateprofile/", Authenticated, authController.upload, validateBody(schemas.updateProfile), updateUserProfile);
+router.post("/verify", createAuthRateLimit(), validateBody(schemas.verifyOtp), verifyOtpCode);
+router.post("/verify-agent-login", createAuthRateLimit(), validateBody(schemas.verifyOtp), verifyAgentLoginOtp);
+router.put("/changepassword/:id", Authenticated, validateBody(schemas.changePassword), changePassword);
+router.post("/forgotpassword", createAuthRateLimit(), validateBody(schemas.forgotPassword), forgotPassword);
+router.post("/resetpassword", createAuthRateLimit(), validateBody(schemas.resetPassword), authController.resetPassword);
 router.get("/users", Authenticated, getAllUsers);
 router.get("/get-single-user", Authenticated, getSingleUser);
 router.get("/social-users/", Authenticated, allSocialUsers);
-router.post("/send-connection-request", Authenticated, sentConnectionRequest);
-router.post("/receive-connection-request", Authenticated, receivedConnectionRequest);
+router.post("/send-connection-request", Authenticated, validateBody(schemas.sendConnectionRequest), sentConnectionRequest);
+router.post("/receive-connection-request", Authenticated, validateBody(schemas.acceptConnectionRequest), receivedConnectionRequest);
 router.get("/get-connections/", Authenticated, authController.getConnections);
 router.get("/user-connections/:id", Authenticated, userConnections);
-router.put("/user/:id", Authenticated, upload, changeImage);
+router.put("/user/:id", Authenticated, upload, validateBody(schemas.changeImage), changeImage);
 // Social sign-in only works when its strategy was registered (see
 // middlewares/initPassport.js); otherwise answer 503 instead of crashing.
 const socialLogin = (strategy, options) => (req, res, next) => {

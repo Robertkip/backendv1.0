@@ -1,6 +1,7 @@
 import { Op } from "sequelize";
 import Location from "../models/locationModel.js";
 import { apartmentParent, detailRecordController } from "../helpers/detailRecordController.js";
+import { logRequestError } from "../config/logger.js";
 
 // apartment_locations has no property_id or active column: property locations
 // live in their own table (/api/v1/property-locations).
@@ -86,7 +87,7 @@ export const GetLocations = async (req, res) => {
             total: locations.length,
         });
     } catch (error) {
-        console.error("Location query failed:", error);
+        logRequestError(req, error, "Location query failed");
         return res.status(500).send({
             status: 500,
             message: "Internal server error",
@@ -118,7 +119,7 @@ export const SearchLocations = async (req, res) => {
             total: locations.length,
         });
     } catch (error) {
-        console.error("Location query failed:", error);
+        logRequestError(req, error, "Location query failed");
         return res.status(500).send({
             status: 500,
             message: "Internal server error",
@@ -150,7 +151,7 @@ export const GetLocationsByName = async (req, res) => {
             total: locations.length,
         });
     } catch (error) {
-        console.error("Location query failed:", error);
+        logRequestError(req, error, "Location query failed");
         return res.status(500).send({
             status: 500,
             message: "Internal server error",
@@ -188,7 +189,7 @@ export const GetLocationById = async (req, res) => {
             data: apartmentLocation
         });
     } catch (error) {
-        console.error("Location query failed:", error);
+        logRequestError(req, error, "Location query failed");
         return res.status(500).send({
             status: 500,
             message: "Internal server error",

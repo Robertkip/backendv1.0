@@ -14,6 +14,7 @@ export default defineConfig({
       // Tests sign in many times from one address; tests/phase3.test.js
       // checks the limiter itself with a small limit.
       AUTH_RATE_LIMIT_MAX: "10000",
+      LOG_LEVEL: "silent",
     },
   },
 });

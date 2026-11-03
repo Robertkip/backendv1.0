@@ -1,6 +1,7 @@
 import AgentLocation from "../models/agentLocationModel.js";
 import AgentProfile from "../models/agentProfileModel.js";
 import { canModifyAgentRecord, sendForbidden } from "../helpers/ownership.js";
+import { logRequestError } from "../config/logger.js";
 
 
 export const createAgentLocation = async (req, res) => {
@@ -30,7 +31,7 @@ export const createAgentLocation = async (req, res) => {
 
     res.status(201).json(newLocation);
   } catch (error) {
-    console.error("Error creating agent location:", error);
+    logRequestError(req, error, "Error creating agent location");
     res.status(500).json({ message: error.message });
   }
 };
@@ -40,7 +41,7 @@ export const getAgentLocations = async (req, res) => {
     const locations = await AgentLocation.findAll();
     res.status(200).json(locations);
   } catch (error) {
-    console.error("Error fetching agent locations:", error);
+    logRequestError(req, error, "Error fetching agent locations");
     res.status(500).json({ message: error.message });
   }
 };
@@ -56,7 +57,7 @@ export const getSingleAgentLocation = async (req, res) => {
 
     res.status(200).json(location);
   } catch (error) {
-    console.error("Error fetching agent location:", error);
+    logRequestError(req, error, "Error fetching agent location");
     res.status(500).json({ message: error.message });
   }
 };
@@ -85,7 +86,7 @@ export const updateAgentLocation = async (req, res) => {
 
     res.status(200).json(location);
   } catch (error) {
-    console.error("Error updating agent location:", error);
+    logRequestError(req, error, "Error updating agent location");
     res.status(500).json({ message: error.message });
   }
 };
@@ -106,7 +107,7 @@ export const deleteAgentLocation = async (req, res) => {
     res.status(200).json({ message: "Agent location deleted successfully" });
 
   } catch (error) {
-    console.error("Error deleting agent location:", error);
+    logRequestError(req, error, "Error deleting agent location");
     res.status(500).json({ message: error.message });
   }
 };  

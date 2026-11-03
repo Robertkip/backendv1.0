@@ -240,7 +240,7 @@ describe("user account changes", () => {
   });
 
   it("lets an admin change a user's password", async () => {
-    const res = await send(admin, "put", `/api/v1/changepassword/${owner.id}`, { password: "Reset1!", confirmPassword: "Reset1!" });
+    const res = await send(admin, "put", `/api/v1/changepassword/${owner.id}`, { password: "Reset123!", confirmPassword: "Reset123!" });
 
     expect(res.status).toBe(200);
   });

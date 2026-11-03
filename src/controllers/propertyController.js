@@ -5,16 +5,12 @@ import { Op } from "sequelize";
 import NodeGeocoder from "node-geocoder";
 import { sequelize } from "../config/connectDb.js";
 import Property from "../models/propertyModel.js";
+import { imageBaseUrl } from "../helpers/imageUrl.js";
 import { getPlaceCoordinates, PlacesNotConfiguredError, SEARCH_RADIUS_DEGREES } from "../services/places.js";
 import { canModify, sendForbidden } from "../helpers/ownership.js";
+import { logger, logRequestError } from "../config/logger.js";
 
 dotenv.config();
-
-// Uploaded images are served from /images; this is the public URL prefix.
-const imageBaseUrl = () =>
-  (process.env.NODE_ENV === "production"
-    ? process.env.PRODUCTION_IMAGE_URL
-    : process.env.DEVELOPMENT_IMAGE_URL) || `http://localhost:${process.env.PORT || 8084}/images/`;
 
 const geocodeAddress = async (address) => {
   const geocoder = NodeGeocoder({ provider: "google", apiKey: process.env.API_KEY });
@@ -46,7 +42,7 @@ export const uploadApartment = async (req, res) => {
         property.longitude = location.longitude;
       }
     } catch (error) {
-      console.error("Geocoding failed for property address:", error.message);
+      logger.error({ error: error.message }, "Geocoding failed for property address");
     }
   }
 
@@ -178,7 +174,7 @@ export const searchApartmentQuery = async (req, res) => {
 
     res.status(200).json(apartments);
   } catch (error) {
-    console.error("Error searching apartments:", error);
+    logRequestError(req, error, "Error searching apartments");
     res.status(500).json({ message: "Internal server error" });
   }
 };

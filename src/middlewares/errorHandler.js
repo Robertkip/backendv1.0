@@ -1,3 +1,4 @@
+import { logRequestError } from "../config/logger.js";
 // Express 4 does not catch a rejected promise from an async handler: the
 // request hangs and the rejection can take the process down. Wrapping a
 // handler forwards that rejection to next(), so errorHandler answers it.
@@ -15,6 +16,8 @@ export const asyncHandler = (handler) => {
     return result;
   };
   Object.defineProperty(wrapped, "name", { value: handler.name });
+  // validateBody marks its middleware with the schema it checks.
+  if (handler.schema) wrapped.schema = handler.schema;
   return wrapped;
 };
 
@@ -42,7 +45,7 @@ export const errorHandler = (err, req, res, next) => {
   const isClientError = status >= 400 && status < 500;
 
   if (!isClientError) {
-    console.error(`Unhandled error on ${req.method} ${req.originalUrl}:`, err);
+    logRequestError(req, err, "Unhandled error");
   }
   if (res.headersSent) {
     return;

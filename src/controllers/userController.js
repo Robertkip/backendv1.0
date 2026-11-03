@@ -5,6 +5,7 @@ import { Op } from "sequelize";
 import UserProfile from "../models/userProfileModel.js";
 import User from "../models/authModel.js";
 import { isAdmin } from "../helpers/ownership.js";
+import { logRequestError } from "../config/logger.js";
 
 dotenv.config();
 export const createUserProfile = async (req, res) => {
@@ -68,7 +69,7 @@ export const searchUserQuery = async (req, res, next) => {
       res.send(data);
     })
     .catch((err) => {
-      console.error("userController.js failed on " + req.method + " " + req.originalUrl + ":", err);
+      logRequestError(req, err, "userController.js failed");
       res.status(500).send({
         message:
           err.message || "Some error occurred while retrieving Apartments.",

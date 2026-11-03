@@ -1,6 +1,7 @@
 import * as Helper from "../helpers/helper.js";
 import User from "../models/authModel.js";
 import { isAdmin } from "../helpers/ownership.js";
+import { logRequestError } from "../config/logger.js";
 
 export const Authenticated = async (req, res, next) => {
   try {
@@ -31,7 +32,7 @@ export const Authenticated = async (req, res, next) => {
 
     next();
   } catch (error) {
-    console.error("Error in Authenticated middleware:", error);
+    logRequestError(req, error, "Error in Authenticated middleware");
     return res.status(500).send({ msg: "Internal server error" });
   }
 };
@@ -46,7 +47,7 @@ export const SuperUser = (req, res, next) => {
 
     next();
   } catch (err) {
-    console.error("authorizationPermission.js failed on " + req.method + " " + req.originalUrl + ":", err);
+    logRequestError(req, err, "authorizationPermission.js failed");
     return res.status(500).send({ msg: "Error" });
   }
 };
@@ -60,7 +61,7 @@ export const AdminRole = (req, res, next) => {
     }
     next();
   } catch (err) {
-    console.error("AdminRole Middleware Error:", err);
+    logRequestError(req, err, "AdminRole Middleware Error");
     return res.status(500).send({ msg: "Error processing AdminRole middleware" });
   }
 };
@@ -74,7 +75,7 @@ export const AgentRole = (req, res, next) => {
     }
     next();
   } catch (err) {
-    console.error("AdminRole Middleware Error:", err);
+    logRequestError(req, err, "AdminRole Middleware Error");
     return res.status(500).send({ msg: "Error processing AdminRole middleware" });
   }
 };
@@ -90,7 +91,7 @@ export const LandlordRole = (req, res, next) => {
     }
     next();
   } catch (err) {
-    console.error("AdminRole Middleware Error:", err);
+    logRequestError(req, err, "AdminRole Middleware Error");
     return res.status(500).send({ msg: "Error processing AdminRole middleware" });
   }
 };
@@ -105,7 +106,7 @@ export const SalesRole = (req, res, next) => {
     }
     next();
   } catch (err) {
-    console.error("AdminRole Middleware Error:", err);
+    logRequestError(req, err, "AdminRole Middleware Error");
     return res.status(500).send({ msg: "Error processing AdminRole middleware" });
   }
 };
@@ -119,7 +120,7 @@ export const BasicUser = (req, res, next) => {
 
     next();
   } catch (err) {
-    console.error("authorizationPermission.js failed on " + req.method + " " + req.originalUrl + ":", err);
+    logRequestError(req, err, "authorizationPermission.js failed");
     return res.status(500).send({ msg: "Error" });
   }
 };

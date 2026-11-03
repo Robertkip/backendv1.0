@@ -8,6 +8,7 @@ import User from "../models/authModel.js";
 import * as PasswordHelper from "../helpers/passwordHelper.js";
 import * as Helper from "../helpers/helper.js";
 import { canModify, sendForbidden } from "../helpers/ownership.js";
+import { imageUrl } from "../helpers/imageUrl.js";
 import Otp from "../models/otpModel.js";
 import Connection from "../models/connectionsModel.js";
 import Role from "../models/role.js";
@@ -18,6 +19,7 @@ import { publishEmailJob } from "../rabbitmq/publisher.js";
 
 import AgentProfile from "../models/agentProfileModel.js";
 import UserProfile from "../models/userProfileModel.js";
+import { logRequestError } from "../config/logger.js";
 
 dotenv.config();
 
@@ -144,7 +146,7 @@ export const Signup = async (req, res) => {
     });
 
   } catch (err) {
-    console.error('Signup error:', err);
+    logRequestError(req, err, "Signup error");
     return res.status(500).json({ message: err.message || 'Internal server error' });
   }
 };
@@ -292,7 +294,7 @@ export const Signin = async (req, res) => {
       message: "Login successful",
     });
   } catch (err) {
-    console.error("Signin error:", err);
+    logRequestError(req, err, "Signin error");
     return res.status(500).json({
       msg: "Unable to sign in. Please try again.",
       message: "Unable to sign in. Please try again.",
@@ -359,7 +361,7 @@ export const verifyOtpCode = async (req, res) => {
 
     return res.status(200).json({ message: "Email verified successfully." });
   } catch (error) {
-    console.error("Error verifying OTP:", error);
+    logRequestError(req, error, "Error verifying OTP");
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -426,7 +428,7 @@ export const verifyAgentLoginOtp = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error verifying agent login OTP:", error);
+    logRequestError(req, error, "Error verifying agent login OTP");
     return res.status(500).json({ message: "Internal server error." });
   }
 };
@@ -472,11 +474,6 @@ export const resetPassword = async (req, res) => {
   return res.status(200).send({ message: "Password reset successfully" });
 };
 
-// Public URL of an uploaded image (files are served from /images).
-const imageUrl = (file) =>
-  ((process.env.NODE_ENV === "production" ? process.env.PRODUCTION_IMAGE_URL : process.env.DEVELOPMENT_IMAGE_URL) ||
-    `http://localhost:${process.env.PORT || 8084}/images/`) + file.filename;
-
 export const updateUserProfile = async (req, res) => {
   const userId = req.query.id ?? req.user.id;
   if (!canModify(req.user, userId)) {
@@ -506,7 +503,7 @@ export const getAllUsers = async (req, res) => {
     const users = await User.findAll();
     res.status(200).send(users);
   } catch (err) {
-    console.error("authController.js failed on " + req.method + " " + req.originalUrl + ":", err);
+    logRequestError(req, err, "authController.js failed");
     res.status(500).send({ message: err.message });
   }
 };
@@ -540,7 +537,7 @@ export const changePassword = async (req, res) => {
 
     res.status(200).json({ msg: "Password updated successfully" });
   } catch (err) {
-    console.error("Error changing password:", err);
+    logRequestError(req, err, "Error changing password");
     res.status(500).json({ msg: "Internal server error" });
   }
 };
@@ -583,7 +580,7 @@ export const getSingleUser = async (req, res, next) => {
       res.send(data);
     })
     .catch((err) => {
-      console.error("authController.js failed on " + req.method + " " + req.originalUrl + ":", err);
+      logRequestError(req, err, "authController.js failed");
       res.status(500).send({
         message: err.message || "Some error occurred while retrieving Users.",
       });
@@ -605,14 +602,16 @@ export const allSocialUsers = async (req, res) => {
     });
 
   } catch (err) {
-    console.error("Error retrieving users", err);
+    logRequestError(req, err, "Error retrieving users");
     res.status(500).json({ message: "Error retrieving users" });
   }
 }
 
 export const sentConnectionRequest = async (req, res) => {
   try {
-    const { currentUserId, selectedUserId } = req.body;
+    // Requests are always sent by the logged-in user.
+    const currentUserId = req.user.id;
+    const { selectedUserId } = req.body;
 
     const selectedUser = await User.findByPk(selectedUserId);
 
@@ -644,7 +643,7 @@ export const sentConnectionRequest = async (req, res) => {
 
     res.status(200).json({ message: "Connection request sent successfully" });
   } catch (error) {
-    console.error(error);
+    logRequestError(req, error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -670,14 +669,16 @@ export const unfollowUser = async (req, res) => {
         res.status(403).json("User is not followed by you");
       }
     } catch (error) {
-      console.error("authController.js failed on " + req.method + " " + req.originalUrl + ":", error);
+      logRequestError(req, error, "authController.js failed");
       res.status(500).json(error);
     }
   }
 };
 
+// The logged-in user accepts a request that senderId sent them.
 export const receivedConnectionRequest = async (req, res) => {
-  const { senderId, recepientId } = req.body;
+  const senderId = Number(req.body.senderId);
+  const recepientId = req.user.id;
 
   try {
     // Retrieve the documents of sender and the recipient
@@ -704,8 +705,8 @@ export const receivedConnectionRequest = async (req, res) => {
     // recepient.connections.push(senderId);
 
     // Filter and update friend requests arrays
-    recepient.connectionsRequest = recepient.connectionsRequest.filter(request => request !== senderId);
-    sender.connectionRequestSent = sender.connectionRequestSent.filter(request => request !== recepientId);
+    recepient.connectionsRequest = (recepient.connectionsRequest || []).filter(request => request !== senderId);
+    sender.connectionRequestSent = (sender.connectionRequestSent || []).filter(request => request !== recepientId);
 
     // Update connections field
     // if (!sender.connections.includes(recepientId)) {
@@ -722,7 +723,7 @@ export const receivedConnectionRequest = async (req, res) => {
 
     res.status(200).json({ message: "Friend Request accepted successfully" });
   } catch (error) {
-    console.error(error);
+    logRequestError(req, error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };

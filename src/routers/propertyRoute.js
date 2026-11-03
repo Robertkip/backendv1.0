@@ -1,6 +1,8 @@
 import express from "express";
 import * as apartmentController from "../controllers/propertyController.js";
 import * as Authorization from "../middlewares/authorizationPermission.js";
+import { validateBody } from "../middlewares/validate.js";
+import * as schemas from "../validation/schemas.js";
 
 const router = express.Router();
 
@@ -8,6 +10,7 @@ router.post(
   "/property",
   Authorization.Authenticated,
   apartmentController.upload,
+  validateBody(schemas.createProperty),
   apartmentController.uploadApartment
 );
 router.get("/allproperty", Authorization.Authenticated, apartmentController.getAllProperties);
@@ -23,6 +26,7 @@ router.put(
   "/property/update/:id",
   Authorization.Authenticated,
   Authorization.AdminRole,
+  validateBody(schemas.updateProperty),
   apartmentController.updateApartment
 );
 // Declared before /delete/:id, which would otherwise treat "all" as an id.

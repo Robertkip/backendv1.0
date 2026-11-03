@@ -1,3 +1,4 @@
+import { logger } from "./logger.js";
 import { createClient } from "redis";
 
 let client;
@@ -7,7 +8,7 @@ let client;
 export const getRedis = async () => {
   if (!client) {
     client = createClient({ url: process.env.REDIS_URL || "redis://localhost:6379" });
-    client.on("error", (error) => console.error("Redis client error:", error.message));
+    client.on("error", (error) => logger.error({ error: error.message }, "Redis client error"));
   }
   if (!client.isOpen) {
     await client.connect();

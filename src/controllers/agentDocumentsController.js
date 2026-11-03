@@ -6,6 +6,8 @@ import AgentDocuments from "../models/agentDocumentsModel.js";
 import fs from "fs";
 import AgentProfile from "../models/agentProfileModel.js";
 import { canModifyAgentRecord, sendForbidden } from "../helpers/ownership.js";
+import { imageBaseUrl } from "../helpers/imageUrl.js";
+import { logRequestError } from "../config/logger.js";
 
 
 dotenv.config();
@@ -13,8 +15,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const projectRoot = path.resolve(__dirname, "../../");
-const PRODUCTION_IMAGE_ADDRESS = process.env.PRODUCTION_IMAGE_URL;
-const DEVELOPMENT_IMAGE_URL = process.env.DEVELOPMENT_IMAGE_URL;
 
 const uploadDir = path.join(projectRoot, "AgentDocuments");
 
@@ -67,10 +67,7 @@ export const createAgentDocument = async (req, res) => {
       return res.status(400).json({ message: "At least one file is required" });
     }
 
-    const baseUrl =
-      process.env.NODE_ENV === "development"
-        ? DEVELOPMENT_IMAGE_URL
-        : PRODUCTION_IMAGE_ADDRESS;
+    const baseUrl = imageBaseUrl();
 
     const fileData = {
       agent_profile_id: agent_id,
@@ -88,7 +85,7 @@ export const createAgentDocument = async (req, res) => {
       data: agentFiles,
     });
   } catch (error) {
-    console.error("Error saving agent files:", error);
+    logRequestError(req, error, "Error saving agent files");
     return res.status(500).json({ message: "Internal Server Error", error: error.message });
   }
 }
@@ -149,7 +146,7 @@ export const deleteAgentDocument = async (req, res) => {
 
     res.status(200).json({ message: "Document deleted successfully" });
   } catch (error) {
-    console.error("agentDocumentsController.js failed on " + req.method + " " + req.originalUrl + ":", error);
+    logRequestError(req, error, "agentDocumentsController.js failed");
     res.status(500).json({ message: error.message });
   }
 }   

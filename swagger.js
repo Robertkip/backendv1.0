@@ -2,9 +2,29 @@
 // actually mounts, so the docs cannot drift from the code. CI fails when the
 // committed file is out of date: run `npm run swagger-autogen` and commit it.
 import fs from "fs";
+import { zodToJsonSchema } from "zod-to-json-schema";
 import { apiRoutes } from "./src/routers/index.js";
 
 const outputFile = new URL("./swagger-output.json", import.meta.url);
+
+// JSON Schema for a request body, without the keywords Swagger 2.0 rejects.
+const bodyJsonSchema = (schema) => {
+  const { $schema, ...json } = zodToJsonSchema(schema, { target: "openApi3", $refStrategy: "none" });
+  return json;
+};
+
+// Upload routes take form fields (Swagger 2.0 formData); the rest a JSON body.
+const bodyParams = (schema, isUpload) => {
+  if (!schema) return [];
+  const json = bodyJsonSchema(schema);
+  if (!isUpload) return [{ name: "body", in: "body", required: true, schema: json }];
+  return Object.entries(json.properties ?? {}).map(([name, property]) => ({
+    name,
+    in: "formData",
+    required: (json.required ?? []).includes(name),
+    type: ["integer", "number", "boolean"].includes(property.type) ? property.type : "string",
+  }));
+};
 
 const paths = {};
 for (const [prefix, router] of apiRoutes) {
@@ -20,15 +40,23 @@ for (const [prefix, router] of apiRoutes) {
       type: "string",
     }));
     const needsLogin = layer.route.stack.some((handler) => handler.name === "Authenticated");
+    // The body schema checked by validateBody (src/validation/schemas.js).
+    const bodySchema = layer.route.stack.find((handler) => handler.handle.schema)?.handle.schema;
+    const isUpload = layer.route.stack.some((handler) => handler.name === "multerMiddleware");
     const tag = prefix === "/api/v1" ? expressPath.split("/")[3] : prefix.split("/")[3];
 
     for (const method of Object.keys(layer.route.methods)) {
       paths[path] ??= {};
       paths[path][method] = {
         tags: [tag],
-        parameters: params,
+        ...(isUpload ? { consumes: ["multipart/form-data"] } : {}),
+        parameters: [...params, ...bodyParams(bodySchema, isUpload)],
         ...(needsLogin ? { security: [{ bearerAuth: [] }] } : {}),
-        responses: { 200: { description: "OK" }, ...(needsLogin ? { 401: { description: "Login required" } } : {}) },
+        responses: {
+          200: { description: "OK" },
+          ...(bodySchema ? { 400: { description: "Invalid request body" } } : {}),
+          ...(needsLogin ? { 401: { description: "Login required" } } : {}),
+        },
       };
     }
   }

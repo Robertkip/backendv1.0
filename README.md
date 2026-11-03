@@ -45,9 +45,23 @@ Tests drop and recreate tables, so they only run against a database whose name e
 
 The connection uses the same `DATABASE_HOST`, `DATABASE_PORT`, `DATABASE_USER` and `DATABASE_PASSWORD` as the app. GitHub Actions runs the tests, an API-docs check and a gitleaks secret scan on every pull request (`.github/workflows/ci.yml`).
 
+## Request validation
+
+Every route that reads a request body checks it against a zod schema in `src/validation/schemas.js` before the handler runs (`validateBody` in the router). Invalid bodies get a 400:
+
+```json
+{ "message": "Invalid request body", "errors": [{ "field": "email", "message": "must be a valid email" }] }
+```
+
+Fields a route does not accept are dropped, strings are trimmed, and form fields (upload routes) are converted to numbers where the schema expects one. New passwords (signup, reset, change) need at least 8 characters. When you add a route that reads a body, add its schema too: `tests/validation.test.js` fails otherwise.
+
+## Logging
+
+Logs are JSON lines written by pino (`src/config/logger.js`), at the level set by `LOG_LEVEL` (default `info`). Every request is logged once when it finishes, with a request id that is also returned in the `X-Request-Id` response header (or taken from that request header when a proxy sets it). Errors logged while handling a request carry the same id, so a client's report can be matched to the server's logs. Authorization headers, cookies, passwords and tokens are redacted. For readable output while developing: `npm run dev:server | npx pino-pretty`.
+
 ## API docs
 
-Swagger UI is served at `/swagger-ui`. `swagger-output.json` is generated from the mounted routes: after adding or changing a route, run `npm run swagger-autogen` and commit the result. CI fails when it is out of date.
+Swagger UI is served at `/swagger-ui`. `swagger-output.json` is generated from the mounted routes and their body schemas: after adding or changing a route, run `npm run swagger-autogen` and commit the result. CI fails when it is out of date.
 
 ## Email delivery
 
@@ -82,5 +96,12 @@ These routes changed in the Phase 2 fixes (see `DEVELOPMENT_CHECKLIST.md`). Writ
 | `POST /api/v1/forgotpassword` answered 401 for unknown emails | Always 200; then `POST /api/v1/resetpassword` with `email`, `code`, `password`, `confirm_password` |
 | `POST /api/v1/create-message` used `senderId` from the body | The sender is the logged-in user |
 | `GET /api/v1/agent-documents` returned one document by an id it never received | Returns the logged-in agent's documents |
+| `POST /api/v1/send-connection-request` used `currentUserId` from the body | The sender is the logged-in user; send only `selectedUserId` |
+| `POST /api/v1/receive-connection-request` used `senderId` and `recepientId` from the body | The logged-in user accepts; send only `senderId` |
+| `POST /api/v1/token/store-device-token` used `userId` from the body | The device is registered for the logged-in user |
+| `GET /api/v1/token/?userId=` matched any id containing the digits | Exact match; only that user or an admin; no `userId` means your own |
+| `POST /api/v1/property/addfiles` with `apartment_id` and `uploaded_by` | `property_id` (`apartment_id` still accepted); the uploader is the logged-in user |
+| `PUT /api/v1/agent-profile/:id` with `agent_name`, `agent_email`, `agent_phone` (never saved) | `agent_fname`, `agent_lname`, `agent_mname`, `agent_phonenumber`, `agent_gender`, `agent_description` |
+| Any body | Checked against a schema: invalid bodies get 400 with the failing fields (see Request validation) |
 
 The list routes accept `?apartment_id=` or `?property_id=` to return only one listing's records.

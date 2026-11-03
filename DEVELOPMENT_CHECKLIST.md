@@ -149,20 +149,22 @@ These routers are all mounted on `/api/v1` and define the same paths, so only th
     - Done: signup runs in a transaction that rolls back when the email job cannot be queued, and a request now waits at most one retry (about 5 seconds) instead of five.
 - [x] **Configuration check at startup.** Fail fast with a clear message when a required variable is missing. `JWT_TOKEN` and `JWT_REFRESH_TOKEN` are required: login breaks without them.
   - Done: [src/config/checkEnv.js](src/config/checkEnv.js); production also requires `REDIS_SESSION_SECRET` and `DATABASE_PASSWORD`.
-- [ ] **Input validation** on every request body (for example zod or express-validator), instead of ad-hoc checks.
+- [x] **Input validation** on every request body (for example zod or express-validator), instead of ad-hoc checks.
+  - Done: zod schemas in [src/validation/schemas.js](src/validation/schemas.js), applied with `validateBody` on every POST and PUT route that reads a body; [tests/validation.test.js](tests/validation.test.js) fails when one is missing. Unknown fields are dropped, so a client can no longer set columns a route never meant to accept. The Swagger docs now include the request bodies.
 - [x] **Rate limiting** on `/signin`, `/signup`, `/verify` and `/forgotpassword`.
   - Done, plus `/verify-agent-login` and `/resetpassword`: 20 requests per IP per route every 15 minutes (`AUTH_RATE_LIMIT_MAX`). Behind nginx set `TRUST_PROXY=1`, or every client shares the proxy's limit.
-- [ ] **Structured logging.** Remove `console.log` of tokens, user objects and API responses (for example in the `Authenticated` middleware).
+- [x] **Structured logging.** Remove `console.log` of tokens, user objects and API responses (for example in the `Authenticated` middleware).
   - [x] Logs of decoded tokens, emails, user objects, OAuth profiles and role lookups are gone.
-  - [ ] Replace the remaining `console` calls with a structured logger (for example pino) with request ids.
+  - [x] Replace the remaining `console` calls with a structured logger (for example pino) with request ids: [src/config/logger.js](src/config/logger.js) (pino and pino-http instead of morgan; `X-Request-Id`; credentials redacted; `LOG_LEVEL`).
 - [x] **API docs.** Regenerate `swagger-output.json` after the route fixes, and keep it in sync from CI.
-  - Done: [swagger.js](swagger.js) builds it from the mounted routes (`npm run swagger-autogen`); CI fails when the committed file is stale. It lists paths, parameters and which routes need a token, but no request bodies yet.
+  - Done: [swagger.js](swagger.js) builds it from the mounted routes (`npm run swagger-autogen`); CI fails when the committed file is stale. It lists paths, parameters, request bodies (from the validation schemas) and which routes need a token.
 
 ---
 
 ## Phase 4: Untested areas (sweep them next)
 
 - [ ] All `POST`, `PUT` and `DELETE` routes, with realistic request bodies: create, then read, update and delete each resource
+  - More security fixes found while writing the validation schemas, covered by [tests/security.test.js](tests/security.test.js): SQL injection in `GET /api/v1/token/?userId=`; anyone could register a device for another user's push notifications, send connection requests as someone else, or upload files to any apartment or property; property files were never linked to their property (wrong column); agent profile updates never saved the changed fields; uploads outside production got image URLs starting with `undefined`.
   - Started: every such route is now called with an empty body (no 500s; this found and fixed crashes in `/verify`, `/verify-agent-login`, `/role`, `/friend`, `/location`, `/agent-location`, `/updateprofile/`, and an OTP check in `/verify-apartment/verify-apartment-creation` that accepted any code), and [tests/phase2.test.js](tests/phase2.test.js) covers create/read/update/delete for listing details, cart, messages, comments and password reset. The other resources still need realistic bodies.
 - [ ] File uploads: apartment and property files, agent documents, post media, profile images
 - [ ] GraphQL at `/graphql`, with and without a token

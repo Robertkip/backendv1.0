@@ -4,6 +4,7 @@ import GoogleStrategy from "passport-google-oauth20";
 import { facebook, google } from "../middlewares/passportConfig.js";
 import session from "express-session";
 import dotenv from "dotenv";
+import { logger } from "../config/logger.js";
 
 dotenv.config();
 
@@ -56,7 +57,7 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
     )
   );
 } else {
-  console.warn("GOOGLE_CLIENT_ID/GOOGLE_CLIENT_SECRET not set, Google sign-in disabled");
+  logger.warn("GOOGLE_CLIENT_ID/GOOGLE_CLIENT_SECRET not set, Google sign-in disabled");
 }
 
 // Serialize user into the sessions

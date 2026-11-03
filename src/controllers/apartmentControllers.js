@@ -9,6 +9,7 @@ import Apartment from "../models/apartmentModel.js";
 import Landlord from "../models/landlordModel.js";
 import { getPlaceCoordinates, PlacesNotConfiguredError, SEARCH_RADIUS_DEGREES } from "../services/places.js";
 import { canModifyApartment, sendForbidden } from "../helpers/ownership.js";
+import { logRequestError } from "../config/logger.js";
 
 dotenv.config();
 
@@ -39,7 +40,7 @@ export const uploadApartment = async (req, res) => {
       return res.status(201).send("Apartment Created Successfully");
   }
   catch (error) {
-    console.error("Error saving apartment:", error);
+    logRequestError(req, error, "Error saving apartment");
     return res.status(500).send({ message: "Internal Server Error" });
 }
 };
@@ -107,7 +108,7 @@ export const getAllApartments = async (req, res) => {
 
     return res.status(200).json(response);
   } catch (error) {
-    console.error("SQL Error:", error);
+    logRequestError(req, error, "SQL Error");
     return res.status(500).json({ message: "Server error", error: error.message });
   }
 };

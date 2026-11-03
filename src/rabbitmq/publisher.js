@@ -1,5 +1,6 @@
 // rabbitmq/publisher.js (main backend)
 import amqp from 'amqplib';
+import { logger } from "../config/logger.js";
 
 let channel = null;
 let connection = null;
@@ -31,11 +32,11 @@ export const connectRabbitMQ = async (retries = 5) => {
       },
     });
 
-    console.log('✅ RabbitMQ publisher connected and queue asserted');
+    logger.info("RabbitMQ publisher connected and queue asserted");
     return channel;
   } catch (err) {
     if (retries > 0) {
-      console.log(`⚠️ RabbitMQ connection failed. Retrying in 5s... (${retries} retries left)`);
+      logger.warn(`RabbitMQ connection failed. Retrying in 5s... (${retries} retries left)`);
       await new Promise(resolve => setTimeout(resolve, 5000));
       return connectRabbitMQ(retries - 1);
     }

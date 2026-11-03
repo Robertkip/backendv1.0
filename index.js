@@ -3,7 +3,6 @@ import cookieSession from "cookie-session";
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
-import logger from "morgan";
 import fs from "fs";
 import path from "path";
 import url, {fileURLToPath} from "url";
@@ -32,6 +31,7 @@ import connectDB from "./src/config/connectMongo.js";
 import { runMigrations } from "./src/config/connectDb.js";
 import { checkEnv } from "./src/config/checkEnv.js";
 import { errorHandler } from "./src/middlewares/errorHandler.js";
+import { logger, requestLogger } from "./src/config/logger.js";
 const options = JSON.parse(fs.readFileSync(new URL("./swagger-output.json", import.meta.url), "utf8"));
 
 const __filename = fileURLToPath(import.meta.url);
@@ -46,7 +46,7 @@ checkEnv();
 
 // A rejected promise nobody awaited must not take the whole API down.
 process.on("unhandledRejection", (reason) => {
-  console.error("Unhandled promise rejection:", reason);
+  logger.error({ err: reason }, "Unhandled promise rejection");
 });
 
 const app = express();
@@ -54,6 +54,9 @@ const app = express();
 // Number of reverse proxies in front of the app (for example 1 behind nginx),
 // so req.ip and the login rate limits see the real client address.
 app.set("trust proxy", Number(process.env.TRUST_PROXY) || 0);
+
+// First, so every request is logged with an id (see src/config/logger.js).
+app.use(requestLogger);
 
 
 connectDB();
@@ -95,7 +98,7 @@ const redisClient = createClient({
   url: process.env.REDIS_URL || 'redis://localhost:6379',
   legacyMode: true, // Keep for connect-redis compatibility
 });
-redisClient.connect().catch(console.error);
+redisClient.connect().catch((error) => logger.error({ err: error }, "Session Redis connection failed"));
 
 
 const redisStore = new RedisStore({
@@ -128,10 +131,10 @@ grpcserver.bindAsync(
   grpc.ServerCredentials.createInsecure(),
   (error, port) => {
     if (error) {
-      console.error('gRPC bind error:', error);
+      logger.error({ err: error }, "gRPC bind error");
       return;
     }
-    console.log(`gRPC server listening on port ${port}`);
+    logger.info(`gRPC server listening on port ${port}`);
     grpcserver.start();
   }
 );
@@ -146,7 +149,6 @@ app.use(
 
 app.use(detectDevice);
 app.use(helmet());
-app.use(logger("common"));
 
 initPassport(app);
 
@@ -208,10 +210,10 @@ const startServer = async () => {
   try {
     await runMigrations();
     httpServer.listen(PORT, () => {
-      console.log(`HTTP server is running on port ${PORT}`);
+      logger.info(`HTTP server is running on port ${PORT}`);
     });
   } catch (error) {
-    console.error('Server startup failed:', error);
+    logger.error({ err: error }, "Server startup failed");
     process.exit(1);
   }
 };

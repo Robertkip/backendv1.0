@@ -4,6 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { createRequire } from 'module';
 import dotenv from 'dotenv';
+import { logger } from "./logger.js";
 
 dotenv.config();
 
@@ -25,12 +26,12 @@ export const sequelize = new Sequelize({
         acquire: 30000,
         idle: 10000,
     },
-    logging: process.env.NODE_ENV === 'development' ? console.log : false
+    logging: process.env.NODE_ENV === 'development' ? (sql) => logger.debug({ sql }, 'SQL') : false
 });
 
 // Migrations live in migrations/*.cjs and run in file-name order; the ones
 // already applied are recorded in the SequelizeMeta table.
-export const createMigrator = (logger = console) =>
+export const createMigrator = (migrationLogger = logger) =>
     new Umzug({
         migrations: {
             glob: path.join(__dirname, '../../migrations/*.cjs'),
@@ -48,19 +49,19 @@ export const createMigrator = (logger = console) =>
             Sequelize,
         },
         storage: new SequelizeStorage({ sequelize }),
-        logger,
+        logger: migrationLogger,
     });
 
 export const runMigrations = async() => {
     try {
         await sequelize.authenticate();
-        console.log("Database connection established");
+        logger.info("Database connection established");
 
         await createMigrator().up();
 
-        console.log("All migrations completed successfully");
+        logger.info("All migrations completed successfully");
     } catch (error) {
-        console.error("Migration error:", error);
+        logger.error({ err: error }, "Migration error");
         process.exit(1);
     }
 };
@@ -69,8 +70,8 @@ export const runMigrations = async() => {
 export const testConnection = async() => {
     try {
         await sequelize.authenticate();
-        console.log("Database connection established successfully");
+        logger.info("Database connection established successfully");
     } catch (error) {
-        console.error("Unable to connect to database:", error);
+        logger.error({ err: error }, "Unable to connect to database");
     }
 };
