@@ -1,6 +1,8 @@
 import express from "express";
 import * as apartmentController from "../controllers/apartmentControllers.js";
 import * as Authorization from "../middlewares/authorizationPermission.js";
+import { validateBody } from "../middlewares/validate.js";
+import * as schemas from "../validation/schemas.js";
 
 const router = express.Router();
 
@@ -8,6 +10,7 @@ router.post(
   "/apartment",
   Authorization.Authenticated,
   apartmentController.upload,
+  validateBody(schemas.createApartment),
   apartmentController.uploadApartment
 );
 
@@ -15,34 +18,27 @@ router.get("/userapartment", Authorization.Authenticated, apartmentController.ge
 router.get("/user-apartments", Authorization.Authenticated, apartmentController.getApartmentByUser);
 router.get("/apartments", apartmentController.getAllRentals);
 router.get("/rentals", apartmentController.getAllRentals);
-router.get("/allapartment/", apartmentController.getAllApartments);
 router.get("/allapartment", apartmentController.getAllApartments);
 
 router.get("/apartment/:id", apartmentController.getApartmentById);
 
-router.get(
-  "/apartmentaccount/:logent_id",
-  apartmentController.getLandlordApartments
-);
-
-router.get(
-  "/apartmentaccount/:logent_id",
-  apartmentController.getAgentApartments
-);
+router.get("/apartmentaccount/:logent_id", apartmentController.getUserApartments);
 
 router.put(
   "/apartment/update/:id",
   Authorization.Authenticated,
   Authorization.AdminRole,
+  validateBody(schemas.updateApartment),
   apartmentController.updateApartment
 );
-router.delete("/apartment/delete/:id", Authorization.Authenticated, apartmentController.deleteApartment);
+// Declared before /delete/:id, which would otherwise treat "all" as an id.
 router.delete(
   "/apartment/delete/all",
   Authorization.Authenticated,
   Authorization.AdminRole,
   apartmentController.deleteAllApartments
 );
+router.delete("/apartment/delete/:id", Authorization.Authenticated, apartmentController.deleteApartment);
 router.get("/single-apartment", apartmentController.searchApartmentQuery);
 
 router.get("/search-apartment", apartmentController.searchApartmentInPlace);

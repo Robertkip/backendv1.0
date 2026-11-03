@@ -3,7 +3,6 @@ import cookieSession from "cookie-session";
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
-import logger from "morgan";
 import fs from "fs";
 import path from "path";
 import url, {fileURLToPath} from "url";
@@ -30,6 +29,9 @@ import connectSocket from "./src/socket/ConnectSocket.js";
 import { Authenticated } from "./src/middlewares/authorizationPermission.js";
 import connectDB from "./src/config/connectMongo.js";
 import { runMigrations } from "./src/config/connectDb.js";
+import { checkEnv } from "./src/config/checkEnv.js";
+import { errorHandler } from "./src/middlewares/errorHandler.js";
+import { logger, requestLogger } from "./src/config/logger.js";
 const options = JSON.parse(fs.readFileSync(new URL("./swagger-output.json", import.meta.url), "utf8"));
 
 const __filename = fileURLToPath(import.meta.url);
@@ -40,14 +42,31 @@ const uploadDir = path.join(projectRoot, "Images");
 const PROTO_PATH = path.join(__dirname, "./proto/post.proto");
 
 dotenv.config();
+checkEnv();
+
+// A rejected promise nobody awaited must not take the whole API down.
+process.on("unhandledRejection", (reason) => {
+  logger.error({ err: reason }, "Unhandled promise rejection");
+});
 
 const app = express();
+
+// Number of reverse proxies in front of the app (for example 1 behind nginx),
+// so req.ip and the login rate limits see the real client address.
+app.set("trust proxy", Number(process.env.TRUST_PROXY) || 0);
+
+// First, so every request is logged with an id (see src/config/logger.js).
+app.use(requestLogger);
 
 
 connectDB();
 
+// File uploads use multipart (multer) and are not limited here.
+const BODY_LIMIT = process.env.BODY_LIMIT || "10mb";
+
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: BODY_LIMIT }));
+app.use(express.urlencoded({ limit: BODY_LIMIT, extended: true }));
 
 const server = new ApolloServer({
   typeDefs,
@@ -62,7 +81,6 @@ const server = new ApolloServer({
 
 
 global.__basedir = __dirname;
-console.log(__basedir);
 
 const specs = {
   customCss: fs.readFileSync("./swagger.css", "utf-8"),
@@ -80,7 +98,7 @@ const redisClient = createClient({
   url: process.env.REDIS_URL || 'redis://localhost:6379',
   legacyMode: true, // Keep for connect-redis compatibility
 });
-redisClient.connect().catch(console.error);
+redisClient.connect().catch((error) => logger.error({ err: error }, "Session Redis connection failed"));
 
 
 const redisStore = new RedisStore({
@@ -88,6 +106,7 @@ const redisStore = new RedisStore({
   prefix: "waridi:",
 });
 
+// checkEnv() makes production set this; the fallback is for local development.
 const REDIS_SESSION_SECRET = process.env.REDIS_SESSION_SECRET || 'your-secret-here';
 
 const packageDefinition = protoLoader.loadSync(PROTO_PATH);
@@ -112,10 +131,10 @@ grpcserver.bindAsync(
   grpc.ServerCredentials.createInsecure(),
   (error, port) => {
     if (error) {
-      console.error('gRPC bind error:', error);
+      logger.error({ err: error }, "gRPC bind error");
       return;
     }
-    console.log(`gRPC server listening on port ${port}`);
+    logger.info(`gRPC server listening on port ${port}`);
     grpcserver.start();
   }
 );
@@ -123,16 +142,13 @@ grpcserver.bindAsync(
 app.use(
   cookieSession({
     name: "session",
-    keys: ["waridi"],
-    maxAge: 24 * 60 * 60 * 100,
+    keys: [REDIS_SESSION_SECRET],
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
   })
 );
 
 app.use(detectDevice);
-app.use(express.json({ limit: '800mb' }));
-app.use(express.urlencoded({ limit: '800mb', extended: true }));
 app.use(helmet());
-app.use(logger("common"));
 
 initPassport(app);
 
@@ -173,7 +189,6 @@ app.use('/graphql', Authenticated);
 
 app.post('/locations', (req, res) => {
   const payload = req.body;
-  console.log('Received location', payload);
   io.emit('location:update', payload);
   res.json({ ok: true });
 });
@@ -184,6 +199,9 @@ app.use(graphqlUploadExpress());
 await server.start();
 server.applyMiddleware({ app });
 
+// Last: answers any error a route passed on, after logging it.
+app.use(errorHandler);
+
 const httpServer = http.createServer(app);
 
 connectSocket(httpServer);
@@ -192,10 +210,10 @@ const startServer = async () => {
   try {
     await runMigrations();
     httpServer.listen(PORT, () => {
-      console.log(`HTTP server is running on port ${PORT}`);
+      logger.info(`HTTP server is running on port ${PORT}`);
     });
   } catch (error) {
-    console.error('Server startup failed:', error);
+    logger.error({ err: error }, "Server startup failed");
     process.exit(1);
   }
 };

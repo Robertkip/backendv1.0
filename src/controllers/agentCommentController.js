@@ -1,115 +1,64 @@
-import AgentComment  from "../models/agentCommentModel.js";
+import AgentComment from "../models/agentCommentModel.js";
+import User from "../models/authModel.js";
+import { canModify, sendForbidden } from "../helpers/ownership.js";
 
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+const withAuthor = {
+  include: [{ model: User, as: "user", attributes: ["id", "username", "user_avatar"] }],
+};
+
+// Comment ids are UUIDs; anything else cannot match a comment.
+const findComment = (id, options) => (UUID.test(id) ? AgentComment.findByPk(id, options) : null);
 
 export const createAgentComment = async (req, res) => {
-  try {
-    const { content, agent_id } = req.body;
-    const user_id = req.user.id;
-
-    const newComment = await AgentComment.create({
-      user_id: user_id,
-      content: content,
-      agent_id: agent_id
-    });
-
-    res.status(201).json(newComment);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  const { content, agent_id } = req.body;
+  if (!content || !agent_id) {
+    return res.status(400).json({ message: "content and agent_id are required" });
   }
-}
+  const newComment = await AgentComment.create({ user_id: req.user.id, content, agent_id });
+  return res.status(201).json(newComment);
+};
 
+// GET /agent-comments/:agentId lists the comments on one agent profile.
 export const getAgentComments = async (req, res) => {
-  try {
-    const { agent_id } = req.params;
-
-    const comments = await AgentComment.findAll({
-      where: { agent_id: agent_id },
-      include: [
-        {
-          model: UserProfile,
-          as: "user",
-          attributes: ["id", "user_fname", "user_lname", "user_avatar"]
-        }
-      ]
-    });
-
-    res.status(200).json(comments);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  const agentId = Number(req.params.agentId);
+  if (!Number.isInteger(agentId)) {
+    return res.status(400).json({ message: "agentId must be a number" });
   }
-}
+  const comments = await AgentComment.findAll({ where: { agent_id: agentId }, ...withAuthor });
+  return res.status(200).json(comments);
+};
 
 export const getSingleAgentComment = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const comment = await AgentComment.findByPk(id, {
-      include: [
-        {
-          model: UserProfile,
-          as: "user",
-          attributes: ["id", "user_fname", "user_lname", "user_avatar"]
-        }
-      ]
-    });
-
-    if (!comment) {
-      return res.status(404).json({ message: "Comment not found" });
-    }
-
-    res.status(200).json(comment);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  const comment = await findComment(req.params.id, withAuthor);
+  if (!comment) {
+    return res.status(404).json({ message: "Comment not found" });
   }
-}
-
+  return res.status(200).json(comment);
+};
 
 export const updateAgentComment = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { content } = req.body;
-
-    const comment = await AgentComment.findByPk(id);
-
-    if (!comment) {
-      return res.status(404).json({ message: "Comment not found" });
-    }
-
-    // Check if the user is the owner of the comment
-    if (comment.user_id !== req.user.id) {
-      return res.status(403).json({ message: "You are not authorized to update this comment" });
-    }
-
-    comment.content = content;
-    await comment.save();
-
-    res.status(200).json(comment);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  const comment = await findComment(req.params.id);
+  if (!comment) {
+    return res.status(404).json({ message: "Comment not found" });
   }
-}
+  if (!canModify(req.user, comment.user_id)) {
+    return sendForbidden(res);
+  }
+  comment.content = req.body.content;
+  await comment.save();
+  return res.status(200).json(comment);
+};
 
 export const deleteAgentComment = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const comment = await AgentComment.findByPk(id);
-
-    if (!comment) {
-      return res.status(404).json({ message: "Comment not found" });
-    }
-
-    // Check if the user is the owner of the comment
-    if (comment.user_id !== req.user.id) {
-      return res.status(403).json({ message: "You are not authorized to delete this comment" });
-    }
-
-    await comment.destroy();
-
-    res.status(200).json({ message: "Comment deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  const comment = await findComment(req.params.id);
+  if (!comment) {
+    return res.status(404).json({ message: "Comment not found" });
   }
-}   
-
-
+  if (!canModify(req.user, comment.user_id)) {
+    return sendForbidden(res);
+  }
+  await comment.destroy();
+  return res.status(200).json({ message: "Comment deleted successfully" });
+};

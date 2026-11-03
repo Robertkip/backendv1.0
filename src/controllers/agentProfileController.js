@@ -4,6 +4,7 @@ import ejs from "ejs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { publishEmailJob } from "../rabbitmq/publisher.js";
+import { logRequestError } from "../config/logger.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -58,7 +59,7 @@ export const createAgentProfile = async (req, res) => {
       data: newAgentProfile,
     });
   } catch (error) {
-    console.error(error);
+    logRequestError(req, error);
     return res.status(500).json({ message: error.message });
   }
 };
@@ -68,7 +69,7 @@ export const getAgentProfiles = async (req, res) => {
     const agentProfiles = await AgentProfile.findAll();
     return res.status(200).json(agentProfiles);
   } catch (error) {
-    console.error(error);
+    logRequestError(req, error);
     return res.status(500).json({ message: error.message });
   }
 };
@@ -83,7 +84,7 @@ export const getMyAgentProfile = async (req, res) => {
 
     return res.status(200).json(agentProfile);
   } catch (error) {
-    console.error(error);
+    logRequestError(req, error);
     return res.status(500).json({ message: error.message });
   }
 };
@@ -99,7 +100,7 @@ export const getSingleAgentProfile = async (req, res) => {
 
     return res.status(200).json(agentProfile);
   } catch (error) {
-    console.error(error);
+    logRequestError(req, error);
     return res.status(500).json({ message: error.message });
   }
 };
@@ -107,7 +108,7 @@ export const getSingleAgentProfile = async (req, res) => {
 export const updateAgentProfile = async (req, res) => {
   try {
     const { id } = req.params;
-    const { agent_name, agent_email, agent_phone, agent_description } = req.body;
+    const { agent_fname, agent_lname, agent_mname, agent_phonenumber, agent_gender, agent_description } = req.body;
 
     const agentProfile = await AgentProfile.findByPk(id);
 
@@ -118,16 +119,16 @@ export const updateAgentProfile = async (req, res) => {
       return sendForbidden(res);
     }
 
-    await agentProfile.update({
-      agent_name,
-      agent_email,
-      agent_phone,
-      agent_description
-    });
+    // Verification fields (agent_verified, is_agent_verified) are not
+    // changed here: an agent must not approve their own profile.
+    const changes = { agent_fname, agent_lname, agent_mname, agent_phonenumber, agent_gender, agent_description };
+    await agentProfile.update(
+      Object.fromEntries(Object.entries(changes).filter(([, value]) => value !== undefined))
+    );
 
     return res.status(200).json(agentProfile);
   } catch (error) {
-    console.error(error);
+    logRequestError(req, error);
     return res.status(500).json({ message: error.message });
   }
 };
@@ -147,7 +148,7 @@ export const deleteAgentProfile = async (req, res) => {
     await agentProfile.destroy();
     return res.status(200).json({ message: "Agent profile deleted successfully" });
   } catch (error) {
-    console.error(error);
+    logRequestError(req, error);
     return res.status(500).json({ message: error.message });
   }
 };

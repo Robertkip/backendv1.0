@@ -1,16 +1,19 @@
 import express from 'express';
 import * as locationController from '../controllers/locationController.js';
 import { Authenticated } from '../middlewares/authorizationPermission.js';
+import { validateBody } from '../middlewares/validate.js';
+import * as schemas from '../validation/schemas.js';
 
+// Apartment locations, mounted on /api/v1/location.
 const router = express.Router();
 
-router.post('/addlocation', Authenticated, locationController.CreateLocation);
+router.post('/addlocation', Authenticated, validateBody(schemas.apartmentLocations.create), locationController.CreateLocation);
 router.get('/alllocations', locationController.GetLocations);
 router.get('/locations', locationController.GetLocations);
 router.get('/locations/search', locationController.SearchLocations);
 router.get('/locations/name/:name', locationController.GetLocationsByName);
 router.get('/locations/:id', locationController.GetLocationById);
-router.get('/update/:id', Authenticated, locationController.UpdateLocation);
-router.get('/deletelocation/:id', Authenticated, locationController.DeleteLocation);
+router.put('/locations/:id', Authenticated, validateBody(schemas.apartmentLocations.update), locationController.UpdateLocation);
+router.delete('/locations/:id', Authenticated, locationController.DeleteLocation);
 
 export default router;

@@ -1,6 +1,7 @@
 import ApartmentPaymentPlan from "../models/apartmentPaymentPlanModel.js";
 import Apartment from "../models/apartmentModel.js";
 import { canModifyApartment, isAdmin, sendForbidden } from "../helpers/ownership.js";
+import { logRequestError } from "../config/logger.js";
 
 // A payment plan belongs to whoever owns its apartment.
 const canModifyPaymentPlan = async (user, paymentPlan) => {
@@ -24,7 +25,7 @@ export const createApartmentPaymentPlan = async (req, res) => {
 
     return res.status(201).json(newPaymentPlan);
   } catch (error) {
-    console.error(error);
+    logRequestError(req, error);
     return res.status(500).json({ message: error.message });
   }
 };
@@ -34,7 +35,7 @@ export const getApartmentPaymentPlans = async (req, res) => {
     const paymentPlans = await ApartmentPaymentPlan.findAll();
     return res.status(200).json(paymentPlans);
   } catch (error) {
-    console.error(error);
+    logRequestError(req, error);
     return res.status(500).json({ message: error.message });
   }
 };  
@@ -50,7 +51,7 @@ export const getSingleApartmentPaymentPlan = async (req, res) => {
 
     return res.status(200).json(paymentPlan);
   } catch (error) {
-    console.error(error);
+    logRequestError(req, error);
     return res.status(500).json({ message: error.message });
   }
 };
@@ -79,7 +80,7 @@ export const updateApartmentPaymentPlan = async (req, res) => {
 
     return res.status(200).json(paymentPlan);
   } catch (error) {
-    console.error(error);
+    logRequestError(req, error);
     return res.status(500).json({ message: error.message });
   }
 };
@@ -99,7 +100,7 @@ export const deleteApartmentPaymentPlan = async (req, res) => {
     await paymentPlan.destroy();
     return res.status(204).send();
   } catch (error) {
-    console.error(error);
+    logRequestError(req, error);
     return res.status(500).json({ message: error.message });
   }
 };

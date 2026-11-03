@@ -4,6 +4,7 @@ import { fileURLToPath } from "url";
 import NotificationToken from "../models/notificationTokenModel.js";
 
 import Notify from "../models/notifyModel.js";
+import { logger, logRequestError } from "../config/logger.js";
 
 // The service account key is a secret and is not committed; without it the
 // server still starts and only push notifications are disabled.
@@ -17,7 +18,7 @@ if (firebaseEnabled) {
     credential: admin.credential.cert(serviceAccount),
   });
 } else {
-  console.warn(`Firebase service account not found at ${serviceAccountPath}, push notifications disabled`);
+  logger.warn(`Firebase service account not found at ${serviceAccountPath}, push notifications disabled`);
 }
 
 let onlineUsers = [];
@@ -48,7 +49,7 @@ export const registerToken = async (req, res) => {
     return res.status(200).json({ message: "Successfully registered token!" });
 
   } catch (error) {
-    console.error("Error registering token:", error);
+    logRequestError(req, error, "Error registering token");
     return res.status(500).json({ message: "Internal server error", error });
   }
 };
@@ -111,7 +112,7 @@ export const sendTokenInformation = async (req, res) => {
     });
 
   } catch (err) {
-    console.error("FCM Error:", err);
+    logRequestError(req, err, "FCM Error");
     res.status(500).json({
       message: "FCM Error",
       error: err,
@@ -134,7 +135,7 @@ export const getUserNotifications = async (req, res) => {
 
     res.status(200).json({ notifications });
   } catch (error) {
-    console.error("Error fetching notifications:", error);
+    logRequestError(req, error, "Error fetching notifications");
     res.status(500).json({ message: "Internal server error", error });
   }
 };

@@ -1,61 +1,936 @@
 {
   "swagger": "2.0",
   "info": {
-    "version": "1.0.0",
-    "title": "REST API",
-    "description": ""
+    "title": "Waridi API",
+    "description": "Generated from the mounted routes by swagger.js.",
+    "version": "1.0.0"
   },
-  "host": "localhost:8084",
   "basePath": "/",
   "schemes": [
+    "https",
     "http"
   ],
+  "securityDefinitions": {
+    "bearerAuth": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header",
+      "description": "Bearer <token>"
+    }
+  },
   "paths": {
-    "/agent": {
+    "/api/v1/agent-comment": {
       "post": {
-        "description": "",
+        "tags": [
+          "agent-comment"
+        ],
         "parameters": [
           {
             "name": "body",
             "in": "body",
+            "required": true,
             "schema": {
               "type": "object",
               "properties": {
-                "userId": {
-                  "example": "any"
+                "content": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 5000
                 },
-                "agent_fname": {
-                  "example": "any"
-                },
-                "agent_lname": {
-                  "example": "any"
-                },
-                "agent_phonenumber": {
-                  "example": "any"
-                },
-                "agent_idno": {
-                  "example": "any"
-                },
-                "agent_location": {
-                  "example": "any"
+                "agent_id": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
                 }
-              }
+              },
+              "required": [
+                "content",
+                "agent_id"
+              ],
+              "additionalProperties": false
             }
           }
         ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
-          "201": {
-            "description": "Created"
+          "200": {
+            "description": "OK"
           },
           "400": {
-            "description": "Bad Request"
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Login required"
           }
         }
       }
     },
-    "/allagent": {
+    "/api/v1/agent-comment/{id}": {
       "get": {
-        "description": "",
+        "tags": [
+          "agent-comment"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "agent-comment"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "content": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 5000
+                }
+              },
+              "required": [
+                "content"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "agent-comment"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/agent-comments/{agentId}": {
+      "get": {
+        "tags": [
+          "agent-comments"
+        ],
+        "parameters": [
+          {
+            "name": "agentId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/agent-documents": {
+      "post": {
+        "tags": [
+          "agent-documents"
+        ],
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "agent-documents"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/agent-documents/{id}": {
+      "get": {
+        "tags": [
+          "agent-documents"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "agent-documents"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/agent-location": {
+      "post": {
+        "tags": [
+          "agent-location"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "agent_county": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "agent_subcounty": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "agent_town": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "agent_street": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "agent_location_description": {
+                  "type": "string",
+                  "maxLength": 255
+                }
+              },
+              "required": [
+                "agent_county",
+                "agent_subcounty",
+                "agent_street"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "agent-location"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/agent-location/{id}": {
+      "get": {
+        "tags": [
+          "agent-location"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "agent-location"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "agent_county": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "agent_subcounty": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "agent_town": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "agent_street": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "agent_location_description": {
+                  "type": "string",
+                  "maxLength": 255
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "agent-location"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/agent-payment": {
+      "post": {
+        "tags": [
+          "agent-payment"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "apartment_id": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
+                },
+                "unit_type": {
+                  "type": "integer"
+                },
+                "plan_description": {
+                  "type": "string",
+                  "maxLength": 5000
+                },
+                "pricing_amount": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "plan_duration": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "currency_type": {
+                  "type": "string",
+                  "maxLength": 10
+                }
+              },
+              "required": [
+                "apartment_id",
+                "unit_type"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "agent-payment"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/agent-payment/{id}": {
+      "get": {
+        "tags": [
+          "agent-payment"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "agent-payment"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "unit_type": {
+                  "type": "integer"
+                },
+                "plan_description": {
+                  "type": "string",
+                  "maxLength": 5000
+                },
+                "pricing_amount": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "plan_duration": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "currency_type": {
+                  "type": "string",
+                  "maxLength": 10
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "agent-payment"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/agent-profile": {
+      "post": {
+        "tags": [
+          "agent-profile"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "agent_fname": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                },
+                "agent_lname": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                },
+                "agent_mname": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "agent_phonenumber": {
+                  "type": "string",
+                  "pattern": "^\\+?[0-9 ()-]{7,20}$"
+                },
+                "agent_gender": {
+                  "type": "string",
+                  "maxLength": 20
+                },
+                "agent_description": {
+                  "type": "string",
+                  "maxLength": 5000
+                },
+                "agent_idno": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "agent_fname",
+                "agent_lname",
+                "agent_phonenumber",
+                "agent_idno"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "agent-profile"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/agent-profile/{id}": {
+      "get": {
+        "tags": [
+          "agent-profile"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "agent-profile"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "agent_fname": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                },
+                "agent_lname": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                },
+                "agent_mname": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "agent_phonenumber": {
+                  "type": "string",
+                  "pattern": "^\\+?[0-9 ()-]{7,20}$"
+                },
+                "agent_gender": {
+                  "type": "string",
+                  "maxLength": 20
+                },
+                "agent_description": {
+                  "type": "string",
+                  "maxLength": 5000
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "agent-profile"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/agent-profile/me": {
+      "get": {
+        "tags": [
+          "agent-profile"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/allapartment": {
+      "get": {
+        "tags": [
+          "allapartment"
+        ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "OK"
@@ -63,9 +938,383 @@
         }
       }
     },
-    "/agent/{id}": {
+    "/api/v1/allcart": {
       "get": {
-        "description": "",
+        "tags": [
+          "allcart"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/alllandlord": {
+      "get": {
+        "tags": [
+          "alllandlord"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/allmarket": {
+      "get": {
+        "tags": [
+          "allmarket"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/allproperty": {
+      "get": {
+        "tags": [
+          "allproperty"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/alltenant": {
+      "get": {
+        "tags": [
+          "alltenant"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/apartment": {
+      "post": {
+        "tags": [
+          "apartment"
+        ],
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "apartment_name",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "apartment_location",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "apartment_description",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "address",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/apartment-comment": {
+      "post": {
+        "tags": [
+          "apartment-comment"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "content": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 5000
+                },
+                "apartmentId": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
+                },
+                "apartment_id": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "content"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/apartment-comment/{id}": {
+      "get": {
+        "tags": [
+          "apartment-comment"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "apartment-comment"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "content": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 5000
+                }
+              },
+              "required": [
+                "content"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "apartment-comment"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/apartment-facilities": {
+      "get": {
+        "tags": [
+          "apartment-facilities"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "apartment-facilities"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "apartment_id": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
+                },
+                "facility_name": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "service_provider": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "provider_contact": {
+                  "type": "string",
+                  "maxLength": 255
+                }
+              },
+              "required": [
+                "apartment_id"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/apartment-facilities/{id}": {
+      "get": {
+        "tags": [
+          "apartment-facilities"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -77,19 +1326,176 @@
         "responses": {
           "200": {
             "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "apartment-facilities"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
           },
-          "404": {
-            "description": "Not Found"
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "apartment_id": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
+                },
+                "facility_name": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "service_provider": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "provider_contact": {
+                  "type": "string",
+                  "maxLength": 255
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "apartment-facilities"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
           }
         }
       }
     },
-    "/agentuser/{userId}": {
+    "/api/v1/apartment-properties": {
       "get": {
-        "description": "",
+        "tags": [
+          "apartment-properties"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "apartment-properties"
+        ],
         "parameters": [
           {
-            "name": "userId",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "apartment_id": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
+                },
+                "number_of_units": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "number_of_one_bd": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "number_of_two_bd": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "number_of_three_bd": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "number_of_four_bd": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "apartment_id"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/apartment-properties/{id}": {
+      "get": {
+        "tags": [
+          "apartment-properties"
+        ],
+        "parameters": [
+          {
+            "name": "id",
             "in": "path",
             "required": true,
             "type": "string"
@@ -98,107 +1504,277 @@
         "responses": {
           "200": {
             "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "apartment-properties"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
           },
-          "500": {
-            "description": "Internal Server Error"
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "apartment_id": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
+                },
+                "number_of_units": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "number_of_one_bd": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "number_of_two_bd": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "number_of_three_bd": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "number_of_four_bd": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "apartment-properties"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
           }
         }
       }
     },
-    "agentapartment/{apartmentId}": {
+    "/api/v1/apartment/{id}": {
       "get": {
-        "description": "",
+        "tags": [
+          "apartment"
+        ],
         "parameters": [
           {
-            "name": "apartmentId",
+            "name": "id",
             "in": "path",
             "required": true,
             "type": "string"
           }
         ],
         "responses": {
-          "default": {
-            "description": ""
+          "200": {
+            "description": "OK"
           }
         }
       }
     },
-    "/apartment": {
+    "/api/v1/apartment/addfiles": {
       "post": {
-        "description": "",
+        "tags": [
+          "apartment"
+        ],
+        "consumes": [
+          "multipart/form-data"
+        ],
         "parameters": [
+          {
+            "name": "apartment_id",
+            "in": "formData",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/apartment/delete/{id}": {
+      "delete": {
+        "tags": [
+          "apartment"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/apartment/delete/all": {
+      "delete": {
+        "tags": [
+          "apartment"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/apartment/update/{id}": {
+      "put": {
+        "tags": [
+          "apartment"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
           {
             "name": "body",
             "in": "body",
+            "required": true,
             "schema": {
               "type": "object",
               "properties": {
                 "apartment_name": {
-                  "example": "any"
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
                 },
                 "apartment_location": {
-                  "example": "any"
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "apartment_slug": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "rent_amount": {
+                  "type": "string",
+                  "maxLength": 255
                 },
                 "apartment_description": {
-                  "example": "any"
+                  "type": "string",
+                  "maxLength": 5000
                 },
-                "address": {
-                  "example": "any"
-                },
-                "logent_id": {
-                  "example": "any"
+                "agent_id": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
                 }
-              }
+              },
+              "additionalProperties": false
             }
           }
         ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "201": {
-            "description": "Created"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/allapartment": {
-      "get": {
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/apartment/{id}": {
-      "get": {
-        "description": "",
-        "parameters": [
+        "security": [
           {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
+            "bearerAuth": []
           }
         ],
         "responses": {
           "200": {
             "description": "OK"
           },
-          "404": {
-            "description": "Not Found"
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Login required"
           }
         }
       }
     },
-    "/apartmentaccount/{logent_id}": {
+    "/api/v1/apartmentaccount/{logent_id}": {
       "get": {
-        "description": "",
+        "tags": [
+          "apartmentaccount"
+        ],
         "parameters": [
           {
             "name": "logent_id",
@@ -210,37 +1786,28 @@
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "500": {
-            "description": "Internal Server Error"
           }
         }
       }
     },
-    "/apartment/{agent_id}": {
+    "/api/v1/apartments": {
       "get": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "agent_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
+        "tags": [
+          "apartments"
         ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "500": {
-            "description": "Internal Server Error"
           }
         }
       }
     },
-    "/apartment/update/{id}": {
+    "/api/v1/cart/{id}": {
       "put": {
-        "description": "",
+        "tags": [
+          "cart"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -249,371 +1816,50 @@
             "type": "string"
           },
           {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          },
-          {
             "name": "body",
             "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "apartment_name": {
-                  "example": "any"
-                },
-                "apartment_location": {
-                  "example": "any"
-                },
-                "apartment_description": {
-                  "example": "any"
-                },
-                "logent_id": {
-                  "example": "any"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/apartment/delete/{id}": {
-      "delete": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
             "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/apartment/delete/all": {
-      "delete": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/": {
-      "get": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "user_fname",
-            "in": "query",
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/signup": {
-      "post": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
             "schema": {
               "type": "object",
               "properties": {
-                "username": {
-                  "example": "any"
-                },
-                "email": {
-                  "example": "any"
-                },
-                "password": {
-                  "example": "any"
-                },
-                "confirm_password": {
-                  "example": "any"
-                },
-                "active": {
-                  "example": "any"
-                },
-                "verified": {
-                  "example": "any"
-                },
-                "roleId": {
-                  "example": "any"
+                "action": {
+                  "type": "string",
+                  "enum": [
+                    "increment",
+                    "decrement"
+                  ]
                 }
-              }
+              },
+              "required": [
+                "action"
+              ],
+              "additionalProperties": false
             }
           }
         ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
+          "200": {
+            "description": "OK"
+          },
           "400": {
-            "description": "Bad Request"
-          },
-          "422": {
-            "description": "Unprocessable Entity"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/signin": {
-      "post": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "email": {
-                  "example": "any"
-                },
-                "password": {
-                  "example": "any"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
+            "description": "Invalid request body"
           },
           "401": {
-            "description": "Unauthorized"
-          },
-          "500": {
-            "description": "Internal Server Error"
+            "description": "Login required"
           }
         }
       }
     },
-    "/send/{to}": {
-      "get": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "to",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/verify/{to}/{code}": {
-      "get": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "to",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "code",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/changepassword": {
+    "/api/v1/cart/{productId}": {
       "post": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "email": {
-                  "example": "any"
-                },
-                "otpCode": {
-                  "example": "any"
-                },
-                "password": {
-                  "example": "any"
-                }
-              }
-            }
-          }
+        "tags": [
+          "cart"
         ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/users": {
-      "get": {
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/get-single-user": {
-      "get": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "query",
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/user/{id}": {
-      "put": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "description": {
-                  "example": "any"
-                },
-                "dateofbirth": {
-                  "example": "any"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/google": {
-      "get": {
-        "description": "",
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        }
-      }
-    },
-    "/facebook": {
-      "get": {
-        "description": "",
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        }
-      }
-    },
-    "/google/callback": {
-      "get": {
-        "description": "",
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        }
-      }
-    },
-    "/facebook/callback": {
-      "get": {
-        "description": "",
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        }
-      }
-    },
-    "/cart/{productId}": {
-      "post": {
-        "description": "",
         "parameters": [
           {
             "name": "productId",
@@ -622,50 +1868,9 @@
             "type": "string"
           }
         ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "404": {
-            "description": "Not Found"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/allcart": {
-      "get": {
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/cart/{id}": {
-      "delete": {
-        "description": "",
-        "parameters": [
+        "security": [
           {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
+            "bearerAuth": []
           }
         ],
         "responses": {
@@ -673,60 +1878,42 @@
             "description": "OK"
           },
           "401": {
-            "description": "Unauthorized"
-          },
-          "404": {
-            "description": "Not Found"
-          },
-          "500": {
-            "description": "Internal Server Error"
+            "description": "Login required"
           }
         }
       },
-      "put": {
-        "description": "",
+      "delete": {
+        "tags": [
+          "cart"
+        ],
         "parameters": [
           {
-            "name": "id",
+            "name": "productId",
             "in": "path",
             "required": true,
             "type": "string"
-          },
+          }
+        ],
+        "security": [
           {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "action": {
-                  "example": "any"
-                }
-              }
-            }
+            "bearerAuth": []
           }
         ],
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request"
           },
           "401": {
-            "description": "Unauthorized"
-          },
-          "404": {
-            "description": "Not Found"
-          },
-          "500": {
-            "description": "Internal Server Error"
+            "description": "Login required"
           }
         }
       }
     },
-    "/send/{id}": {
-      "post": {
-        "description": "",
+    "/api/v1/changepassword/{id}": {
+      "put": {
+        "tags": [
+          "changepassword"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -737,116 +1924,108 @@
           {
             "name": "body",
             "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "chat": {
-                  "example": "any"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/show/{id}": {
-      "get": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
             "required": true,
-            "type": "string"
+            "schema": {
+              "type": "object",
+              "properties": {
+                "password": {
+                  "type": "string",
+                  "minLength": 8,
+                  "maxLength": 128
+                },
+                "confirmPassword": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "password",
+                "confirmPassword"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
           }
         ],
         "responses": {
           "200": {
             "description": "OK"
-          }
-        }
-      }
-    },
-    "/friend": {
-      "post": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "senderId": {
-                  "example": "any"
-                },
-                "receiverId": {
-                  "example": "any"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/landlord": {
-      "post": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "userId": {
-                  "example": "any"
-                },
-                "landlord_fname": {
-                  "example": "any"
-                },
-                "landlord_lname": {
-                  "example": "any"
-                },
-                "landlord_phonenumber": {
-                  "example": "any"
-                },
-                "landlord_idno": {
-                  "example": "any"
-                },
-                "landlord_location": {
-                  "example": "any"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Created"
           },
           "400": {
-            "description": "Bad Request"
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Login required"
           }
         }
       }
     },
-    "/alllandlord": {
+    "/api/v1/create-message": {
+      "post": {
+        "tags": [
+          "create-message"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "receiverId": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
+                },
+                "message": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 5000
+                },
+                "messageType": {
+                  "type": "string",
+                  "enum": [
+                    "text",
+                    "image"
+                  ]
+                }
+              },
+              "required": [
+                "receiverId",
+                "message"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/facebook": {
       "get": {
-        "description": "",
+        "tags": [
+          "facebook"
+        ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "OK"
@@ -854,9 +2033,320 @@
         }
       }
     },
-    "/landlordid/{id}": {
+    "/api/v1/facebook/callback": {
       "get": {
-        "description": "",
+        "tags": [
+          "facebook"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/forgotpassword": {
+      "post": {
+        "tags": [
+          "forgotpassword"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "format": "email",
+                  "maxLength": 254
+                }
+              },
+              "required": [
+                "email"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
+          }
+        }
+      }
+    },
+    "/api/v1/friend": {
+      "post": {
+        "tags": [
+          "friend"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "receiverId": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "receiverId"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/get-all-messages": {
+      "get": {
+        "tags": [
+          "get-all-messages"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/get-connections": {
+      "get": {
+        "tags": [
+          "get-connections"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/get-location": {
+      "get": {
+        "tags": [
+          "get-location"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/get-messages": {
+      "get": {
+        "tags": [
+          "get-messages"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/get-notification": {
+      "get": {
+        "tags": [
+          "get-notification"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/get-single-user": {
+      "get": {
+        "tags": [
+          "get-single-user"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/google": {
+      "get": {
+        "tags": [
+          "google"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/google/callback": {
+      "get": {
+        "tags": [
+          "google"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/landlord": {
+      "post": {
+        "tags": [
+          "landlord"
+        ],
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "formData",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "landlord_fname",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "landlord_lname",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "landlord_phonenumber",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "landlord_idno",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "landlord_location",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/landlordid/{id}": {
+      "get": {
+        "tags": [
+          "landlordid"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -865,16 +2355,26 @@
             "type": "string"
           }
         ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
           }
         }
       }
     },
-    "/landlorduser/{userId}": {
+    "/api/v1/landlorduser/{userId}": {
       "get": {
-        "description": "",
+        "tags": [
+          "landlorduser"
+        ],
         "parameters": [
           {
             "name": "userId",
@@ -883,58 +2383,183 @@
             "type": "string"
           }
         ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
           },
-          "500": {
-            "description": "Internal Server Error"
+          "401": {
+            "description": "Login required"
           }
         }
       }
     },
-    "/market": {
+    "/api/v1/lands": {
+      "get": {
+        "tags": [
+          "lands"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/location": {
       "post": {
-        "description": "",
+        "tags": [
+          "location"
+        ],
         "parameters": [
           {
             "name": "body",
             "in": "body",
+            "required": true,
             "schema": {
               "type": "object",
               "properties": {
-                "sellerId": {
-                  "example": "any"
+                "latitude": {
+                  "type": "number",
+                  "minimum": -90,
+                  "maximum": 90
                 },
-                "product_name": {
-                  "example": "any"
+                "longitude": {
+                  "type": "number",
+                  "minimum": -180,
+                  "maximum": 180
                 },
-                "product_description": {
-                  "example": "any"
-                },
-                "product_quantity": {
-                  "example": "any"
-                },
-                "product_price": {
-                  "example": "any"
+                "timestamp": {
+                  "anyOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "string",
+                      "maxLength": 50
+                    }
+                  ]
                 }
-              }
+              },
+              "required": [
+                "latitude",
+                "longitude"
+              ],
+              "additionalProperties": false
             }
           }
         ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
-          "201": {
-            "description": "Created"
+          "200": {
+            "description": "OK"
           },
           "400": {
-            "description": "Bad Request"
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Login required"
           }
         }
       }
     },
-    "/allmarket": {
+    "/api/v1/location/addlocation": {
+      "post": {
+        "tags": [
+          "location"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "apartment_id": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
+                },
+                "country": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "county": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "city_town": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "latitude": {
+                  "type": "number",
+                  "minimum": -90,
+                  "maximum": 90
+                },
+                "longitude": {
+                  "type": "number",
+                  "minimum": -180,
+                  "maximum": 180
+                },
+                "address": {
+                  "type": "string",
+                  "maxLength": 1000
+                },
+                "location_description": {
+                  "type": "string",
+                  "maxLength": 255
+                }
+              },
+              "required": [
+                "apartment_id"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/location/alllocations": {
       "get": {
-        "description": "",
+        "tags": [
+          "location"
+        ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "OK"
@@ -942,9 +2567,279 @@
         }
       }
     },
-    "/marketproducts/{sellerId}": {
+    "/api/v1/location/locations": {
       "get": {
-        "description": "",
+        "tags": [
+          "location"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/location/locations/{id}": {
+      "get": {
+        "tags": [
+          "location"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "location"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "apartment_id": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
+                },
+                "country": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "county": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "city_town": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "latitude": {
+                  "type": "number",
+                  "minimum": -90,
+                  "maximum": 90
+                },
+                "longitude": {
+                  "type": "number",
+                  "minimum": -180,
+                  "maximum": 180
+                },
+                "address": {
+                  "type": "string",
+                  "maxLength": 1000
+                },
+                "location_description": {
+                  "type": "string",
+                  "maxLength": 255
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "location"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/location/locations/name/{name}": {
+      "get": {
+        "tags": [
+          "location"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/location/locations/search": {
+      "get": {
+        "tags": [
+          "location"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/market": {
+      "post": {
+        "tags": [
+          "market"
+        ],
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "product_name",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "product_description",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "product_quantity",
+            "in": "formData",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "product_price",
+            "in": "formData",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/market/delete/{id}": {
+      "delete": {
+        "tags": [
+          "market"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/market/delete/all": {
+      "delete": {
+        "tags": [
+          "market"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/marketproducts/{sellerId}": {
+      "get": {
+        "tags": [
+          "marketproducts"
+        ],
         "parameters": [
           {
             "name": "sellerId",
@@ -954,29 +2849,1093 @@
           }
         ],
         "responses": {
-          "default": {
-            "description": ""
+          "200": {
+            "description": "OK"
           }
         }
       }
     },
-    "/store-device-token": {
+    "/api/v1/posts/media": {
       "post": {
-        "description": "",
+        "tags": [
+          "posts"
+        ],
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/properties": {
+      "get": {
+        "tags": [
+          "properties"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/property": {
+      "post": {
+        "tags": [
+          "property"
+        ],
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "apartment_name",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "apartment_location",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "apartment_description",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "apartment_price",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "address",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/property-facilities": {
+      "get": {
+        "tags": [
+          "property-facilities"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "property-facilities"
+        ],
         "parameters": [
           {
             "name": "body",
             "in": "body",
+            "required": true,
             "schema": {
               "type": "object",
               "properties": {
-                "userId": {
-                  "example": "any"
+                "property_id": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
                 },
-                "deviceToken": {
-                  "example": "any"
+                "facility_name": {
+                  "type": "string",
+                  "maxLength": 255
                 }
-              }
+              },
+              "required": [
+                "property_id"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/property-facilities/{id}": {
+      "get": {
+        "tags": [
+          "property-facilities"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "property-facilities"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "property_id": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
+                },
+                "facility_name": {
+                  "type": "string",
+                  "maxLength": 255
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "property-facilities"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/property-locations": {
+      "get": {
+        "tags": [
+          "property-locations"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "property-locations"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "property_id": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
+                },
+                "country": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "county": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "city_town": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "latitude": {
+                  "type": "number",
+                  "minimum": -90,
+                  "maximum": 90
+                },
+                "longitude": {
+                  "type": "number",
+                  "minimum": -180,
+                  "maximum": 180
+                },
+                "address": {
+                  "type": "string",
+                  "maxLength": 1000
+                },
+                "location_description": {
+                  "type": "string",
+                  "maxLength": 255
+                }
+              },
+              "required": [
+                "property_id"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/property-locations/{id}": {
+      "get": {
+        "tags": [
+          "property-locations"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "property-locations"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "property_id": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
+                },
+                "country": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "county": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "city_town": {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                "latitude": {
+                  "type": "number",
+                  "minimum": -90,
+                  "maximum": 90
+                },
+                "longitude": {
+                  "type": "number",
+                  "minimum": -180,
+                  "maximum": 180
+                },
+                "address": {
+                  "type": "string",
+                  "maxLength": 1000
+                },
+                "location_description": {
+                  "type": "string",
+                  "maxLength": 255
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "property-locations"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/property-properties": {
+      "get": {
+        "tags": [
+          "property-properties"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "property-properties"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "property_id": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
+                },
+                "bedrooms": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "bathrooms": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "kitchen": {
+                  "type": "string",
+                  "maxLength": 255
+                }
+              },
+              "required": [
+                "property_id"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/property-properties/{id}": {
+      "get": {
+        "tags": [
+          "property-properties"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "property-properties"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "property_id": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
+                },
+                "bedrooms": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "bathrooms": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "kitchen": {
+                  "type": "string",
+                  "maxLength": 255
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "property-properties"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/property/{id}": {
+      "get": {
+        "tags": [
+          "property"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/property/addfiles": {
+      "post": {
+        "tags": [
+          "property"
+        ],
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "property_id",
+            "in": "formData",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "apartment_id",
+            "in": "formData",
+            "required": false,
+            "type": "integer"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/property/agent/{agent_id}": {
+      "get": {
+        "tags": [
+          "property"
+        ],
+        "parameters": [
+          {
+            "name": "agent_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/property/delete/{id}": {
+      "delete": {
+        "tags": [
+          "property"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/property/delete/all": {
+      "delete": {
+        "tags": [
+          "property"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/property/update/{id}": {
+      "put": {
+        "tags": [
+          "property"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "apartment_name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255
+                },
+                "apartment_location": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "apartment_description": {
+                  "type": "string",
+                  "maxLength": 5000
+                },
+                "apartment_price": {
+                  "type": "string",
+                  "maxLength": 255
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/propertyaccount/{logent_id}": {
+      "get": {
+        "tags": [
+          "propertyaccount"
+        ],
+        "parameters": [
+          {
+            "name": "logent_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/rating": {
+      "post": {
+        "tags": [
+          "rating"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "itemId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                },
+                "rating": {
+                  "type": "number",
+                  "minimum": 1,
+                  "maximum": 5
+                }
+              },
+              "required": [
+                "rating"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/rating/{itemId}": {
+      "get": {
+        "tags": [
+          "rating"
+        ],
+        "parameters": [
+          {
+            "name": "itemId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/receive-connection-request": {
+      "post": {
+        "tags": [
+          "receive-connection-request"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "senderId": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "senderId"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/register": {
+      "post": {
+        "tags": [
+          "register"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 4096
+                }
+              },
+              "required": [
+                "token"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/rentals": {
+      "get": {
+        "tags": [
+          "rentals"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/resetpassword": {
+      "post": {
+        "tags": [
+          "resetpassword"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "format": "email",
+                  "maxLength": 254
+                },
+                "code": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 10
+                },
+                "password": {
+                  "type": "string",
+                  "minLength": 8,
+                  "maxLength": 128
+                },
+                "confirm_password": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "email",
+                "password",
+                "confirm_password"
+              ],
+              "additionalProperties": false
             }
           }
         ],
@@ -985,111 +3944,73 @@
             "description": "OK"
           },
           "400": {
-            "description": "Bad Request"
-          },
-          "500": {
-            "description": "Internal Server Error"
+            "description": "Invalid request body"
           }
         }
       }
     },
-    "/role": {
+    "/api/v1/role": {
       "post": {
-        "description": "",
+        "tags": [
+          "role"
+        ],
         "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          },
           {
             "name": "body",
             "in": "body",
+            "required": true,
             "schema": {
               "type": "object",
               "properties": {
                 "roleName": {
-                  "example": "any"
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 50
                 },
                 "active": {
-                  "example": "any"
+                  "anyOf": [
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "true",
+                        "false"
+                      ]
+                    }
+                  ]
                 }
-              }
+              },
+              "required": [
+                "roleName"
+              ],
+              "additionalProperties": false
             }
           }
         ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
-          "201": {
-            "description": "Created"
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
           },
           "401": {
-            "description": "Unauthorized"
-          },
-          "500": {
-            "description": "Internal Server Error"
+            "description": "Login required"
           }
         }
       },
       "get": {
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/tenant": {
-      "post": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "userId": {
-                  "example": "any"
-                },
-                "tenant_fname": {
-                  "example": "any"
-                },
-                "tenant_lname": {
-                  "example": "any"
-                },
-                "tenant_idno": {
-                  "example": "any"
-                },
-                "tenant_phonenumber": {
-                  "example": "any"
-                },
-                "tenant_location": {
-                  "example": "any"
-                }
-              }
-            }
-          }
+        "tags": [
+          "role"
         ],
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "422": {
-            "description": "Unprocessable Entity"
-          }
-        }
-      }
-    },
-    "/alltenant": {
-      "get": {
-        "description": "",
+        "parameters": [],
         "responses": {
           "200": {
             "description": "OK"
@@ -1097,9 +4018,11 @@
         }
       }
     },
-    "/tenant/{id}": {
+    "/api/v1/role/{id}": {
       "get": {
-        "description": "",
+        "tags": [
+          "role"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -1111,82 +4034,248 @@
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "404": {
-            "description": "Not Found"
           }
         }
       }
     },
-    "/tenantuser/{userId}": {
+    "/api/v1/search-apartment": {
       "get": {
-        "description": "",
-        "parameters": [
+        "tags": [
+          "search-apartment"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/v1/search-property": {
+      "get": {
+        "tags": [
+          "search-property"
+        ],
+        "parameters": [],
+        "security": [
           {
-            "name": "userId",
-            "in": "path",
-            "required": true,
-            "type": "string"
+            "bearerAuth": []
           }
         ],
         "responses": {
           "200": {
             "description": "OK"
           },
-          "500": {
-            "description": "Internal Server Error"
+          "401": {
+            "description": "Login required"
           }
         }
       }
     },
-    "/userprofile": {
+    "/api/v1/send-connection-request": {
       "post": {
-        "description": "",
+        "tags": [
+          "send-connection-request"
+        ],
         "parameters": [
           {
             "name": "body",
             "in": "body",
+            "required": true,
             "schema": {
               "type": "object",
               "properties": {
-                "userId": {
-                  "example": "any"
-                },
-                "user_fname": {
-                  "example": "any"
-                },
-                "user_lname": {
-                  "example": "any"
-                },
-                "user_phonenumber": {
-                  "example": "any"
-                },
-                "user_location": {
-                  "example": "any"
-                },
-                "followers": {
-                  "example": "any"
-                },
-                "following": {
-                  "example": "any"
+                "selectedUserId": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
                 }
-              }
+              },
+              "required": [
+                "selectedUserId"
+              ],
+              "additionalProperties": false
             }
           }
         ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
-          "201": {
-            "description": "Created"
+          "200": {
+            "description": "OK"
           },
           "400": {
-            "description": "Bad Request"
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Login required"
           }
         }
       }
     },
-    "/alluserprofile": {
+    "/api/v1/send-notification": {
+      "post": {
+        "tags": [
+          "send-notification"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "body": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 1000
+                },
+                "imageUrl": {
+                  "type": "string",
+                  "format": "uri",
+                  "maxLength": 2000
+                },
+                "type": {
+                  "type": "string",
+                  "maxLength": 50
+                }
+              },
+              "required": [
+                "body"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/signin": {
+      "post": {
+        "tags": [
+          "signin"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "maxLength": 254
+                },
+                "password": {
+                  "type": "string",
+                  "maxLength": 128
+                }
+              },
+              "required": [
+                "email",
+                "password"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
+          }
+        }
+      }
+    },
+    "/api/v1/signup": {
+      "post": {
+        "tags": [
+          "signup"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "username": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 50
+                },
+                "email": {
+                  "type": "string",
+                  "format": "email",
+                  "maxLength": 254
+                },
+                "password": {
+                  "type": "string",
+                  "minLength": 8,
+                  "maxLength": 128
+                },
+                "confirm_password": {
+                  "type": "string"
+                },
+                "roleId": {
+                  "type": "integer",
+                  "exclusiveMinimum": true,
+                  "minimum": 0
+                }
+              },
+              "required": [
+                "username",
+                "email",
+                "password",
+                "confirm_password"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
+          }
+        }
+      }
+    },
+    "/api/v1/single-apartment": {
       "get": {
-        "description": "",
+        "tags": [
+          "single-apartment"
+        ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "OK"
@@ -1194,9 +4283,117 @@
         }
       }
     },
-    "/userprofile/{id}": {
+    "/api/v1/single-property": {
       "get": {
-        "description": "",
+        "tags": [
+          "single-property"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/social-users": {
+      "get": {
+        "tags": [
+          "social-users"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/tenant": {
+      "post": {
+        "tags": [
+          "tenant"
+        ],
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "formData",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "tenant_fname",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "tenant_lname",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "tenant_idno",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "tenant_phonenumber",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "tenant_location",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/tenant/{id}": {
+      "get": {
+        "tags": [
+          "tenant"
+        ],
         "parameters": [
           {
             "name": "id",
@@ -1205,19 +4402,26 @@
             "type": "string"
           }
         ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
           },
-          "404": {
-            "description": "Not Found"
+          "401": {
+            "description": "Login required"
           }
         }
       }
     },
-    "/singleuser/{userId}": {
+    "/api/v1/tenantuser/{userId}": {
       "get": {
-        "description": "",
+        "tags": [
+          "tenantuser"
+        ],
         "parameters": [
           {
             "name": "userId",
@@ -1226,12 +4430,571 @@
             "type": "string"
           }
         ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
           },
-          "500": {
-            "description": "Internal Server Error"
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/token": {
+      "get": {
+        "tags": [
+          "token"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/token/store-device-token": {
+      "post": {
+        "tags": [
+          "token"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "deviceToken": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 4096
+                }
+              },
+              "required": [
+                "deviceToken"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/updateprofile": {
+      "put": {
+        "tags": [
+          "updateprofile"
+        ],
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/user": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/user-apartments": {
+      "get": {
+        "tags": [
+          "user-apartments"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/user-connections/{id}": {
+      "get": {
+        "tags": [
+          "user-connections"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/user/{id}": {
+      "put": {
+        "tags": [
+          "user"
+        ],
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "dateofbirth",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/user/alluserprofile": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/user/singleuser/{userId}": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/user/userprofile": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "formData",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "user_fname",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "user_lname",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "user_phonenumber",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "user_location",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "followers",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "following",
+            "in": "formData",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/user/userprofile/{id}": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/userapartment": {
+      "get": {
+        "tags": [
+          "userapartment"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/users": {
+      "get": {
+        "tags": [
+          "users"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/verify": {
+      "post": {
+        "tags": [
+          "verify"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "format": "email",
+                  "maxLength": 254
+                },
+                "code": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 10
+                }
+              },
+              "required": [
+                "email"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
+          }
+        }
+      }
+    },
+    "/api/v1/verify-agent-login": {
+      "post": {
+        "tags": [
+          "verify-agent-login"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "format": "email",
+                  "maxLength": 254
+                },
+                "code": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 10
+                }
+              },
+              "required": [
+                "email"
+              ],
+              "additionalProperties": false
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
+          }
+        }
+      }
+    },
+    "/api/v1/verify-apartment/send-verification-code": {
+      "post": {
+        "tags": [
+          "verify-apartment"
+        ],
+        "parameters": [],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Login required"
+          }
+        }
+      }
+    },
+    "/api/v1/verify-apartment/verify-apartment-creation": {
+      "post": {
+        "tags": [
+          "verify-apartment"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 10
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid request body"
+          },
+          "401": {
+            "description": "Login required"
           }
         }
       }

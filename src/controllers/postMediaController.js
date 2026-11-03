@@ -4,19 +4,17 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { Op } from "sequelize";
 import fs from "fs";
+import { logger } from "../config/logger.js";
 
 dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const projectRoot = path.resolve(__dirname, "../../");
-const PRODUCTION_IMAGE_ADDRESS = process.env.PRODUCTION_IMAGE_URL;
-const DEVELOPMENT_IMAGE_URL = process.env.DEVELOPMENT_IMAGE_URL;
-
 const uploadDir = path.join(projectRoot, "Images");
 
 
-console.log("Serving static from✅✅✅:", uploadDir);
+logger.debug({ uploadDir }, "Serving uploaded files");
 
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });

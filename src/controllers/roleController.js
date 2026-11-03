@@ -1,4 +1,5 @@
 import Role from "../models/role.js";
+import { logRequestError } from "../config/logger.js";
 
 export const GetRole = async (req, res) => {
     try {
@@ -13,6 +14,7 @@ export const GetRole = async (req, res) => {
            data: roles 
         })
     } catch (error) {
+        logRequestError(req, error, "roleController.js failed");
         return res.status(500).send({
 			status: 500,
 			message: "Internal server error",
@@ -23,6 +25,9 @@ export const GetRole = async (req, res) => {
 export const CreateRole = async (req, res) => {
 	try {
 		const { roleName, active } = req.body;
+		if (!roleName) {
+			return res.status(400).send({ status: 400, message: "roleName is required", data: null });
+		}
 
 		const create = await Role.create({
 			roleName,
@@ -35,6 +40,7 @@ export const CreateRole = async (req, res) => {
 			data: create
 		});
 	} catch (error) {
+		logRequestError(req, error, "roleController.js failed");
 		return res.status(500).send({
 			status: 500,
 			message: "Internal server error",
@@ -68,6 +74,7 @@ export const UpdateRole = async (req, res) => {
 			data: role
 		});
 	} catch (error) {
+		logRequestError(req, error, "roleController.js failed");
 		return res.status(500).send({
 			status: 500,
 			message: "Internal server error",
@@ -97,6 +104,7 @@ export const DeleteRole = async (req, res) => {
 			data: null
 		});
 	} catch (error) {
+		logRequestError(req, error, "roleController.js failed");
 		return res.status(500).send({
 			status: 500,
 			message: "Internal server error",
@@ -124,6 +132,7 @@ export const GetRoleById = async (req, res) => {
 			data: role
 		});
 	} catch (error) {
+		logRequestError(req, error, "roleController.js failed");
 
 		return res.status(500).send({
 			status: 500,

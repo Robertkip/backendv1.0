@@ -4,7 +4,10 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { Op } from "sequelize";
 import PropertyFiles from "../models/propertyFilesModel.js";
+import Property from "../models/propertyModel.js";
+import { canModify, sendForbidden } from "../helpers/ownership.js";
 import fs from "fs";
+import { imageBaseUrl } from "../helpers/imageUrl.js";
 
 dotenv.config();
 
@@ -12,8 +15,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const __basedir = __dirname;
 
-const PRODUCTION_IMAGE_ADDRESS = process.env.PRODUCTION_IMAGE_URL;
-const DEVELOPMENT_IMAGE_URL = process.env.DEVELOPMENT_IMAGE_URL;
 
 const uploadDir = path.join(__basedir, "Images");
 if (!fs.existsSync(uploadDir)) {
@@ -47,45 +48,43 @@ export const upload = multer({
 }).array("files", 5);
 
 export const uploadApartment = async (req, res) => {
-  // try {
-    const { apartment_id, uploaded_by } = req.body;
-    const files = req.files;
+  // The column is property_id; older clients send apartment_id.
+  const property_id = req.body.property_id ?? req.body.apartment_id;
+  const files = req.files;
 
-    if (!apartment_id || !uploaded_by) {
-      return res.status(400).json({ message: "apartment_id and uploaded_by are required" });
-    }
+  if (!files || files.length < 1) {
+    return res.status(400).json({ message: "At least one file is required" });
+  }
 
-    if (!files || files.length < 1) {
-      return res.status(400).json({ message: "At least one file is required" });
-    }
+  const property = await Property.findByPk(property_id);
+  if (!property) {
+    return res.status(404).json({ message: "Property not found" });
+  }
+  // Properties created before owners were recorded have no agent_id: admins only.
+  if (!canModify(req.user, property.agent_id)) {
+    return sendForbidden(res);
+  }
 
-    const baseUrl =
-      process.env.NODE_ENV === "development"
-        ? DEVELOPMENT_IMAGE_URL
-        : PRODUCTION_IMAGE_ADDRESS;
+  const baseUrl = imageBaseUrl();
 
-    const fileData = {
-      apartment_id,
-      uploaded_by,
-      file_size: files.reduce((total, file) => total + file.size, 0), 
-    };
+  const fileData = {
+    property_id: property.id,
+    uploaded_by: req.user.id,
+    file_size: files.reduce((total, file) => total + file.size, 0),
+  };
 
-    if (files[0]) fileData.first_image = baseUrl + files[0].filename;
-    if (files[1]) fileData.second_image = baseUrl + files[1].filename;
-    if (files[2]) fileData.third_image = baseUrl + files[2].filename;
-    if (files[3]) fileData.fourth_image = baseUrl + files[3].filename;
-    if (files[4]) fileData.video_path = baseUrl + files[4].filename;
+  if (files[0]) fileData.first_image = baseUrl + files[0].filename;
+  if (files[1]) fileData.second_image = baseUrl + files[1].filename;
+  if (files[2]) fileData.third_image = baseUrl + files[2].filename;
+  if (files[3]) fileData.fourth_image = baseUrl + files[3].filename;
+  if (files[4]) fileData.video_path = baseUrl + files[4].filename;
 
-    const newApartment = await PropertyFiles.create(fileData);
+  const newApartment = await PropertyFiles.create(fileData);
 
-    return res.status(201).json({
-      message: "Apartment files uploaded successfully",
-      data: newApartment,
-    });
-  // } catch (error) {
-  //   console.error("Error saving apartment files:", error);
-  //   return res.status(500).json({ message: "Internal Server Error", error: error.message });
-  // }
+  return res.status(201).json({
+    message: "Apartment files uploaded successfully",
+    data: newApartment,
+  });
 };
 
 export const getPagination = (page, size) => {

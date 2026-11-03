@@ -1,12 +1,14 @@
 import Chat from "../models/chatMessage";
 import User from "../models/authModel";
 import { Op } from "sequelize";
+import { logRequestError } from "../config/logger.js";
 
 export const getUsers = async (req, res, next) => {
 
      await User.findAll().then(data => {
         res.status(200).send(data);
      }).catch(err => {
+        logRequestError(req, err, "chatController.js failed");
         res.status(500).send(err);
      })
 }

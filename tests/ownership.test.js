@@ -39,8 +39,7 @@ let counter = 0;
 const createUser = async (role = "USER") => {
   const n = ++counter;
   const user = await User.create({ email: `owner${n}@example.com`, username: `owner${n}`, roleId: roleId(role), verified: true });
-  // Comments reference userprofiles.id with the user's id.
-  await UserProfile.create({ id: user.id, userId: user.id });
+  await UserProfile.create({ userId: user.id });
   return user;
 };
 
@@ -241,7 +240,7 @@ describe("user account changes", () => {
   });
 
   it("lets an admin change a user's password", async () => {
-    const res = await send(admin, "put", `/api/v1/changepassword/${owner.id}`, { password: "Reset1!", confirmPassword: "Reset1!" });
+    const res = await send(admin, "put", `/api/v1/changepassword/${owner.id}`, { password: "Reset123!", confirmPassword: "Reset123!" });
 
     expect(res.status).toBe(200);
   });

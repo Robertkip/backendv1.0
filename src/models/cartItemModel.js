@@ -12,6 +12,11 @@ const CartItem = sequelize.define("cartitem", {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
+  quantity: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 1,
+  },
 });
 
 CartItem.associations = (models) => {

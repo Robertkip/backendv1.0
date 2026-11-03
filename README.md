@@ -1,129 +1,107 @@
-# WARIDI REAL ESTATE BACKEND 
+# WARIDI REAL ESTATE BACKEND
 
 ## Overview
 This is a real estate mobile application that connects users to LandLords, Property Owners and a possibility of becoming a tenant. It also connects users to users to come to  an agreement if they can be on a budget to co-exist or become room mates.
 
 ## Requirements
 
-- Node.js 20 or newer
+- Node.js 20 or newer (`node --version`)
 - PostgreSQL
 - Redis
+- RabbitMQ (email delivery, see [Email delivery](#email-delivery))
 - MongoDB (posts and chat messages; the rest of the API runs without it)
 
-### Quick start
+## Quick start
 
 1. `npm install --legacy-peer-deps`
-2. Create an empty Postgres database (default name `waridi`).
-3. Copy `env.example` to `.env` and set at least `DATABASE_PASSWORD`. `DATABASE_HOST`, `DATABASE_PORT`, `DATABASE_USER` and `DATABASE_NAME` default to `localhost`, `5432`, `postgres` and `waridi`; `MONGO_URI` defaults to `mongodb://localhost:27017/waridi` and `REDIS_URL` to `redis://localhost:6379`.
+2. Create an empty Postgres database (default name `waridi`): `CREATE DATABASE waridi;`
+3. Copy `env.example` to `.env` and set at least `JWT_TOKEN`, `JWT_REFRESH_TOKEN` and `DATABASE_PASSWORD` (generate secrets with `openssl rand -hex 32`). `DATABASE_HOST`, `DATABASE_PORT`, `DATABASE_USER` and `DATABASE_NAME` default to `localhost`, `5432`, `postgres` and `waridi`; `MONGO_URI` defaults to `mongodb://localhost:27017/waridi` and `REDIS_URL` to `redis://localhost:6379`.
 4. `npm run dev:server`
 
-When there are no files in `migrations/`, startup creates any missing tables from the Sequelize models. Google sign-in is turned on only when `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` are set. Push notifications need a Firebase service account key: get it from an administrator and set `FIREBASE_SERVICE_ACCOUNT_PATH` to its location (default `waridi-793c4-firebase-adminsdk-4z45i-cf675a6b0d.json` in the project root). Without it the server starts with push notifications disabled. Never commit this file or `.env`. Insert the roles listed under **Configure Database** below before registering users.
+The server refuses to start when a required setting is missing and names it. In production (`NODE_ENV=production`) `REDIS_SESSION_SECRET` and `DATABASE_PASSWORD` are required too.
 
-### Running tests
+Startup applies any pending database migrations, which also create the roles (USER, AGENT, LANDLORD, SALES, ADMIN, SUPERADMIN). Google sign-in is turned on only when `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` are set; Facebook sign-in is not wired up yet. Both answer 503 until configured. Place search (`/search-apartment`, `/search-property`) needs `API_KEY` and `PLACES_API_ENDPOINT` and answers 503 without them.
 
-Tests drop and recreate tables, so they only run against a database whose name ends in `_test` (default `waridi_test`; override with `TEST_DATABASE_NAME`).
+Push notifications need a Firebase service account key: get it from an administrator and set `FIREBASE_SERVICE_ACCOUNT_PATH` to its location (default `waridi-793c4-firebase-adminsdk-4z45i-cf675a6b0d.json` in the project root). Without it the server starts with push notifications disabled. Never commit this file or `.env`.
+
+## Database migrations
+
+Migrations live in `migrations/*.cjs` and run in file-name order. Startup applies the pending ones; you can also run them by hand:
+
+- `npm run db:migrate`: apply pending migrations
+- `npm run db:migrate:status`: list applied and pending migrations
+- `npm run db:migrate:undo`: undo the last one
+
+To change the schema, change the model and add a new migration file named `YYYYMMDDHHMMSS-what-it-does.cjs` that exports `up(queryInterface, Sequelize)` and `down(queryInterface, Sequelize)`. Never edit a migration that has already run somewhere.
+
+The first migration creates any missing tables from the models, so it is safe on a database created before migrations were committed; the next ones bring such a database up to date.
+
+## Running tests
+
+Tests drop and recreate tables, so they only run against a database whose name ends in `_test` (default `waridi_test`; override with `TEST_DATABASE_NAME`). They also need Redis.
 
 1. Create the test database once: `CREATE DATABASE waridi_test;`
 2. `npm test`
 
-The connection uses the same `DATABASE_HOST`, `DATABASE_PORT`, `DATABASE_USER` and `DATABASE_PASSWORD` as the app.
+The connection uses the same `DATABASE_HOST`, `DATABASE_PORT`, `DATABASE_USER` and `DATABASE_PASSWORD` as the app. GitHub Actions runs the tests, an API-docs check and a gitleaks secret scan on every pull request (`.github/workflows/ci.yml`).
 
-Verify the Node.js version before installing dependencies:
+## Request validation
 
-```bash
-node --version
+Every route that reads a request body checks it against a zod schema in `src/validation/schemas.js` before the handler runs (`validateBody` in the router). Invalid bodies get a 400:
+
+```json
+{ "message": "Invalid request body", "errors": [{ "field": "email", "message": "must be a valid email" }] }
 ```
 
-The project declares Node.js `>=20.0.0` in `package.json`.
+Fields a route does not accept are dropped, strings are trimmed, and form fields (upload routes) are converted to numbers where the schema expects one. New passwords (signup, reset, change) need at least 8 characters. When you add a route that reads a body, add its schema too: `tests/validation.test.js` fails otherwise.
 
-## Table of Content
-           
-   ### . Local Project Setup
+## Logging
 
-   1) Clone Github Branch **backendv1.2** to your local setup
-     
-             git clone -b backendv1.2 --single-branch https://github.com/Waridi-RE/backendv1.0.git 
+Logs are JSON lines written by pino (`src/config/logger.js`), at the level set by `LOG_LEVEL` (default `info`). Every request is logged once when it finishes, with a request id that is also returned in the `X-Request-Id` response header (or taken from that request header when a proxy sets it). Errors logged while handling a request carry the same id, so a client's report can be matched to the server's logs. Authorization headers, cookies, passwords and tokens are redacted. For readable output while developing: `npm run dev:server | npx pino-pretty`.
 
-   2) CD into your cloned directory *cd backendv1* then install node modules
+## API docs
 
-             npm install --legacy-peer-deps
+Swagger UI is served at `/swagger-ui`. `swagger-output.json` is generated from the mounted routes and their body schemas: after adding or changing a route, run `npm run swagger-autogen` and commit the result. CI fails when it is out of date.
 
-         #### Setup Environment Variables
+## Email delivery
 
-        We have environment variables example file pushed to the github repository, create .env file in local setup base directory. Obtain the values and paste where the keys belong           
+This server does not send email itself. Signup, agent login and forgot-password publish a job to the RabbitMQ queue named by `EMAIL_QUEUE`, and a separate consumer service sends it. Without a running consumer, users never receive their OTP codes.
 
-        #### Setup Email For The Enviroment Variables.
+Each job is a persistent JSON message:
 
-        . Click on the link below to go to auth 2 playground to generate token.
+```json
+{ "to": "user@example.com", "subject": "Verify Your Waridi Account", "html": "<rendered email>", "text": "Plain-text version" }
+```
 
-          [Click Here](https://developers.google.com/oauthplayground/)    
+The queue is declared durable with a 60-second message TTL; expired or rejected messages go to the `email-dlx` exchange with routing key `DEAD_LETTER_QUEUE`. The consumer must declare the queue with the same arguments, send the email (for example with nodemailer), then acknowledge the message.
 
-          > [!TIP]
-          > Read Out To Administrator to Provide a Token For Your Setup
+If RabbitMQ is down, signup answers 500 and saves nothing, so the person can sign up again once it is back.
 
+## API changes for the mobile app
 
-         #### Setup Database 
+These routes changed in the Phase 2 fixes (see `DEVELOPMENT_CHECKLIST.md`). Writes need a token and are allowed only for the owner of the apartment or property, or an admin.
 
-         > [!IMPORTANT]      
-         > Make Sure you have setup postgres locally if it is in Windows Os, Mac Os or Linux Family Of Distributions
+| Before | Now |
+| --- | --- |
+| `POST /api/v1/addproperties` | `POST /api/v1/apartment-properties` (`apartment_id` in body) or `POST /api/v1/property-properties` (`property_id`) |
+| `GET /api/v1/allproperties`, `GET /api/v1/properties/:id` | `GET /api/v1/apartment-properties[/:id]` or `GET /api/v1/property-properties[/:id]` |
+| `POST /api/v1/addfacility` | `POST /api/v1/apartment-facilities` or `POST /api/v1/property-facilities` |
+| `GET /api/v1/allfacilities`, `GET /api/v1/facilities/:id` | `GET /api/v1/apartment-facilities[/:id]` or `GET /api/v1/property-facilities[/:id]` |
+| `POST /api/v1/addlocation`, `GET /api/v1/alllocations`, `/locations`, `/location/:id` (property locations) | `POST /api/v1/property-locations`, `GET /api/v1/property-locations[/:id]` |
+| `GET /api/v1/update/:id` | `PUT /api/v1/<prefix>/:id` |
+| `GET /api/v1/deleteproperty/:id`, `/deletefacilities/:id`, `/deletefacility/:id`, `/deletelocation/:id` | `DELETE /api/v1/<prefix>/:id` |
+| `GET /api/v1/location/update/:id`, `GET /api/v1/location/deletelocation/:id` | `PUT` / `DELETE /api/v1/location/locations/:id` |
+| `GET /api/v1/property/:agent_id` | `GET /api/v1/property/agent/:agent_id` |
+| `GET /api/v1/allapartment/`, `GET /api/v1/allproperty/` (trailing slash) | `GET /api/v1/allapartment`, `GET /api/v1/allproperty` |
+| `POST /api/v1/forgotpassword` answered 401 for unknown emails | Always 200; then `POST /api/v1/resetpassword` with `email`, `code`, `password`, `confirm_password` |
+| `POST /api/v1/create-message` used `senderId` from the body | The sender is the logged-in user |
+| `GET /api/v1/agent-documents` returned one document by an id it never received | Returns the logged-in agent's documents |
+| `POST /api/v1/send-connection-request` used `currentUserId` from the body | The sender is the logged-in user; send only `selectedUserId` |
+| `POST /api/v1/receive-connection-request` used `senderId` and `recepientId` from the body | The logged-in user accepts; send only `senderId` |
+| `POST /api/v1/token/store-device-token` used `userId` from the body | The device is registered for the logged-in user |
+| `GET /api/v1/token/?userId=` matched any id containing the digits | Exact match; only that user or an admin; no `userId` means your own |
+| `POST /api/v1/property/addfiles` with `apartment_id` and `uploaded_by` | `property_id` (`apartment_id` still accepted); the uploader is the logged-in user |
+| `PUT /api/v1/agent-profile/:id` with `agent_name`, `agent_email`, `agent_phone` (never saved) | `agent_fname`, `agent_lname`, `agent_mname`, `agent_phonenumber`, `agent_gender`, `agent_description` |
+| Any body | Checked against a schema: invalid bodies get 400 with the failing fields (see Request validation) |
 
-         . Install sequelize cli
-
-             npm install sequelize-cli --legacy-peer-deps
-
-         . Delete config models and migrations folder in base directory
-
-
-         . Initial Sequelize CLI
-
-            npm sequelize-cli init 
-
-         . Replace file config/config.json with appropriate database values
-
-         . Create Database in postgres. Depending on the OS you use to access database. In ubuntu from terminal.
-
-            CREATE DATABASE waridi;
-
-            Then
-
-            GRANT PRIVILEGES ON DATABASE waridi TO postgres;
-           
-
-        #### Run Sequelize Migrations
-
-        . In help/migration_file.js there is migration for the Database Tables
-
-           - Run Role migration.    
-
-          
-         > [!IMPORTANT]      
-         > After Generating Migration For Role Or Any Other Table navigate to package.json and since this project runs on ES6 but sequelize migrations are run on ES5 we need to change this line: **"type": "module"** to **"type": "commonjs"** then after pushing migration revert back.
-
-         . Push Migration After Generating Migration
-
-            npx sequelize-cli db:migrate
-
-       #### Configure Database
-
-         Add this tables into Postgres Database:
-
-         - Change Password of Postgres
-
-             sudo -i -u postgres
-
-             /password
-
-         INSERT INTO "roles" ("id", "roleName", "active", "createdAt", "updatedAt") 
-       VALUES 
-          (1, 'USER', true, NOW(), NOW()),
-           (2, 'AGENT', true, NOW(), NOW()),
-          (3, 'LANDLORD', true, NOW(), NOW()),
-          (4, 'SALES', true, NOW(), NOW()),
-          (5, 'ADMIN', true, NOW(), NOW()),
-          (6, 'SUPERADMIN', true, NOW(), NOW());
-
-           
-
-
-
-
+The list routes accept `?apartment_id=` or `?property_id=` to return only one listing's records.

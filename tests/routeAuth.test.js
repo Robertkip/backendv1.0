@@ -13,43 +13,37 @@ const PUBLIC_ROUTES = [
   "POST /api/v1/verify",
   "POST /api/v1/verify-agent-login",
   "POST /api/v1/forgotpassword",
+  "POST /api/v1/resetpassword",
   "GET /api/v1/google",
   "GET /api/v1/google/callback",
   "GET /api/v1/facebook",
   "GET /api/v1/facebook/callback",
   "GET /api/v1/role",
-  "GET /api/v1/role:/id",
+  "GET /api/v1/role/:id",
   "GET /api/v1/apartments",
   "GET /api/v1/rentals",
   "GET /api/v1/allapartment",
-  "GET /api/v1/allapartment/",
   "GET /api/v1/apartment/:id",
   "GET /api/v1/apartmentaccount/:logent_id",
   "GET /api/v1/single-apartment",
   "GET /api/v1/search-apartment",
   "GET /api/v1/allmarket",
   "GET /api/v1/marketproducts/:sellerId",
-  "GET /api/v1/allproperties",
-  "GET /api/v1/properties/:id",
-  "GET /api/v1/allfacilities",
-  "GET /api/v1/facilities/:id",
-  "GET /api/v1/alllocations",
-  "GET /api/v1/locations",
-  "GET /api/v1/locations/search",
-  "GET /api/v1/location/:id",
+  "GET /api/v1/apartment-properties/",
+  "GET /api/v1/apartment-properties/:id",
+  "GET /api/v1/apartment-facilities/",
+  "GET /api/v1/apartment-facilities/:id",
+  "GET /api/v1/property-facilities/",
+  "GET /api/v1/property-facilities/:id",
+  "GET /api/v1/property-properties/",
+  "GET /api/v1/property-properties/:id",
+  "GET /api/v1/property-locations/",
+  "GET /api/v1/property-locations/:id",
   "GET /api/v1/location/alllocations",
   "GET /api/v1/location/locations",
   "GET /api/v1/location/locations/search",
   "GET /api/v1/location/locations/name/:name",
   "GET /api/v1/location/locations/:id",
-];
-
-// Public routes whose handlers currently crash or never respond; see
-// DEVELOPMENT_CHECKLIST.md Phase 2. Remove them from here once fixed.
-const BROKEN_ROUTES = [
-  "GET /api/v1/search-apartment",
-  "GET /api/v1/marketproducts/:sellerId",
-  "POST /api/v1/forgotpassword",
 ];
 
 // The response the Authenticated middleware sends when no token is given,
@@ -95,7 +89,7 @@ describe("route access", () => {
       await sequelize.close();
     });
 
-    it.each(PUBLIC_ROUTES.filter((key) => !BROKEN_ROUTES.includes(key)))("%s works without a token", async (key) => {
+    it.each(PUBLIC_ROUTES)("%s works without a token", async (key) => {
       const [method, path] = key.split(" ");
       const url = path.replace(/:(\w+)/g, "1");
 

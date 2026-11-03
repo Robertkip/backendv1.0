@@ -1,14 +1,18 @@
 import FriendRequest from "../models/friendRequestModel.js";
+import { logger, logRequestError } from "../config/logger.js";
 export const postFriendRequest = async (req, res) => {
   try {
-    const { senderId, receiverId } = req.body;
+    const receiverId = Number(req.body.receiverId);
+    if (!Number.isInteger(receiverId)) {
+      return res.status(400).json({ error: "receiverId is required" });
+    }
 
-    // Create a new friend request
-    const friendRequest = await FriendRequest.create({ senderId, receiverId });
+    // Requests are always sent by the logged-in user.
+    const friendRequest = await FriendRequest.create({ senderId: req.user.id, receiverId });
 
     res.json(friendRequest);
   } catch (error) {
-    console.error(error);
+    logRequestError(req, error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
@@ -25,7 +29,7 @@ export const approveFriendRequest = async () => {
 
     res.json(friendRequest);
   } catch (error) {
-    console.error(error);
+    logger.error({ err: error });
     res.status(500).json({ error: "Internal server error" });
   }
 };

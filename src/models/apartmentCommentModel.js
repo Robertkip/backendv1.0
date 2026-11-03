@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../config/connectDb.js";
 import Apartment from "./apartmentModel.js";
-import UserProfile from "./userProfileModel.js";
+import User from "./authModel.js";
 
 const ApartmentComment = sequelize.define(
   "apartment_comments",
@@ -17,11 +17,12 @@ const ApartmentComment = sequelize.define(
       allowNull: false,
     },
 
+    // The commenter's users.id (what the controllers store).
     user_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: "userprofiles",
+        model: "users",
         key: "id",
       },
     },
@@ -52,7 +53,7 @@ ApartmentComment.belongsTo(Apartment, {
   as: "apartment",
 });
 
-ApartmentComment.belongsTo(UserProfile, {
+ApartmentComment.belongsTo(User, {
   foreignKey: "user_id",
   as: "user",
 });
